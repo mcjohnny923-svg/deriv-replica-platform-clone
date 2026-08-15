@@ -1,21 +1,34 @@
-
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { loginUser, saveAuth } from '@/lib/auth-api';
 
 const Login = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt:', { email, password, rememberMe });
+    setError(null);
+    setLoading(true);
+    try {
+      const data = await loginUser({ email, password });
+      saveAuth(data);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -36,6 +49,11 @@ const Login = () => {
         {/* Login Form */}
         <div className="bg-gray-800 p-8 rounded-lg border border-gray-700">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="bg-red-500/10 border border-red-500 text-red-400 text-sm rounded-md p-3">
+                {error}
+              </div>
+            )}
             <div>
               <Label htmlFor="email" className="text-gray-300">Email address</Label>
               <Input
@@ -89,9 +107,10 @@ const Login = () => {
 
             <Button
               type="submit"
-              className="w-full bg-red-600 hover:bg-red-700 text-white py-2"
+              disabled={loading}
+              className="w-full bg-red-600 hover:bg-red-700 text-white py-2 disabled:opacity-50"
             >
-              Sign In
+              {loading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
 

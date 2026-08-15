@@ -1,14 +1,15 @@
-
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Eye, EyeOff, Check } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { registerUser, saveAuth } from '@/lib/auth-api';
 
 const Register = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -22,10 +23,34 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Registration attempt:', formData);
+    setError(null);
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+      const data = await registerUser({
+        email: formData.email,
+        password: formData.password,
+        fullName: fullName || undefined,
+        accountType: formData.accountType as 'demo' | 'real',
+      });
+      saveAuth(data);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -49,6 +74,11 @@ const Register = () => {
 
         <div className="bg-gray-800 p-8 rounded-lg border border-gray-700">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="bg-red-500/10 border border-red-500 text-red-400 text-sm rounded-md p-3">
+                {error}
+              </div>
+            )}
             {/* Account Type */}
             <div>
               <Label className="text-gray-300">Account Type</Label>
@@ -211,10 +241,10 @@ const Register = () => {
 
             <Button
               type="submit"
-              disabled={!agreedToTerms}
+              disabled={!agreedToTerms || loading}
               className="w-full bg-red-600 hover:bg-red-700 text-white py-2 disabled:opacity-50"
             >
-              Create Account
+              {loading ? 'Creating account...' : 'Create Account'}
             </Button>
           </form>
 
