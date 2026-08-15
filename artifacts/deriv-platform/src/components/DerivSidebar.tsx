@@ -1,12 +1,13 @@
-
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  BarChart3, 
-  FileText, 
-  Briefcase, 
-  CreditCard, 
+import {
+  BarChart3,
+  FileText,
+  Briefcase,
+  CreditCard,
+  User,
+  Settings,
   Menu,
-  X
+  X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -19,10 +20,15 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
   const location = useLocation();
 
   const menuItems = [
-    { icon: BarChart3, label: 'Trade', path: '/dashboard', active: true },
+    { icon: BarChart3, label: 'Trade', path: '/dashboard' },
     { icon: FileText, label: 'Reports', path: '/reports' },
     { icon: Briefcase, label: 'Portfolio', path: '/portfolio' },
     { icon: CreditCard, label: 'Cashier', path: '/cashier' },
+  ];
+
+  const accountItems = [
+    { icon: User, label: 'Profile', path: '/profile' },
+    { icon: Settings, label: 'Settings', path: '/settings' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -33,7 +39,7 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={onToggle} />
       )}
-      
+
       {/* Sidebar */}
       <div className={`
         fixed md:relative top-0 left-0 h-full bg-[#151717] border-r border-[#323738] z-50 transition-transform duration-300
@@ -56,6 +62,26 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
         <nav className="p-4">
           <ul className="space-y-2">
             {menuItems.map((item) => (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  className={`flex items-center space-x-3 px-3 py-3 rounded-lg transition-colors group ${
+                    isActive(item.path)
+                      ? 'bg-red-500 text-white'
+                      : 'text-gray-300 hover:bg-[#323738] hover:text-white'
+                  }`}
+                >
+                  <item.icon className="h-5 w-5 flex-shrink-0" />
+                  {isOpen && <span className="font-medium">{item.label}</span>}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          <div className="my-4 border-t border-[#323738]" />
+
+          <ul className="space-y-2">
+            {accountItems.map((item) => (
               <li key={item.path}>
                 <Link
                   to={item.path}
