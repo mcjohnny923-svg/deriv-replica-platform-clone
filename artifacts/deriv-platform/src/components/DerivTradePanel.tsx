@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -6,11 +6,13 @@ import { TrendingUp, TrendingDown } from 'lucide-react';
 
 interface DerivTradePanelProps {
   selectedAsset: string;
+  onTradeTypeChange?: (tradeType: string) => void;
+  onDigitChange?: (digit: number | null) => void;
 }
 
 const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-const DerivTradePanel = ({ selectedAsset }: DerivTradePanelProps) => {
+const DerivTradePanel = ({ selectedAsset, onTradeTypeChange, onDigitChange }: DerivTradePanelProps) => {
   const [tradeType, setTradeType] = useState('rise_fall');
   const [stake, setStake] = useState('10');
   const [duration, setDuration] = useState('5');
@@ -29,6 +31,14 @@ const DerivTradePanel = ({ selectedAsset }: DerivTradePanelProps) => {
 
   const isDigitContract = ['matches_differs', 'even_odd', 'over_under'].includes(tradeType);
   const needsDigitSelector = ['matches_differs', 'over_under'].includes(tradeType);
+
+  useEffect(() => {
+    onTradeTypeChange?.(tradeType);
+  }, [tradeType, onTradeTypeChange]);
+
+  useEffect(() => {
+    onDigitChange?.(needsDigitSelector ? selectedDigit : null);
+  }, [selectedDigit, needsDigitSelector, onDigitChange]);
 
   const calculatePayout = () => {
     const stakeAmount = parseFloat(stake) || 0;
