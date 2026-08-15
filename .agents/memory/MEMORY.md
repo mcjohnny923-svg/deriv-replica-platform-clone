@@ -1,0 +1,1 @@
+- [Imported dependency compatibility](imported-dependency-compatibility.md) — preserve source dependency versions when scaffold upgrades change component APIs.

@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Deriv Trading Platform"
+description = "A Deriv-inspired online trading platform clone featuring real-time charting, trade execution panels, market selection, portfolio tracking, user authentication flows, and account management. Built for traders who want a familiar, professional-grade web trading interface."
+version = "1.0.0"
+id = "artifacts/deriv-platform"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18090
+
+[services.development]
+run = "pnpm --filter @workspace/deriv-platform run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/deriv-platform", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/deriv-platform/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18090"
+BASE_PATH = "/"
