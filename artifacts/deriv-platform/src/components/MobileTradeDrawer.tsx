@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronLeft, ChevronRight, TrendingUp, TrendingDown } from 'lucide-react';
+import { ChevronDown, TrendingUp, TrendingDown } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   TRADE_TYPES,
   DIGITS,
@@ -18,6 +20,8 @@ interface MobileTradeDrawerProps {
   onStakeChange: (stake: string) => void;
   duration: string;
   onDurationChange: (duration: string) => void;
+  durationType: string;
+  onDurationTypeChange: (type: string) => void;
 }
 
 const MobileTradeDrawer = ({
@@ -29,21 +33,18 @@ const MobileTradeDrawer = ({
   onStakeChange,
   duration,
   onDurationChange,
+  durationType,
+  onDurationTypeChange,
 }: MobileTradeDrawerProps) => {
   const [expanded, setExpanded] = useState(true);
   const [equalsChecked, setEqualsChecked] = useState(false);
 
-  const currentIndex = TRADE_TYPES.findIndex((t) => t.value === tradeType);
-  const currentLabel = TRADE_TYPES[currentIndex]?.label ?? 'Rise/Fall';
+  const currentLabel = TRADE_TYPES.find((t) => t.value === tradeType)?.label ?? 'Rise/Fall';
   const digitContract = isDigitContract(tradeType);
   const digitSelector = needsDigitSelector(tradeType);
   const payout = calculatePayout(tradeType, stake);
 
-  const cycleTradeType = (direction: 1 | -1) => {
-    const nextIndex =
-      (currentIndex + direction + TRADE_TYPES.length) % TRADE_TYPES.length;
-    onTradeTypeChange(TRADE_TYPES[nextIndex].value);
-  };
+  const durationUnitLabel = { t: 'Ticks', s: 'Seconds', m: 'Minutes' }[durationType] ?? 'Ticks';
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-30 bg-[#151717] border-t border-[#323738] md:hidden">
@@ -60,18 +61,23 @@ const MobileTradeDrawer = ({
 
       {expanded && (
         <div className="pb-4">
-          {/* Trade type switcher */}
-          <div className="flex items-center justify-between px-4 py-3 border-t border-[#323738]">
-            <button type="button" onClick={() => cycleTradeType(-1)}>
-              <ChevronLeft className="h-5 w-5 text-gray-400" />
-            </button>
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="h-4 w-4 text-red-500" />
-              <span className="text-white font-semibold text-base">{currentLabel}</span>
-            </div>
-            <button type="button" onClick={() => cycleTradeType(1)}>
-              <ChevronRight className="h-5 w-5 text-gray-400" />
-            </button>
+          {/* Trade type dropdown */}
+          <div className="px-4 py-3 border-t border-[#323738]">
+            <Select value={tradeType} onValueChange={onTradeTypeChange}>
+              <SelectTrigger className="w-full bg-transparent border-none text-white text-base font-semibold justify-center gap-2 [&>svg]:hidden">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-red-500" />
+                  <SelectValue>{currentLabel}</SelectValue>
+                </div>
+              </SelectTrigger>
+              <SelectContent className="bg-[#323738] border-[#414647]">
+                {TRADE_TYPES.map((type) => (
+                  <SelectItem key={type.value} value={type.value} className="text-white hover:bg-[#414647]">
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Digit picker row, only for Matches/Differs and Over/Under */}
@@ -94,16 +100,46 @@ const MobileTradeDrawer = ({
             </div>
           )}
 
-          {/* Duration / stake row */}
-          <div className="flex items-center justify-between px-4 py-3 border-t border-[#323738]">
-            <div className="text-white text-sm">
-              {duration} {digitContract ? 'tick' : 'min'}
+          {/* Duration / stake row, both editable */}
+          <div className="flex items-center gap-3 px-4 py-3 border-t border-[#323738]">
+            <div className="flex-1">
+              <label className="block text-[11px] text-gray-400 mb-1">Duration</label>
+              <div className="flex gap-1">
+                <Input
+                  type="number"
+                  value={duration}
+                  onChange={(e) => onDurationChange(e.target.value)}
+                  min="1"
+                  className="bg-[#0e0e0e] border-[#323738] text-white h-9 text-sm"
+                />
+                <Select value={durationType} onValueChange={onDurationTypeChange}>
+                  <SelectTrigger className="w-24 bg-[#0e0e0e] border-[#323738] text-white h-9 text-sm">
+                    <SelectValue>{durationUnitLabel}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#323738] border-[#414647]">
+                    <SelectItem value="t" className="text-white hover:bg-[#414647]">Ticks</SelectItem>
+                    <SelectItem value="s" className="text-white hover:bg-[#414647]">Seconds</SelectItem>
+                    <SelectItem value="m" className="text-white hover:bg-[#414647]">Minutes</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div className="flex items-center space-x-1">
-              <span className="text-white font-semibold">{stake}</span>
-              <span className="text-white font-semibold">USD</span>
+            <div className="flex-1">
+              <label className="block text-[11px] text-gray-400 mb-1 text-right">Stake</label>
+              <div className="relative">
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
+                  USD
+                </span>
+                <Input
+                  type="number"
+                  value={stake}
+                  onChange={(e) => onStakeChange(e.target.value)}
+                  min="1"
+                  step="0.01"
+                  className="bg-[#0e0e0e] border-[#323738] text-white h-9 text-sm pl-10"
+                />
+              </div>
             </div>
-            <span className="text-gray-400 text-sm">Stake</span>
           </div>
 
           {/* Equals checkbox, only for non-digit contracts */}

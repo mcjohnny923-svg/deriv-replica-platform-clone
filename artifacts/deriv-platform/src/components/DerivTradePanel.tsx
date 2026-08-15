@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -21,6 +20,8 @@ interface DerivTradePanelProps {
   onStakeChange: (stake: string) => void;
   duration: string;
   onDurationChange: (duration: string) => void;
+  durationType: string;
+  onDurationTypeChange: (type: string) => void;
 }
 
 const DerivTradePanel = ({
@@ -33,9 +34,9 @@ const DerivTradePanel = ({
   onStakeChange,
   duration,
   onDurationChange,
+  durationType,
+  onDurationTypeChange,
 }: DerivTradePanelProps) => {
-  const [durationType, setDurationType] = useState('t');
-
   const digitContract = isDigitContract(tradeType);
   const digitSelector = needsDigitSelector(tradeType);
   const payout = calculatePayout(tradeType, stake);
@@ -148,7 +149,7 @@ const DerivTradePanel = ({
               className="bg-[#323738] border-[#414647] text-white flex-1"
               min="1"
             />
-            <Select value={durationType} onValueChange={setDurationType}>
+            <Select value={durationType} onValueChange={onDurationTypeChange}>
               <SelectTrigger className="w-24 bg-[#323738] border-[#414647] text-white">
                 <SelectValue />
               </SelectTrigger>

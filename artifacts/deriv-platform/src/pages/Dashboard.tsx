@@ -14,7 +14,8 @@ const Dashboard = () => {
   const [tradeType, setTradeType] = useState('rise_fall');
   const [selectedDigit, setSelectedDigit] = useState(5);
   const [stake, setStake] = useState('10');
-  const [duration, setDuration] = useState('5');
+  const [duration, setDuration] = useState('1');
+  const [durationType, setDurationType] = useState('t');
 
   const showDigitStats = isDigitContract(tradeType);
 
@@ -30,8 +31,11 @@ const Dashboard = () => {
           <div className="flex-1 flex">
             {/* Chart and controls area */}
             <div className="flex-1 flex flex-col pb-64 md:pb-0">
-              <DerivChart selectedAsset={selectedAsset} onAssetChange={setSelectedAsset} />
-              {showDigitStats && <DigitStatsDisplay selectedDigit={selectedDigit} />}
+              {showDigitStats ? (
+                <DigitStatsDisplay selectedDigit={selectedDigit} />
+              ) : (
+                <DerivChart selectedAsset={selectedAsset} onAssetChange={setSelectedAsset} />
+              )}
               <DerivBottomPanel />
             </div>
 
@@ -47,6 +51,8 @@ const Dashboard = () => {
                 onStakeChange={setStake}
                 duration={duration}
                 onDurationChange={setDuration}
+                durationType={durationType}
+                onDurationTypeChange={setDurationType}
               />
             </div>
           </div>
@@ -63,6 +69,8 @@ const Dashboard = () => {
         onStakeChange={setStake}
         duration={duration}
         onDurationChange={setDuration}
+        durationType={durationType}
+        onDurationTypeChange={setDurationType}
       />
     </div>
   );
