@@ -21,7 +21,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#0e0e0e] text-white flex flex-col">
-      <DerivHeader />
+      <DerivHeader onMenuClick={() => setIsSidebarOpen(true)} />
 
       <div className="flex flex-1 overflow-hidden">
         <DerivSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
