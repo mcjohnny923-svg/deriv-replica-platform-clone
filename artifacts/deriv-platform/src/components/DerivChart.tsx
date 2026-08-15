@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { ChevronDown, TrendingUp, TrendingDown } from 'lucide-react';
@@ -14,19 +13,45 @@ interface DerivChartProps {
   onAssetChange: (asset: string) => void;
 }
 
+interface AssetGroup {
+  label: string;
+  assets: string[];
+}
+
 const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [currentPrice, setCurrentPrice] = useState(12547.89);
   const [priceChange, setPriceChange] = useState(+12.34);
   const [isAssetDropdownOpen, setIsAssetDropdownOpen] = useState(false);
 
-  const assets = [
-    'Volatility 75 Index',
-    'Volatility 100 Index',
-    'EUR/USD',
-    'GBP/USD',
-    'USD/JPY',
-    'AUD/USD',
+  const assetGroups: AssetGroup[] = [
+    {
+      label: 'Continuous Indices',
+      assets: [
+        'Volatility 10 Index',
+        'Volatility 25 Index',
+        'Volatility 50 Index',
+        'Volatility 75 Index',
+        'Volatility 100 Index',
+      ],
+    },
+    {
+      label: '1s Indices',
+      assets: [
+        'Volatility 10 (1s) Index',
+        'Volatility 15 (1s) Index',
+        'Volatility 25 (1s) Index',
+        'Volatility 30 (1s) Index',
+        'Volatility 50 (1s) Index',
+        'Volatility 75 (1s) Index',
+        'Volatility 90 (1s) Index',
+        'Volatility 100 (1s) Index',
+      ],
+    },
+    {
+      label: 'Forex',
+      assets: ['EUR/USD', 'GBP/USD', 'USD/JPY', 'AUD/USD'],
+    },
   ];
 
   const timeframes = ['1T', '5T', '15T', '30T', '1H', '4H', '1D'];
@@ -83,18 +108,30 @@ const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
             </button>
             
             {isAssetDropdownOpen && (
-              <div className="absolute top-full left-0 mt-1 w-64 bg-[#323738] border border-[#414647] rounded-lg shadow-lg z-50">
-                {assets.map((asset) => (
-                  <button
-                    key={asset}
-                    onClick={() => {
-                      onAssetChange(asset);
-                      setIsAssetDropdownOpen(false);
-                    }}
-                    className="block w-full text-left px-4 py-3 hover:bg-[#414647] text-white transition-colors"
-                  >
-                    {asset}
-                  </button>
+              <div className="absolute top-full left-0 mt-1 w-72 max-h-96 overflow-y-auto bg-[#323738] border border-[#414647] rounded-lg shadow-lg z-50">
+                {assetGroups.map((group) => (
+                  <div key={group.label}>
+                    <div className="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-400 sticky top-0 bg-[#323738]">
+                      {group.label}
+                    </div>
+                    {group.assets.map((asset) => (
+                      <button
+                        key={asset}
+                        onClick={() => {
+                          onAssetChange(asset);
+                          setIsAssetDropdownOpen(false);
+                        }}
+                        className={`flex items-center justify-between w-full text-left px-4 py-2.5 hover:bg-[#414647] text-white transition-colors ${
+                          asset === selectedAsset ? 'bg-[#414647]/60' : ''
+                        }`}
+                      >
+                        <span>{asset}</span>
+                        {asset === selectedAsset && (
+                          <span className="text-red-500 text-sm">✓</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 ))}
               </div>
             )}
