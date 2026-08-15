@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import { useState, useEffect, useRef } from 'react';
 import { ChevronDown, TrendingUp, TrendingDown } from 'lucide-react';
-
-interface ChartData {
-  time: string;
-  price: number;
-}
+import {
+  createChart,
+  ColorType,
+  CrosshairMode,
+  type IChartApi,
+  type ISeriesApi,
+  type UTCTimestamp,
+} from 'lightweight-charts';
 
 interface DerivChartProps {
   selectedAsset: string;
@@ -19,13 +21,31 @@ interface AssetGroup {
 
 const TIMEFRAMES = ['1T', '5T', '15T', '30T', '1H', '4H', '1D'];
 
+const TIMEFRAME_SECONDS: Record<string, number> = {
+  '1T': 1,
+  '5T': 5,
+  '15T': 15,
+  '30T': 30,
+  '1H': 3600,
+  '4H': 14400,
+  '1D': 86400,
+};
+
 const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
-  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<IChartApi | null>(null);
+  const areaSeriesRef = useRef<ISeriesApi<'Area'> | null>(null);
+  const candleSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
+  const lastCandleRef = useRef<{ time: number; open: number; high: number; low: number; close: number } | null>(null);
+  const priceRef = useRef(12547.89);
+
   const [currentPrice, setCurrentPrice] = useState(12547.89);
   const [priceChange, setPriceChange] = useState(+12.34);
   const [isAssetDropdownOpen, setIsAssetDropdownOpen] = useState(false);
   const [isTimeframeDropdownOpen, setIsTimeframeDropdownOpen] = useState(false);
   const [selectedTimeframe, setSelectedTimeframe] = useState('1T');
+
+  const isTickMode = selectedTimeframe === '1T';
 
   const assetGroups: AssetGroup[] = [
     {
@@ -57,42 +77,172 @@ const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
     },
   ];
 
+  // Create chart once
   useEffect(() => {
-    const generateData = () => {
-      const data: ChartData[] = [];
-      let basePrice = currentPrice;
+    if (!chartContainerRef.current) return;
 
-      for (let i = 0; i < 200; i++) {
-        basePrice += (Math.random() - 0.5) * 50;
-        data.push({
-          time: new Date(Date.now() - (200 - i) * 60000).toLocaleTimeString('en-US', {
-            hour12: false,
-            hour: '2-digit',
-            minute: '2-digit',
-          }),
-          price: Math.max(0, basePrice),
-        });
-      }
+    const chart = createChart(chartContainerRef.current, {
+      layout: {
+        background: { type: ColorType.Solid, color: '#151717' },
+        textColor: '#9ca3af',
+      },
+      grid: {
+        vertLines: { color: '#232728' },
+        horzLines: { color: '#232728' },
+      },
+      rightPriceScale: {
+        borderColor: '#323738',
+      },
+      timeScale: {
+        borderColor: '#323738',
+        timeVisible: true,
+        secondsVisible: true,
+      },
+      crosshair: {
+        mode: CrosshairMode.Normal,
+      },
+      handleScroll: {
+        mouseWheel: true,
+        pressedMouseMove: true,
+        horzTouchDrag: true,
+        vertTouchDrag: true,
+      },
+      handleScale: {
+        axisPressedMouseMove: true,
+        mouseWheel: true,
+        pinch: true,
+      },
+      width: chartContainerRef.current.clientWidth,
+      height: chartContainerRef.current.clientHeight,
+    });
 
-      return data;
+    chartRef.current = chart;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      const { width, height } = entries[0].contentRect;
+      chart.applyOptions({ width, height });
+    });
+    resizeObserver.observe(chartContainerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+      chart.remove();
+      chartRef.current = null;
+      areaSeriesRef.current = null;
+      candleSeriesRef.current = null;
     };
+  }, []);
 
-    setChartData(generateData());
+  // Switch series type + seed initial data when timeframe or asset changes
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
 
-    const interval = setInterval(() => {
-      setCurrentPrice((prev) => {
-        const change = (Math.random() - 0.5) * 20;
-        const newPrice = Math.max(0, prev + change);
-        setPriceChange(change);
-        return newPrice;
+    if (areaSeriesRef.current) {
+      chart.removeSeries(areaSeriesRef.current);
+      areaSeriesRef.current = null;
+    }
+    if (candleSeriesRef.current) {
+      chart.removeSeries(candleSeriesRef.current);
+      candleSeriesRef.current = null;
+    }
+
+    const now = Math.floor(Date.now() / 1000);
+    let basePrice = priceRef.current;
+
+    if (isTickMode) {
+      const series = chart.addAreaSeries({
+        lineColor: '#ffffff',
+        topColor: 'rgba(255,255,255,0.25)',
+        bottomColor: 'rgba(255,255,255,0.0)',
+        lineWidth: 2,
+        priceLineVisible: true,
+        lastValueVisible: true,
       });
-    }, 3000);
+
+      const seed = Array.from({ length: 100 }, (_, i) => {
+        basePrice += (Math.random() - 0.5) * 3;
+        return { time: (now - (100 - i)) as UTCTimestamp, value: basePrice };
+      });
+      series.setData(seed);
+      areaSeriesRef.current = series;
+      priceRef.current = basePrice;
+    } else {
+      const series = chart.addCandlestickSeries({
+        upColor: '#00d68f',
+        downColor: '#ff444f',
+        borderVisible: false,
+        wickUpColor: '#00d68f',
+        wickDownColor: '#ff444f',
+      });
+
+      const intervalSec = TIMEFRAME_SECONDS[selectedTimeframe];
+      const seed: { time: number; open: number; high: number; low: number; close: number }[] = [];
+      let t = now - intervalSec * 100;
+      for (let i = 0; i < 100; i++) {
+        const open = basePrice;
+        const close = open + (Math.random() - 0.5) * 40;
+        const high = Math.max(open, close) + Math.random() * 15;
+        const low = Math.min(open, close) - Math.random() * 15;
+        seed.push({ time: t, open, high, low, close });
+        basePrice = close;
+        t += intervalSec;
+      }
+      series.setData(seed as never);
+      candleSeriesRef.current = series;
+      priceRef.current = basePrice;
+      lastCandleRef.current = seed[seed.length - 1];
+    }
+
+    chart.timeScale().fitContent();
+  }, [isTickMode, selectedTimeframe, selectedAsset]);
+
+  // Live updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const change = (Math.random() - 0.5) * (isTickMode ? 3 : 8);
+      const newPrice = Math.max(0, priceRef.current + change);
+      priceRef.current = newPrice;
+      setCurrentPrice(newPrice);
+      setPriceChange(change);
+
+      const now = Math.floor(Date.now() / 1000);
+
+      if (isTickMode && areaSeriesRef.current) {
+        areaSeriesRef.current.update({ time: now as UTCTimestamp, value: newPrice });
+      } else if (!isTickMode && candleSeriesRef.current && lastCandleRef.current) {
+        const intervalSec = TIMEFRAME_SECONDS[selectedTimeframe];
+        const last = lastCandleRef.current;
+        const bucketTime = Math.floor(now / intervalSec) * intervalSec;
+
+        if (bucketTime === last.time) {
+          const updated = {
+            ...last,
+            high: Math.max(last.high, newPrice),
+            low: Math.min(last.low, newPrice),
+            close: newPrice,
+          };
+          lastCandleRef.current = updated;
+          candleSeriesRef.current.update(updated as never);
+        } else {
+          const fresh = {
+            time: bucketTime,
+            open: last.close,
+            high: newPrice,
+            low: newPrice,
+            close: newPrice,
+          };
+          lastCandleRef.current = fresh;
+          candleSeriesRef.current.update(fresh as never);
+        }
+      }
+    }, 1000);
 
     return () => clearInterval(interval);
-  }, [selectedAsset]);
+  }, [isTickMode, selectedTimeframe]);
 
   return (
-    <div className="flex-1 bg-[#0e0e0e] p-3 sm:p-4">
+    <div className="flex-1 bg-[#0e0e0e] p-3 sm:p-4 flex flex-col">
       {/* Asset selector and price info */}
       <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
         <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
@@ -184,32 +334,9 @@ const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
         </div>
       </div>
 
-      {/* Chart */}
-      <div className="h-80 sm:h-96 bg-[#151717] rounded-lg p-4">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData}>
-            <XAxis
-              dataKey="time"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: '#6B7280', fontSize: 12 }}
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: '#6B7280', fontSize: 12 }}
-              domain={['dataMin - 50', 'dataMax + 50']}
-            />
-            <Line
-              type="monotone"
-              dataKey="price"
-              stroke="#EF4444"
-              strokeWidth={2}
-              dot={false}
-              activeDot={{ r: 4, fill: '#EF4444' }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+      {/* Chart, zoom/pan scoped to this element only via lightweight-charts */}
+      <div className="flex-1 min-h-[320px] bg-[#151717] rounded-lg overflow-hidden">
+        <div ref={chartContainerRef} className="w-full h-full" />
       </div>
     </div>
   );
