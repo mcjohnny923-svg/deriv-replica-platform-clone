@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,22 +8,40 @@ interface DerivTradePanelProps {
   selectedAsset: string;
 }
 
+const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
 const DerivTradePanel = ({ selectedAsset }: DerivTradePanelProps) => {
   const [tradeType, setTradeType] = useState('rise_fall');
   const [stake, setStake] = useState('10');
   const [duration, setDuration] = useState('5');
   const [durationType, setDurationType] = useState('t');
+  const [selectedDigit, setSelectedDigit] = useState(5);
 
   const tradeTypes = [
     { value: 'rise_fall', label: 'Rise/Fall' },
     { value: 'higher_lower', label: 'Higher/Lower' },
     { value: 'touch_notouch', label: 'Touch/No Touch' },
     { value: 'in_out', label: 'In/Out' },
+    { value: 'matches_differs', label: 'Matches/Differs' },
+    { value: 'even_odd', label: 'Even/Odd' },
+    { value: 'over_under', label: 'Over/Under' },
   ];
+
+  const isDigitContract = ['matches_differs', 'even_odd', 'over_under'].includes(tradeType);
+  const needsDigitSelector = ['matches_differs', 'over_under'].includes(tradeType);
 
   const calculatePayout = () => {
     const stakeAmount = parseFloat(stake) || 0;
-    const multiplier = tradeType === 'rise_fall' ? 1.85 : 1.75;
+    const payoutMultipliers: Record<string, number> = {
+      rise_fall: 1.85,
+      higher_lower: 1.75,
+      touch_notouch: 1.75,
+      in_out: 1.75,
+      matches_differs: 9.5,
+      even_odd: 1.95,
+      over_under: 1.9,
+    };
+    const multiplier = payoutMultipliers[tradeType] ?? 1.75;
     return (stakeAmount * multiplier).toFixed(2);
   };
 
@@ -64,6 +81,31 @@ const DerivTradePanel = ({ selectedAsset }: DerivTradePanelProps) => {
             <div className="text-white font-medium text-sm">{selectedAsset}</div>
           </div>
         </div>
+
+        {/* Digit selector, only for Matches/Differs and Over/Under */}
+        {needsDigitSelector && (
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              {tradeType === 'matches_differs' ? 'Digit to match' : 'Digit barrier'}
+            </label>
+            <div className="grid grid-cols-5 gap-2">
+              {DIGITS.map((digit) => (
+                <button
+                  key={digit}
+                  type="button"
+                  onClick={() => setSelectedDigit(digit)}
+                  className={`py-2 rounded text-sm font-medium border transition-colors ${
+                    selectedDigit === digit
+                      ? 'bg-red-600 border-red-500 text-white'
+                      : 'bg-[#323738] border-[#414647] text-gray-300 hover:bg-[#414647]'
+                  }`}
+                >
+                  {digit}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Stake */}
         <div>
@@ -140,21 +182,58 @@ const DerivTradePanel = ({ selectedAsset }: DerivTradePanelProps) => {
 
         {/* Purchase buttons */}
         <div className="space-y-3">
-          <Button className="w-full bg-green-500 hover:bg-green-600 text-white py-4 font-medium text-base">
-            <div className="flex items-center justify-center space-x-2">
-              <TrendingUp className="h-5 w-5" />
-              <span>Rise</span>
-            </div>
-            <div className="text-xs opacity-90 ml-2">12,559.23</div>
-          </Button>
-          
-          <Button className="w-full bg-red-500 hover:bg-red-600 text-white py-4 font-medium text-base">
-            <div className="flex items-center justify-center space-x-2">
-              <TrendingDown className="h-5 w-5" />
-              <span>Fall</span>
-            </div>
-            <div className="text-xs opacity-90 ml-2">12,536.55</div>
-          </Button>
+          {tradeType === 'matches_differs' && (
+            <>
+              <Button className="w-full bg-green-500 hover:bg-green-600 text-white py-4 font-medium text-base">
+                Matches
+              </Button>
+              <Button className="w-full bg-red-500 hover:bg-red-600 text-white py-4 font-medium text-base">
+                Differs
+              </Button>
+            </>
+          )}
+
+          {tradeType === 'even_odd' && (
+            <>
+              <Button className="w-full bg-green-500 hover:bg-green-600 text-white py-4 font-medium text-base">
+                Even
+              </Button>
+              <Button className="w-full bg-red-500 hover:bg-red-600 text-white py-4 font-medium text-base">
+                Odd
+              </Button>
+            </>
+          )}
+
+          {tradeType === 'over_under' && (
+            <>
+              <Button className="w-full bg-green-500 hover:bg-green-600 text-white py-4 font-medium text-base">
+                Over
+              </Button>
+              <Button className="w-full bg-red-500 hover:bg-red-600 text-white py-4 font-medium text-base">
+                Under
+              </Button>
+            </>
+          )}
+
+          {!isDigitContract && (
+            <>
+              <Button className="w-full bg-green-500 hover:bg-green-600 text-white py-4 font-medium text-base">
+                <div className="flex items-center justify-center space-x-2">
+                  <TrendingUp className="h-5 w-5" />
+                  <span>Rise</span>
+                </div>
+                <div className="text-xs opacity-90 ml-2">12,559.23</div>
+              </Button>
+
+              <Button className="w-full bg-red-500 hover:bg-red-600 text-white py-4 font-medium text-base">
+                <div className="flex items-center justify-center space-x-2">
+                  <TrendingDown className="h-5 w-5" />
+                  <span>Fall</span>
+                </div>
+                <div className="text-xs opacity-90 ml-2">12,536.55</div>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Risk warning */}
