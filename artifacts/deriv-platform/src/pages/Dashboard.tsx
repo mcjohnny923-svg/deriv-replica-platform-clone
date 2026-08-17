@@ -6,6 +6,7 @@ import DerivTradePanel from '@/components/DerivTradePanel';
 import DerivBottomPanel from '@/components/DerivBottomPanel';
 import DigitStatsDisplay from '@/components/DigitStatsDisplay';
 import MobileTradeDrawer from '@/components/MobileTradeDrawer';
+import AssetPriceBar from '@/components/AssetPriceBar';
 import { isDigitContract } from '@/lib/trade-config';
 
 const Dashboard = () => {
@@ -32,7 +33,10 @@ const Dashboard = () => {
             {/* Chart and controls area */}
             <div className="flex-1 flex flex-col pb-64 md:pb-0">
               {showDigitStats ? (
-                <DigitStatsDisplay selectedDigit={selectedDigit} />
+                <>
+                  <AssetPriceBar selectedAsset={selectedAsset} onAssetChange={setSelectedAsset} />
+                  <DigitStatsDisplay selectedDigit={selectedDigit} />
+                </>
               ) : (
                 <DerivChart selectedAsset={selectedAsset} onAssetChange={setSelectedAsset} />
               )}
