@@ -38,3 +38,25 @@ export function isDigitContract(tradeType: string): boolean {
 export function needsDigitSelector(tradeType: string): boolean {
   return ['matches_differs', 'over_under'].includes(tradeType);
 }
+
+// Maps a UI asset display name to a stable symbol/category for the backend
+export function assetToMarketInfo(assetName: string): { symbol: string; category: string } {
+  const symbol = assetName.replace(/\s+/g, '_').toUpperCase();
+  const category = assetName.includes('Volatility') ? 'synthetic' : 'forex';
+  return { symbol, category };
+}
+
+// Direction string sent to the backend for a given trade type + UI choice
+export function directionFor(tradeType: string, choice: string): string {
+  const map: Record<string, Record<string, string>> = {
+    rise_fall: { rise: 'rise', fall: 'fall' },
+    matches_differs: { matches: 'matches', differs: 'differs' },
+    even_odd: { even: 'even', odd: 'odd' },
+    over_under: { over: 'over', under: 'under' },
+  };
+  return map[tradeType]?.[choice] ?? choice;
+}
+
+export function durationUnitLabel(unit: string): string {
+  return { t: 'Ticks', s: 'Seconds', m: 'Minutes' }[unit] ?? 'Ticks';
+}

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { ChevronDown, TrendingUp, TrendingDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -9,9 +10,14 @@ import {
   calculatePayout,
   isDigitContract,
   needsDigitSelector,
+  assetToMarketInfo,
+  directionFor,
 } from '@/lib/trade-config';
+import { buyTrade } from '@/lib/trades-api';
+import { getStoredAccount, updateStoredAccountBalance } from '@/lib/auth-api';
 
 interface MobileTradeDrawerProps {
+  selectedAsset: string;
   tradeType: string;
   onTradeTypeChange: (value: string) => void;
   selectedDigit: number;
@@ -22,9 +28,11 @@ interface MobileTradeDrawerProps {
   onDurationChange: (duration: string) => void;
   durationType: string;
   onDurationTypeChange: (type: string) => void;
+  onTradePlaced?: (newBalance: string) => void;
 }
 
 const MobileTradeDrawer = ({
+  selectedAsset,
   tradeType,
   onTradeTypeChange,
   selectedDigit,
@@ -35,9 +43,11 @@ const MobileTradeDrawer = ({
   onDurationChange,
   durationType,
   onDurationTypeChange,
+  onTradePlaced,
 }: MobileTradeDrawerProps) => {
   const [expanded, setExpanded] = useState(true);
   const [equalsChecked, setEqualsChecked] = useState(false);
+  const [submittingChoice, setSubmittingChoice] = useState<string | null>(null);
 
   const currentLabel = TRADE_TYPES.find((t) => t.value === tradeType)?.label ?? 'Rise/Fall';
   const digitContract = isDigitContract(tradeType);
@@ -45,6 +55,52 @@ const MobileTradeDrawer = ({
   const payout = calculatePayout(tradeType, stake);
 
   const durationUnitLabel = { t: 'Ticks', s: 'Seconds', m: 'Minutes' }[durationType] ?? 'Ticks';
+
+  const placeTrade = async (choice: string) => {
+    const account = getStoredAccount();
+    if (!account) {
+      toast.error('Please log in to place a trade.');
+      return;
+    }
+    const stakeNum = parseFloat(stake);
+    if (!stakeNum || stakeNum <= 0) {
+      toast.error('Enter a valid stake amount.');
+      return;
+    }
+    const durationNum = parseFloat(duration);
+    if (!durationNum || durationNum <= 0) {
+      toast.error('Enter a valid duration.');
+      return;
+    }
+
+    setSubmittingChoice(choice);
+    try {
+      const { symbol, category } = assetToMarketInfo(selectedAsset);
+      const direction = directionFor(tradeType, choice);
+      const result = await buyTrade({
+        accountId: account.id,
+        marketSymbol: symbol,
+        marketDisplayName: selectedAsset,
+        marketCategory: category,
+        tradeType,
+        direction,
+        digit: digitSelector ? selectedDigit : undefined,
+        stake: stakeNum,
+        durationValue: durationNum,
+        durationUnit: durationType as 't' | 's' | 'm',
+      });
+
+      updateStoredAccountBalance(result.newBalance);
+      onTradePlaced?.(result.newBalance);
+      toast.success(`Trade placed: ${direction} on ${selectedAsset}`, {
+        description: `Stake USD ${stakeNum.toFixed(2)} — settles in ${duration} ${durationUnitLabel.toLowerCase()}`,
+      });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to place trade');
+    } finally {
+      setSubmittingChoice(null);
+    }
+  };
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-30 bg-[#151717] border-t border-[#323738] md:hidden">
@@ -164,39 +220,63 @@ const MobileTradeDrawer = ({
           <div className="grid grid-cols-2 gap-2 px-4 pt-2">
             {tradeType === 'matches_differs' && (
               <>
-                <button className="bg-teal-700/40 border border-teal-500 rounded-lg py-4 text-teal-300 font-semibold">
-                  Matches
+                <button
+                  onClick={() => placeTrade('matches')}
+                  disabled={submittingChoice !== null}
+                  className="bg-teal-700/40 border border-teal-500 rounded-lg py-4 text-teal-300 font-semibold disabled:opacity-50"
+                >
+                  {submittingChoice === 'matches' ? 'Placing...' : 'Matches'}
                   <div className="text-xs opacity-80">USD {payout}</div>
                 </button>
-                <button className="bg-red-900/40 border border-red-500 rounded-lg py-4 text-red-300 font-semibold">
-                  Differs
+                <button
+                  onClick={() => placeTrade('differs')}
+                  disabled={submittingChoice !== null}
+                  className="bg-red-900/40 border border-red-500 rounded-lg py-4 text-red-300 font-semibold disabled:opacity-50"
+                >
+                  {submittingChoice === 'differs' ? 'Placing...' : 'Differs'}
                   <div className="text-xs opacity-80">USD {payout}</div>
                 </button>
               </>
             )}
             {tradeType === 'even_odd' && (
               <>
-                <button className="bg-teal-700/40 border border-teal-500 rounded-lg py-4 text-teal-300 font-semibold">
-                  Even
+                <button
+                  onClick={() => placeTrade('even')}
+                  disabled={submittingChoice !== null}
+                  className="bg-teal-700/40 border border-teal-500 rounded-lg py-4 text-teal-300 font-semibold disabled:opacity-50"
+                >
+                  {submittingChoice === 'even' ? 'Placing...' : 'Even'}
                   <div className="text-xs opacity-80">USD {payout}</div>
                 </button>
-                <button className="bg-red-900/40 border border-red-500 rounded-lg py-4 text-red-300 font-semibold">
-                  Odd
+                <button
+                  onClick={() => placeTrade('odd')}
+                  disabled={submittingChoice !== null}
+                  className="bg-red-900/40 border border-red-500 rounded-lg py-4 text-red-300 font-semibold disabled:opacity-50"
+                >
+                  {submittingChoice === 'odd' ? 'Placing...' : 'Odd'}
                   <div className="text-xs opacity-80">USD {payout}</div>
                 </button>
               </>
             )}
             {tradeType === 'over_under' && (
               <>
-                <button className="bg-teal-700/40 border border-teal-500 rounded-lg py-4 text-teal-300 font-semibold">
+                <button
+                  onClick={() => placeTrade('over')}
+                  disabled={submittingChoice !== null}
+                  className="bg-teal-700/40 border border-teal-500 rounded-lg py-4 text-teal-300 font-semibold disabled:opacity-50"
+                >
                   <div className="flex items-center justify-center gap-1">
-                    <TrendingUp className="h-4 w-4" /> Over
+                    <TrendingUp className="h-4 w-4" /> {submittingChoice === 'over' ? 'Placing...' : 'Over'}
                   </div>
                   <div className="text-xs opacity-80">Payout {payout} USD</div>
                 </button>
-                <button className="bg-red-900/40 border border-red-500 rounded-lg py-4 text-red-300 font-semibold">
+                <button
+                  onClick={() => placeTrade('under')}
+                  disabled={submittingChoice !== null}
+                  className="bg-red-900/40 border border-red-500 rounded-lg py-4 text-red-300 font-semibold disabled:opacity-50"
+                >
                   <div className="flex items-center justify-center gap-1">
-                    <TrendingDown className="h-4 w-4" /> Under
+                    <TrendingDown className="h-4 w-4" /> {submittingChoice === 'under' ? 'Placing...' : 'Under'}
                   </div>
                   <div className="text-xs opacity-80">Payout {payout} USD</div>
                 </button>
@@ -204,11 +284,19 @@ const MobileTradeDrawer = ({
             )}
             {!digitContract && (
               <>
-                <button className="bg-teal-700/40 border border-teal-500 rounded-lg py-4 text-teal-300 font-semibold flex items-center justify-center gap-2">
-                  <TrendingUp className="h-4 w-4" /> Rise
+                <button
+                  onClick={() => placeTrade('rise')}
+                  disabled={submittingChoice !== null}
+                  className="bg-teal-700/40 border border-teal-500 rounded-lg py-4 text-teal-300 font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  <TrendingUp className="h-4 w-4" /> {submittingChoice === 'rise' ? 'Placing...' : 'Rise'}
                 </button>
-                <button className="bg-red-900/40 border border-red-500 rounded-lg py-4 text-red-300 font-semibold flex items-center justify-center gap-2">
-                  <TrendingDown className="h-4 w-4" /> Fall
+                <button
+                  onClick={() => placeTrade('fall')}
+                  disabled={submittingChoice !== null}
+                  className="bg-red-900/40 border border-red-500 rounded-lg py-4 text-red-300 font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  <TrendingDown className="h-4 w-4" /> {submittingChoice === 'fall' ? 'Placing...' : 'Fall'}
                 </button>
               </>
             )}

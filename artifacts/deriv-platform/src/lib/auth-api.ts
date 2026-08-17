@@ -6,19 +6,32 @@ export interface AuthUser {
   fullName: string | null;
 }
 
+export interface AuthAccount {
+  id: number;
+  userId: number;
+  type: "demo" | "real";
+  currency: string;
+  balance: string;
+}
+
 export interface AuthResponse {
   token: string;
   user: AuthUser;
-  account?: unknown;
-  accounts?: unknown[];
+  account?: AuthAccount;
+  accounts?: AuthAccount[];
 }
 
 const TOKEN_KEY = "auth_token";
 const USER_KEY = "auth_user";
+const ACCOUNT_KEY = "auth_account";
 
 export function saveAuth(data: AuthResponse) {
   localStorage.setItem(TOKEN_KEY, data.token);
   localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+  const account = data.account ?? data.accounts?.[0];
+  if (account) {
+    localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
+  }
 }
 
 export function getToken(): string | null {
@@ -30,9 +43,22 @@ export function getStoredUser(): AuthUser | null {
   return raw ? JSON.parse(raw) : null;
 }
 
+export function getStoredAccount(): AuthAccount | null {
+  const raw = localStorage.getItem(ACCOUNT_KEY);
+  return raw ? JSON.parse(raw) : null;
+}
+
+export function updateStoredAccountBalance(balance: string) {
+  const account = getStoredAccount();
+  if (account) {
+    localStorage.setItem(ACCOUNT_KEY, JSON.stringify({ ...account, balance }));
+  }
+}
+
 export function clearAuth() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
+  localStorage.removeItem(ACCOUNT_KEY);
 }
 
 export async function registerUser(input: {

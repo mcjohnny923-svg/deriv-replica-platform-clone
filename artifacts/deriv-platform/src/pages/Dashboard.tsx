@@ -17,12 +17,17 @@ const Dashboard = () => {
   const [stake, setStake] = useState('10');
   const [duration, setDuration] = useState('1');
   const [durationType, setDurationType] = useState('t');
+  const [balanceRefreshKey, setBalanceRefreshKey] = useState(0);
 
   const showDigitStats = isDigitContract(tradeType);
 
+  const handleTradePlaced = () => {
+    setBalanceRefreshKey((k) => k + 1);
+  };
+
   return (
     <div className="min-h-screen bg-[#0e0e0e] text-white flex flex-col">
-      <DerivHeader onMenuClick={() => setIsSidebarOpen(true)} />
+      <DerivHeader onMenuClick={() => setIsSidebarOpen(true)} balanceRefreshKey={balanceRefreshKey} />
 
       <div className="flex flex-1 overflow-hidden">
         <DerivSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
@@ -40,7 +45,7 @@ const Dashboard = () => {
               ) : (
                 <DerivChart selectedAsset={selectedAsset} onAssetChange={setSelectedAsset} />
               )}
-              <DerivBottomPanel />
+              <DerivBottomPanel refreshKey={balanceRefreshKey} />
             </div>
 
             {/* Trade panel, desktop only */}
@@ -57,6 +62,7 @@ const Dashboard = () => {
                 onDurationChange={setDuration}
                 durationType={durationType}
                 onDurationTypeChange={setDurationType}
+                onTradePlaced={handleTradePlaced}
               />
             </div>
           </div>
@@ -65,6 +71,7 @@ const Dashboard = () => {
 
       {/* Trade drawer, mobile only */}
       <MobileTradeDrawer
+        selectedAsset={selectedAsset}
         tradeType={tradeType}
         onTradeTypeChange={setTradeType}
         selectedDigit={selectedDigit}
@@ -75,6 +82,7 @@ const Dashboard = () => {
         onDurationChange={setDuration}
         durationType={durationType}
         onDurationTypeChange={setDurationType}
+        onTradePlaced={handleTradePlaced}
       />
     </div>
   );

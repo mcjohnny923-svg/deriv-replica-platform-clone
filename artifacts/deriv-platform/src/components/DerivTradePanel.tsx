@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -8,7 +10,11 @@ import {
   calculatePayout,
   isDigitContract,
   needsDigitSelector,
+  assetToMarketInfo,
+  directionFor,
 } from '@/lib/trade-config';
+import { buyTrade } from '@/lib/trades-api';
+import { getStoredAccount, updateStoredAccountBalance } from '@/lib/auth-api';
 
 interface DerivTradePanelProps {
   selectedAsset: string;
@@ -22,6 +28,7 @@ interface DerivTradePanelProps {
   onDurationChange: (duration: string) => void;
   durationType: string;
   onDurationTypeChange: (type: string) => void;
+  onTradePlaced?: (newBalance: string) => void;
 }
 
 const DerivTradePanel = ({
@@ -36,10 +43,59 @@ const DerivTradePanel = ({
   onDurationChange,
   durationType,
   onDurationTypeChange,
+  onTradePlaced,
 }: DerivTradePanelProps) => {
+  const [submittingChoice, setSubmittingChoice] = useState<string | null>(null);
+
   const digitContract = isDigitContract(tradeType);
   const digitSelector = needsDigitSelector(tradeType);
   const payout = calculatePayout(tradeType, stake);
+
+  const placeTrade = async (choice: string) => {
+    const account = getStoredAccount();
+    if (!account) {
+      toast.error('Please log in to place a trade.');
+      return;
+    }
+    const stakeNum = parseFloat(stake);
+    if (!stakeNum || stakeNum <= 0) {
+      toast.error('Enter a valid stake amount.');
+      return;
+    }
+    const durationNum = parseFloat(duration);
+    if (!durationNum || durationNum <= 0) {
+      toast.error('Enter a valid duration.');
+      return;
+    }
+
+    setSubmittingChoice(choice);
+    try {
+      const { symbol, category } = assetToMarketInfo(selectedAsset);
+      const direction = directionFor(tradeType, choice);
+      const result = await buyTrade({
+        accountId: account.id,
+        marketSymbol: symbol,
+        marketDisplayName: selectedAsset,
+        marketCategory: category,
+        tradeType,
+        direction,
+        digit: digitSelector ? selectedDigit : undefined,
+        stake: stakeNum,
+        durationValue: durationNum,
+        durationUnit: durationType as 't' | 's' | 'm',
+      });
+
+      updateStoredAccountBalance(result.newBalance);
+      onTradePlaced?.(result.newBalance);
+      toast.success(`Trade placed: ${direction} on ${selectedAsset}`, {
+        description: `Stake USD ${stakeNum.toFixed(2)} — settles in ${duration} ${durationType === 't' ? 'ticks' : durationType === 's' ? 'seconds' : 'minutes'}`,
+      });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to place trade');
+    } finally {
+      setSubmittingChoice(null);
+    }
+  };
 
   return (
     <div className="h-full bg-[#151717] border-l border-[#323738]">
@@ -180,53 +236,83 @@ const DerivTradePanel = ({
         <div className="space-y-3">
           {tradeType === 'matches_differs' && (
             <>
-              <Button className="w-full bg-green-500 hover:bg-green-600 text-white py-4 font-medium text-base">
-                Matches
+              <Button
+                onClick={() => placeTrade('matches')}
+                disabled={submittingChoice !== null}
+                className="w-full bg-green-500 hover:bg-green-600 text-white py-4 font-medium text-base disabled:opacity-50"
+              >
+                {submittingChoice === 'matches' ? 'Placing...' : 'Matches'}
               </Button>
-              <Button className="w-full bg-red-500 hover:bg-red-600 text-white py-4 font-medium text-base">
-                Differs
+              <Button
+                onClick={() => placeTrade('differs')}
+                disabled={submittingChoice !== null}
+                className="w-full bg-red-500 hover:bg-red-600 text-white py-4 font-medium text-base disabled:opacity-50"
+              >
+                {submittingChoice === 'differs' ? 'Placing...' : 'Differs'}
               </Button>
             </>
           )}
 
           {tradeType === 'even_odd' && (
             <>
-              <Button className="w-full bg-green-500 hover:bg-green-600 text-white py-4 font-medium text-base">
-                Even
+              <Button
+                onClick={() => placeTrade('even')}
+                disabled={submittingChoice !== null}
+                className="w-full bg-green-500 hover:bg-green-600 text-white py-4 font-medium text-base disabled:opacity-50"
+              >
+                {submittingChoice === 'even' ? 'Placing...' : 'Even'}
               </Button>
-              <Button className="w-full bg-red-500 hover:bg-red-600 text-white py-4 font-medium text-base">
-                Odd
+              <Button
+                onClick={() => placeTrade('odd')}
+                disabled={submittingChoice !== null}
+                className="w-full bg-red-500 hover:bg-red-600 text-white py-4 font-medium text-base disabled:opacity-50"
+              >
+                {submittingChoice === 'odd' ? 'Placing...' : 'Odd'}
               </Button>
             </>
           )}
 
           {tradeType === 'over_under' && (
             <>
-              <Button className="w-full bg-green-500 hover:bg-green-600 text-white py-4 font-medium text-base">
-                Over
+              <Button
+                onClick={() => placeTrade('over')}
+                disabled={submittingChoice !== null}
+                className="w-full bg-green-500 hover:bg-green-600 text-white py-4 font-medium text-base disabled:opacity-50"
+              >
+                {submittingChoice === 'over' ? 'Placing...' : 'Over'}
               </Button>
-              <Button className="w-full bg-red-500 hover:bg-red-600 text-white py-4 font-medium text-base">
-                Under
+              <Button
+                onClick={() => placeTrade('under')}
+                disabled={submittingChoice !== null}
+                className="w-full bg-red-500 hover:bg-red-600 text-white py-4 font-medium text-base disabled:opacity-50"
+              >
+                {submittingChoice === 'under' ? 'Placing...' : 'Under'}
               </Button>
             </>
           )}
 
           {!digitContract && (
             <>
-              <Button className="w-full bg-green-500 hover:bg-green-600 text-white py-4 font-medium text-base">
+              <Button
+                onClick={() => placeTrade('rise')}
+                disabled={submittingChoice !== null}
+                className="w-full bg-green-500 hover:bg-green-600 text-white py-4 font-medium text-base disabled:opacity-50"
+              >
                 <div className="flex items-center justify-center space-x-2">
                   <TrendingUp className="h-5 w-5" />
-                  <span>Rise</span>
+                  <span>{submittingChoice === 'rise' ? 'Placing...' : 'Rise'}</span>
                 </div>
-                <div className="text-xs opacity-90 ml-2">12,559.23</div>
               </Button>
 
-              <Button className="w-full bg-red-500 hover:bg-red-600 text-white py-4 font-medium text-base">
+              <Button
+                onClick={() => placeTrade('fall')}
+                disabled={submittingChoice !== null}
+                className="w-full bg-red-500 hover:bg-red-600 text-white py-4 font-medium text-base disabled:opacity-50"
+              >
                 <div className="flex items-center justify-center space-x-2">
                   <TrendingDown className="h-5 w-5" />
-                  <span>Fall</span>
+                  <span>{submittingChoice === 'fall' ? 'Placing...' : 'Fall'}</span>
                 </div>
-                <div className="text-xs opacity-90 ml-2">12,536.55</div>
               </Button>
             </>
           )}
