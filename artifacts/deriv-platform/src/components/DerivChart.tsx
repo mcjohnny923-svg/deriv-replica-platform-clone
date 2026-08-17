@@ -21,13 +21,13 @@ interface AssetGroup {
   assets: string[];
 }
 
-const TIMEFRAMES = ['1T', '5T', '15T', '30T', '1H', '4H', '1D'];
+const TIMEFRAMES = ['1T', '5M', '15M', '30M', '1H', '4H', '1D'];
 
 const TIMEFRAME_SECONDS: Record<string, number> = {
   '1T': 1,
-  '5T': 5,
-  '15T': 15,
-  '30T': 30,
+  '5M': 300,
+  '15M': 900,
+  '30M': 1800,
   '1H': 3600,
   '4H': 14400,
   '1D': 86400,
