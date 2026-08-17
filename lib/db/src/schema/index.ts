@@ -14,7 +14,6 @@ import { z } from "zod/v4";
 
 // ---------- Enums ----------
 export const accountTypeEnum = pgEnum("account_type", ["demo", "real"]);
-export const tradeDirectionEnum = pgEnum("trade_direction", ["up", "down"]);
 export const tradeStatusEnum = pgEnum("trade_status", ["open", "won", "lost"]);
 export const transactionTypeEnum = pgEnum("transaction_type", [
   "deposit",
@@ -88,13 +87,17 @@ export const tradesTable = pgTable("trades", {
   marketId: integer("market_id")
     .references(() => marketsTable.id)
     .notNull(),
-  direction: tradeDirectionEnum("direction").notNull(),
+  tradeType: text("trade_type").notNull(), // rise_fall, higher_lower, touch_notouch, in_out, matches_differs, even_odd, over_under
+  direction: text("direction").notNull(), // rise/fall, over/under, matches/differs, even/odd (contract-specific label)
+  digit: integer("digit"), // selected digit, only for matches_differs / over_under
   stake: numeric("stake", { precision: 15, scale: 2 }).notNull(),
+  payoutMultiplier: numeric("payout_multiplier", { precision: 6, scale: 3 }).notNull(),
   entryPrice: numeric("entry_price", { precision: 15, scale: 5 }).notNull(),
   exitPrice: numeric("exit_price", { precision: 15, scale: 5 }),
   payout: numeric("payout", { precision: 15, scale: 2 }),
   status: tradeStatusEnum("status").notNull().default("open"),
   openedAt: timestamp("opened_at").defaultNow().notNull(),
+  settlesAt: timestamp("settles_at").notNull(),
   closedAt: timestamp("closed_at"),
 });
 
