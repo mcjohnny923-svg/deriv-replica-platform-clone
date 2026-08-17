@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { ChevronDown, TrendingUp, TrendingDown } from 'lucide-react';
 import {
   createChart,
+  AreaSeries,
+  CandlestickSeries,
   ColorType,
   CrosshairMode,
   type IChartApi,
@@ -151,7 +153,7 @@ const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
     let basePrice = priceRef.current;
 
     if (isTickMode) {
-      const series = chart.addAreaSeries({
+      const series = chart.addSeries(AreaSeries, {
         lineColor: '#ffffff',
         topColor: 'rgba(255,255,255,0.25)',
         bottomColor: 'rgba(255,255,255,0.0)',
@@ -168,7 +170,7 @@ const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
       areaSeriesRef.current = series;
       priceRef.current = basePrice;
     } else {
-      const series = chart.addCandlestickSeries({
+      const series = chart.addSeries(CandlestickSeries, {
         upColor: '#00d68f',
         downColor: '#ff444f',
         borderVisible: false,
