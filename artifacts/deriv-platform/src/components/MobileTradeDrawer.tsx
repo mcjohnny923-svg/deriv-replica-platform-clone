@@ -103,7 +103,7 @@ const MobileTradeDrawer = ({
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-30 bg-[#151717] border-t border-[#323738] md:hidden">
+    <div className="fixed bottom-16 md:bottom-0 left-0 right-0 z-30 bg-[#151717] border-t border-[#323738] md:hidden">
       {/* Collapse handle */}
       <button
         type="button"

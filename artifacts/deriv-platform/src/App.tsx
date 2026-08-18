@@ -9,6 +9,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import Deposit from "./pages/Deposit";
+import Positions from "./pages/Positions";
+import Automate from "./pages/Automate";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 const App = () => (
@@ -31,6 +33,8 @@ const App = () => (
           <Route path="/markets" element={<Dashboard />} />
           <Route path="/about" element={<Index />} />
           <Route path="/settings" element={<Profile />} />
+          <Route path="/positions" element={<Positions />} />
+          <Route path="/automate" element={<Automate />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
