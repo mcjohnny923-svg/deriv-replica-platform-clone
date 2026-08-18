@@ -17,20 +17,20 @@ export interface AuthAccount {
 export interface AuthResponse {
   token: string;
   user: AuthUser;
-  account?: AuthAccount;
-  accounts?: AuthAccount[];
+  accounts: AuthAccount[];
 }
 
 const TOKEN_KEY = "auth_token";
 const USER_KEY = "auth_user";
-const ACCOUNT_KEY = "auth_account";
+const ACCOUNTS_KEY = "auth_accounts";
+const ACTIVE_TYPE_KEY = "auth_active_account_type";
 
 export function saveAuth(data: AuthResponse) {
   localStorage.setItem(TOKEN_KEY, data.token);
   localStorage.setItem(USER_KEY, JSON.stringify(data.user));
-  const account = data.account ?? data.accounts?.[0];
-  if (account) {
-    localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
+  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(data.accounts));
+  if (!localStorage.getItem(ACTIVE_TYPE_KEY)) {
+    localStorage.setItem(ACTIVE_TYPE_KEY, "demo");
   }
 }
 
@@ -43,29 +43,44 @@ export function getStoredUser(): AuthUser | null {
   return raw ? JSON.parse(raw) : null;
 }
 
+export function getStoredAccounts(): AuthAccount[] {
+  const raw = localStorage.getItem(ACCOUNTS_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
+
+export function getActiveAccountType(): "demo" | "real" {
+  return (localStorage.getItem(ACTIVE_TYPE_KEY) as "demo" | "real") ?? "demo";
+}
+
+export function setActiveAccountType(type: "demo" | "real") {
+  localStorage.setItem(ACTIVE_TYPE_KEY, type);
+}
+
+// The account currently used for placing trades / displaying balance
 export function getStoredAccount(): AuthAccount | null {
-  const raw = localStorage.getItem(ACCOUNT_KEY);
-  return raw ? JSON.parse(raw) : null;
+  const accounts = getStoredAccounts();
+  const activeType = getActiveAccountType();
+  return accounts.find((a) => a.type === activeType) ?? accounts[0] ?? null;
 }
 
 export function updateStoredAccountBalance(balance: string) {
-  const account = getStoredAccount();
-  if (account) {
-    localStorage.setItem(ACCOUNT_KEY, JSON.stringify({ ...account, balance }));
-  }
+  const accounts = getStoredAccounts();
+  const activeType = getActiveAccountType();
+  const updated = accounts.map((a) => (a.type === activeType ? { ...a, balance } : a));
+  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(updated));
 }
 
 export function clearAuth() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
-  localStorage.removeItem(ACCOUNT_KEY);
+  localStorage.removeItem(ACCOUNTS_KEY);
+  localStorage.removeItem(ACTIVE_TYPE_KEY);
 }
 
 export async function registerUser(input: {
   email: string;
   password: string;
   fullName?: string;
-  accountType: "demo" | "real";
 }): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
     method: "POST",
