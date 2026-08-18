@@ -4,6 +4,7 @@ export interface AuthUser {
   id: number;
   email: string;
   fullName: string | null;
+  createdAt: string;
 }
 
 export interface AuthAccount {
