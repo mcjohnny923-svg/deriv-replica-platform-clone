@@ -1,4 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { toast } from 'sonner';
+import { Flag } from 'lucide-react';
 import { getStoredAccount } from '@/lib/auth-api';
 import { getOpenTrades, getTradeHistory, type Trade } from '@/lib/trades-api';
 
@@ -6,17 +8,61 @@ interface DerivBottomPanelProps {
   refreshKey?: number;
 }
 
+function formatContractLabel(trade: Trade): string {
+  const direction = trade.direction.charAt(0).toUpperCase() + trade.direction.slice(1);
+  return `${direction} - ${trade.market?.displayName ?? 'Market'}`;
+}
+
 const DerivBottomPanel = ({ refreshKey }: DerivBottomPanelProps) => {
   const [activeTab, setActiveTab] = useState('open_positions');
   const [openTrades, setOpenTrades] = useState<Trade[]>([]);
   const [closedTrades, setClosedTrades] = useState<Trade[]>([]);
   const [now, setNow] = useState(Date.now());
+  const previousOpenIds = useRef<Set<number>>(new Set());
 
   const loadOpen = useCallback(async () => {
     const account = getStoredAccount();
     if (!account) return;
     try {
       const { openTrades: trades } = await getOpenTrades(account.id);
+
+      // Detect trades that just disappeared from "open" — they settled
+      const currentIds = new Set(trades.map((t) => t.id));
+      const settledIds = [...previousOpenIds.current].filter((id) => !currentIds.has(id));
+
+      if (settledIds.length > 0) {
+        const { closedTrades: recentlyClosed } = await getTradeHistory(account.id);
+        for (const id of settledIds) {
+          const settled = recentlyClosed.find((t) => t.id === id);
+          if (settled) {
+            const won = settled.status === 'won';
+            const amount = won
+              ? Number(settled.payout ?? 0) - Number(settled.stake)
+              : -Number(settled.stake);
+            const sign = amount >= 0 ? '+' : '-';
+
+            toast.custom(() => (
+              <div className="flex items-center gap-3 bg-white rounded-xl px-4 py-3 shadow-lg min-w-[280px]">
+                <div
+                  className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${
+                    won ? 'bg-green-100' : 'bg-red-100'
+                  }`}
+                >
+                  <Flag className={`h-4 w-4 ${won ? 'text-green-600' : 'text-red-600'}`} />
+                </div>
+                <div>
+                  <div className={`font-bold text-sm ${won ? 'text-green-600' : 'text-red-600'}`}>
+                    {won ? 'Profit' : 'Loss'}: {sign}{Math.abs(amount).toFixed(2)} USD
+                  </div>
+                  <div className="text-gray-500 text-xs">{formatContractLabel(settled)}</div>
+                </div>
+              </div>
+            ), { duration: 4000 });
+          }
+        }
+      }
+
+      previousOpenIds.current = currentIds;
       setOpenTrades(trades);
     } catch {
       // silent fail, keep previous state
