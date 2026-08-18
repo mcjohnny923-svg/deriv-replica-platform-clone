@@ -18,7 +18,6 @@ const Register = () => {
     confirmPassword: '',
     country: '',
     phone: '',
-    accountType: 'real'
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -42,7 +41,6 @@ const Register = () => {
         email: formData.email,
         password: formData.password,
         fullName: fullName || undefined,
-        accountType: formData.accountType as 'demo' | 'real',
       });
       saveAuth(data);
       navigate('/dashboard');
@@ -54,7 +52,7 @@ const Register = () => {
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -69,7 +67,9 @@ const Register = () => {
             <span className="text-2xl font-bold text-white">TradePro</span>
           </Link>
           <h1 className="text-3xl font-bold text-white">Create your account</h1>
-          <p className="mt-2 text-gray-400">Start trading with confidence</p>
+          <p className="mt-2 text-gray-400">
+            You'll get both a Demo account (USD 10,000 virtual balance) and a Real account, ready to switch between anytime.
+          </p>
         </div>
 
         <div className="bg-gray-800 p-8 rounded-lg border border-gray-700">
@@ -79,38 +79,6 @@ const Register = () => {
                 {error}
               </div>
             )}
-            {/* Account Type */}
-            <div>
-              <Label className="text-gray-300">Account Type</Label>
-              <div className="grid grid-cols-2 gap-4 mt-2">
-                <button
-                  type="button"
-                  onClick={() => handleInputChange('accountType', 'demo')}
-                  className={`p-4 rounded-lg border-2 transition-colors ${
-                    formData.accountType === 'demo'
-                      ? 'border-red-500 bg-red-500/10'
-                      : 'border-gray-600 bg-gray-700'
-                  }`}
-                >
-                  <div className="text-white font-medium">Demo Account</div>
-                  <div className="text-sm text-gray-400">Practice with virtual money</div>
-                  <div className="text-sm text-green-400 mt-1">$10,000 virtual balance</div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleInputChange('accountType', 'real')}
-                  className={`p-4 rounded-lg border-2 transition-colors ${
-                    formData.accountType === 'real'
-                      ? 'border-red-500 bg-red-500/10'
-                      : 'border-gray-600 bg-gray-700'
-                  }`}
-                >
-                  <div className="text-white font-medium">Real Account</div>
-                  <div className="text-sm text-gray-400">Trade with real money</div>
-                  <div className="text-sm text-blue-400 mt-1">Deposit required</div>
-                </button>
-              </div>
-            </div>
 
             {/* Personal Information */}
             <div className="grid grid-cols-2 gap-4">
