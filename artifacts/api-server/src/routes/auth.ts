@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db, usersTable, accountsTable } from "@workspace/db";
 import { hashPassword, comparePassword, signToken } from "../lib/auth";
 
@@ -20,18 +20,40 @@ router.post("/register", async (req, res) => {
   }
   const { email, password, fullName, accountType } = parsed.data;
 
-  const existing = await db.query.usersTable.findFirst({
+  const existingUser = await db.query.usersTable.findFirst({
     where: eq(usersTable.email, email),
   });
-  if (existing) {
-    return res.status(409).json({ error: "Email already registered" });
-  }
 
-  const passwordHash = await hashPassword(password);
-  const [user] = await db
-    .insert(usersTable)
-    .values({ email, passwordHash, fullName })
-    .returning();
+  let user;
+
+  if (existingUser) {
+    // Email already belongs to a user — verify it's really them before adding an account
+    const passwordMatches = await comparePassword(password, existingUser.passwordHash);
+    if (!passwordMatches) {
+      return res.status(409).json({ error: "Email already registered" });
+    }
+
+    const existingAccountOfType = await db.query.accountsTable.findFirst({
+      where: and(
+        eq(accountsTable.userId, existingUser.id),
+        eq(accountsTable.type, accountType),
+      ),
+    });
+    if (existingAccountOfType) {
+      return res.status(409).json({
+        error: `You already have a ${accountType} account. Please log in instead.`,
+      });
+    }
+
+    user = existingUser;
+  } else {
+    const passwordHash = await hashPassword(password);
+    const [newUser] = await db
+      .insert(usersTable)
+      .values({ email, passwordHash, fullName })
+      .returning();
+    user = newUser;
+  }
 
   const startingBalance = accountType === "demo" ? "10000" : "0";
   const [account] = await db
