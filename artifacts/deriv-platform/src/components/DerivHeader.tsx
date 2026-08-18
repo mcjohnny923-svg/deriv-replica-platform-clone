@@ -18,8 +18,14 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey }: DerivHeaderProps) => {
   }, [balanceRefreshKey]);
 
   const displayType = account?.type ?? 'demo';
-  const displayBalance = account ? Number(account.balance).toFixed(2) : '0.00';
+  const displayBalance = account
+    ? Number(account.balance).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    : '0.00';
   const displayCurrency = account?.currency ?? 'USD';
+  const typeColorClass = displayType === 'real' ? 'text-green-500' : 'text-orange-400';
 
   return (
     <header className="bg-[#151717] border-b border-[#323738] h-14 px-3 flex items-center justify-between">
@@ -73,8 +79,8 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey }: DerivHeaderProps) => {
             className="flex items-center space-x-1.5 px-2.5 py-1.5 bg-[#323738] rounded hover:bg-[#414647] transition-colors"
           >
             <div className="text-left leading-tight">
-              <div className="text-[10px] text-gray-400 capitalize">{displayType}</div>
-              <div className="text-xs font-medium text-white whitespace-nowrap">
+              <div className={`text-[10px] font-semibold capitalize ${typeColorClass}`}>{displayType}</div>
+              <div className="text-xs font-bold text-white whitespace-nowrap">
                 {displayCurrency} {displayBalance}
               </div>
             </div>
@@ -85,8 +91,8 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey }: DerivHeaderProps) => {
             <div className="absolute right-0 top-full mt-1 w-60 bg-[#323738] border border-[#414647] rounded-lg shadow-lg z-50 overflow-hidden">
               <div className="flex items-center justify-between w-full px-4 py-3">
                 <div className="text-left">
-                  <div className="text-sm font-medium text-white capitalize">{displayType}</div>
-                  <div className="text-xs text-gray-400">
+                  <div className={`text-sm font-semibold capitalize ${typeColorClass}`}>{displayType}</div>
+                  <div className="text-xs font-bold text-white">
                     {displayCurrency} {displayBalance}
                   </div>
                 </div>
