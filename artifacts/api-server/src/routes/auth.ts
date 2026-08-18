@@ -32,7 +32,6 @@ router.post("/register", async (req, res) => {
     .values({ email, passwordHash, fullName })
     .returning();
 
-  // Every new user gets both a demo and a real account at once
   const [demoAccount] = await db
     .insert(accountsTable)
     .values({ userId: user.id, type: "demo", currency: "USD", balance: "10000" })
@@ -46,7 +45,7 @@ router.post("/register", async (req, res) => {
 
   res.status(201).json({
     token,
-    user: { id: user.id, email: user.email, fullName: user.fullName },
+    user: { id: user.id, email: user.email, fullName: user.fullName, createdAt: user.createdAt },
     accounts: [demoAccount, realAccount],
   });
 });
@@ -83,7 +82,7 @@ router.post("/login", async (req, res) => {
 
   res.json({
     token,
-    user: { id: user.id, email: user.email, fullName: user.fullName },
+    user: { id: user.id, email: user.email, fullName: user.fullName, createdAt: user.createdAt },
     accounts,
   });
 });
