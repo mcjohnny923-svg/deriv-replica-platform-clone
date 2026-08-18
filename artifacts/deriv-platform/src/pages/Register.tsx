@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { registerUser, saveAuth } from '@/lib/auth-api';
+import { COUNTRIES } from '@/lib/countries';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -125,12 +126,12 @@ const Register = () => {
                 <SelectTrigger className="mt-1 bg-gray-700 border-gray-600 text-white">
                   <SelectValue placeholder="Select your country" />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-700 border-gray-600">
-                  <SelectItem value="us" className="text-white hover:bg-gray-600">United States</SelectItem>
-                  <SelectItem value="uk" className="text-white hover:bg-gray-600">United Kingdom</SelectItem>
-                  <SelectItem value="de" className="text-white hover:bg-gray-600">Germany</SelectItem>
-                  <SelectItem value="fr" className="text-white hover:bg-gray-600">France</SelectItem>
-                  <SelectItem value="au" className="text-white hover:bg-gray-600">Australia</SelectItem>
+                <SelectContent className="bg-gray-700 border-gray-600 max-h-72">
+                  {COUNTRIES.map((c) => (
+                    <SelectItem key={c.code} value={c.code} className="text-white hover:bg-gray-600">
+                      {c.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
