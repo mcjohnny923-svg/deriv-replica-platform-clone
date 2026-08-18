@@ -185,12 +185,12 @@ const Automate = () => {
   return (
     <div className="h-screen bg-[#0e0e0e] text-white flex flex-col overflow-hidden">
       <DerivHeader onMenuClick={() => setIsSidebarOpen(true)} balanceRefreshKey={balanceRefreshKey} />
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         <DerivSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
 
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           {/* Scrollable content */}
-          <div className="flex-1 overflow-y-auto pb-4">
+          <div className="flex-1 min-h-0 overflow-y-auto pb-4">
             <div className="max-w-lg mx-auto p-4 space-y-4">
               {isRunning && (
                 <div className="bg-[#151717] border border-[#323738] rounded-lg p-4 flex justify-between items-center">
