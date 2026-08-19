@@ -5,6 +5,7 @@ export interface AuthUser {
   email: string;
   fullName: string | null;
   createdAt: string;
+  referralCode: string;
 }
 
 export interface AuthAccount {
@@ -57,7 +58,6 @@ export function setActiveAccountType(type: "demo" | "real") {
   localStorage.setItem(ACTIVE_TYPE_KEY, type);
 }
 
-// The account currently used for placing trades / displaying balance
 export function getStoredAccount(): AuthAccount | null {
   const accounts = getStoredAccounts();
   const activeType = getActiveAccountType();
@@ -82,6 +82,7 @@ export async function registerUser(input: {
   email: string;
   password: string;
   fullName?: string;
+  referralCode?: string;
 }): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
     method: "POST",
