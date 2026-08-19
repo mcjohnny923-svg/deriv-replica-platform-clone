@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import Deposit from "./pages/Deposit";
 import Positions from "./pages/Positions";
 import Automate from "./pages/Automate";
+import Partners from "./pages/Partners";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 const App = () => (
@@ -35,6 +36,7 @@ const App = () => (
           <Route path="/settings" element={<Profile />} />
           <Route path="/positions" element={<Positions />} />
           <Route path="/automate" element={<Automate />} />
+          <Route path="/partners" element={<Partners />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
