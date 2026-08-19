@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,9 @@ import { COUNTRIES } from '@/lib/countries';
 
 const Register = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const referralCode = searchParams.get('ref') ?? undefined;
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -42,6 +45,7 @@ const Register = () => {
         email: formData.email,
         password: formData.password,
         fullName: fullName || undefined,
+        referralCode,
       });
       saveAuth(data);
       navigate('/dashboard');
@@ -71,6 +75,11 @@ const Register = () => {
           <p className="mt-2 text-gray-400">
             You'll get both a Demo account (USD 10,000 virtual balance) and a Real account, ready to switch between anytime.
           </p>
+          {referralCode && (
+            <div className="mt-3 inline-block bg-green-500/10 border border-green-500 text-green-400 text-sm rounded-full px-4 py-1">
+              Referred by code: {referralCode}
+            </div>
+          )}
         </div>
 
         <div className="bg-gray-800 p-8 rounded-lg border border-gray-700">
