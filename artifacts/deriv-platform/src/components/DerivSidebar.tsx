@@ -4,6 +4,7 @@ import {
   FileText,
   Briefcase,
   CreditCard,
+  Users,
   User,
   Settings,
   Menu,
@@ -24,6 +25,7 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
     { icon: FileText, label: 'Reports', path: '/reports' },
     { icon: Briefcase, label: 'Portfolio', path: '/portfolio' },
     { icon: CreditCard, label: 'Cashier', path: '/cashier' },
+    { icon: Users, label: 'Partners', path: '/partners' },
   ];
 
   const accountItems = [
