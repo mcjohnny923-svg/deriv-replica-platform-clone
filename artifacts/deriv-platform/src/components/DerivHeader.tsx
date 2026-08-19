@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown, Check, Bell, HelpCircle, Menu } from 'lucide-react';
+import { ChevronDown, Check, HelpCircle, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getStoredAccounts, getActiveAccountType, setActiveAccountType, type AuthAccount } from '@/lib/auth-api';
 
@@ -72,11 +72,6 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
 
       {/* Right section - Account and controls */}
       <div className="flex items-center space-x-2">
-        {/* Notifications */}
-        <Button variant="ghost" size="icon" className="text-gray-300 hover:text-white hover:bg-[#323738] h-8 w-8">
-          <Bell className="h-4 w-4" />
-        </Button>
-
         {/* Help */}
         <Button variant="ghost" size="icon" className="hidden sm:inline-flex text-gray-300 hover:text-white hover:bg-[#323738] h-8 w-8">
           <HelpCircle className="h-4 w-4" />
@@ -127,6 +122,13 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
             </div>
           )}
         </div>
+
+        {/* Deposit button */}
+        <Link to="/deposit">
+          <Button className="bg-red-500 hover:bg-red-600 text-white h-9 px-4 rounded-full font-semibold text-sm">
+            Deposit
+          </Button>
+        </Link>
       </div>
     </header>
   );
