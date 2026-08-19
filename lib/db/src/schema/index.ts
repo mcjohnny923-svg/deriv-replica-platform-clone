@@ -31,6 +31,8 @@ export const usersTable = pgTable("users", {
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   fullName: text("full_name"),
+  referralCode: text("referral_code").unique(),
+  referredByUserId: integer("referred_by_user_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -87,9 +89,9 @@ export const tradesTable = pgTable("trades", {
   marketId: integer("market_id")
     .references(() => marketsTable.id)
     .notNull(),
-  tradeType: text("trade_type").notNull(), // rise_fall, higher_lower, touch_notouch, in_out, matches_differs, even_odd, over_under
-  direction: text("direction").notNull(), // rise/fall, over/under, matches/differs, even/odd (contract-specific label)
-  digit: integer("digit"), // selected digit, only for matches_differs / over_under
+  tradeType: text("trade_type").notNull(),
+  direction: text("direction").notNull(),
+  digit: integer("digit"),
   stake: numeric("stake", { precision: 15, scale: 2 }).notNull(),
   payoutMultiplier: numeric("payout_multiplier", { precision: 6, scale: 3 }).notNull(),
   entryPrice: numeric("entry_price", { precision: 15, scale: 5 }).notNull(),
@@ -129,6 +131,31 @@ export const insertTransactionSchema = createInsertSchema(
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 export type Transaction = typeof transactionsTable.$inferSelect;
 
+// ---------- Referral earnings ledger ----------
+export const referralEarningsTable = pgTable("referral_earnings", {
+  id: serial("id").primaryKey(),
+  referrerUserId: integer("referrer_user_id")
+    .references(() => usersTable.id)
+    .notNull(),
+  referredUserId: integer("referred_user_id")
+    .references(() => usersTable.id)
+    .notNull(),
+  tradeId: integer("trade_id")
+    .references(() => tradesTable.id)
+    .notNull(),
+  amount: numeric("amount", { precision: 15, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertReferralEarningSchema = createInsertSchema(
+  referralEarningsTable,
+).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertReferralEarning = z.infer<typeof insertReferralEarningSchema>;
+export type ReferralEarning = typeof referralEarningsTable.$inferSelect;
+
 // ---------- Relations ----------
 export const usersRelations = relations(usersTable, ({ many }) => ({
   accounts: many(accountsTable),
@@ -160,6 +187,24 @@ export const transactionsRelations = relations(
     account: one(accountsTable, {
       fields: [transactionsTable.accountId],
       references: [accountsTable.id],
+    }),
+  }),
+);
+
+export const referralEarningsRelations = relations(
+  referralEarningsTable,
+  ({ one }) => ({
+    referrer: one(usersTable, {
+      fields: [referralEarningsTable.referrerUserId],
+      references: [usersTable.id],
+    }),
+    referred: one(usersTable, {
+      fields: [referralEarningsTable.referredUserId],
+      references: [usersTable.id],
+    }),
+    trade: one(tradesTable, {
+      fields: [referralEarningsTable.tradeId],
+      references: [tradesTable.id],
     }),
   }),
 );

@@ -1,13 +1,21 @@
 import { Router, type IRouter, type Response } from "express";
 import { z } from "zod";
 import { eq, and, lte, ne } from "drizzle-orm";
-import { db, accountsTable, marketsTable, tradesTable } from "@workspace/db";
+import {
+  db,
+  accountsTable,
+  marketsTable,
+  tradesTable,
+  usersTable,
+  referralEarningsTable,
+} from "@workspace/db";
 import { authenticate, type AuthedRequest } from "../middlewares/authenticate";
 import {
   getPayoutMultiplier,
   getWinProbability,
   durationToSeconds,
 } from "../lib/trade-config";
+import { REFERRAL_COMMISSION_RATE } from "../lib/referral";
 
 const router: IRouter = Router();
 router.use(authenticate);
@@ -30,6 +38,27 @@ async function getOrCreateMarket(symbol: string, displayName: string, category: 
     .values({ symbol, displayName, category })
     .returning();
   return created;
+}
+
+async function creditReferralCommission(accountId: number, tradeId: number, stake: number) {
+  const account = await db.query.accountsTable.findFirst({
+    where: eq(accountsTable.id, accountId),
+  });
+  if (!account) return;
+
+  const trader = await db.query.usersTable.findFirst({
+    where: eq(usersTable.id, account.userId),
+  });
+  if (!trader?.referredByUserId) return;
+
+  const commission = stake * REFERRAL_COMMISSION_RATE;
+
+  await db.insert(referralEarningsTable).values({
+    referrerUserId: trader.referredByUserId,
+    referredUserId: trader.id,
+    tradeId,
+    amount: commission.toFixed(2),
+  });
 }
 
 // Settle any of this account's open trades whose settlesAt has passed
@@ -74,6 +103,9 @@ async function settleDueTrades(accountId: number) {
           .where(eq(accountsTable.id, accountId));
       }
     }
+
+    // 5% referral commission on stake, win or lose
+    await creditReferralCommission(accountId, trade.id, stakeNum);
   }
 }
 

@@ -3,13 +3,26 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { db, usersTable, accountsTable } from "@workspace/db";
 import { hashPassword, comparePassword, signToken } from "../lib/auth";
+import { generateReferralCode } from "../lib/referral";
 
 const router: IRouter = Router();
+
+async function generateUniqueReferralCode(): Promise<string> {
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const code = generateReferralCode();
+    const existing = await db.query.usersTable.findFirst({
+      where: eq(usersTable.referralCode, code),
+    });
+    if (!existing) return code;
+  }
+  throw new Error("Failed to generate a unique referral code");
+}
 
 const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   fullName: z.string().optional(),
+  referralCode: z.string().optional(),
 });
 
 router.post("/register", async (req, res) => {
@@ -17,7 +30,7 @@ router.post("/register", async (req, res) => {
   if (!parsed.success) {
     return res.status(400).json({ error: parsed.error.flatten() });
   }
-  const { email, password, fullName } = parsed.data;
+  const { email, password, fullName, referralCode } = parsed.data;
 
   const existing = await db.query.usersTable.findFirst({
     where: eq(usersTable.email, email),
@@ -26,10 +39,28 @@ router.post("/register", async (req, res) => {
     return res.status(409).json({ error: "Email already registered" });
   }
 
+  let referredByUserId: number | null = null;
+  if (referralCode) {
+    const referrer = await db.query.usersTable.findFirst({
+      where: eq(usersTable.referralCode, referralCode.toUpperCase()),
+    });
+    if (referrer) {
+      referredByUserId = referrer.id;
+    }
+  }
+
   const passwordHash = await hashPassword(password);
+  const ownReferralCode = await generateUniqueReferralCode();
+
   const [user] = await db
     .insert(usersTable)
-    .values({ email, passwordHash, fullName })
+    .values({
+      email,
+      passwordHash,
+      fullName,
+      referralCode: ownReferralCode,
+      referredByUserId,
+    })
     .returning();
 
   const [demoAccount] = await db
@@ -45,7 +76,13 @@ router.post("/register", async (req, res) => {
 
   res.status(201).json({
     token,
-    user: { id: user.id, email: user.email, fullName: user.fullName, createdAt: user.createdAt },
+    user: {
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      createdAt: user.createdAt,
+      referralCode: user.referralCode,
+    },
     accounts: [demoAccount, realAccount],
   });
 });
@@ -74,6 +111,16 @@ router.post("/login", async (req, res) => {
     return res.status(401).json({ error: "Invalid email or password" });
   }
 
+  // Backfill a referral code for older accounts created before this feature existed
+  let referralCode = user.referralCode;
+  if (!referralCode) {
+    referralCode = await generateUniqueReferralCode();
+    await db
+      .update(usersTable)
+      .set({ referralCode })
+      .where(eq(usersTable.id, user.id));
+  }
+
   const accounts = await db.query.accountsTable.findMany({
     where: eq(accountsTable.userId, user.id),
   });
@@ -82,7 +129,13 @@ router.post("/login", async (req, res) => {
 
   res.json({
     token,
-    user: { id: user.id, email: user.email, fullName: user.fullName, createdAt: user.createdAt },
+    user: {
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      createdAt: user.createdAt,
+      referralCode,
+    },
     accounts,
   });
 });
