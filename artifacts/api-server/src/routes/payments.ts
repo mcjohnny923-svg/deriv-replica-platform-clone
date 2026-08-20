@@ -8,12 +8,13 @@ import {
   verifyNovtrupSignature,
   type NovtrupWebhookPayload,
 } from "../lib/novtrup";
+import { kesToUsd, getKesPerUsdRate } from "../lib/forex";
 
 const router: IRouter = Router();
 
 const depositSchema = z.object({
   accountId: z.number(),
-  amount: z.number().positive(),
+  amountKes: z.number().positive(),
   phoneNumber: z.string().regex(/^254\d{9}$/, "Phone must be in 2547XXXXXXXX format"),
 });
 
@@ -22,7 +23,7 @@ router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) 
   if (!parsed.success) {
     return res.status(400).json({ error: parsed.error.flatten() });
   }
-  const { accountId, amount, phoneNumber } = parsed.data;
+  const { accountId, amountKes, phoneNumber } = parsed.data;
 
   const account = await db.query.accountsTable.findFirst({
     where: eq(accountsTable.id, accountId),
@@ -31,10 +32,11 @@ router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) 
     return res.status(403).json({ error: "Account not found or not owned by you" });
   }
 
+  const usdAmount = kesToUsd(amountKes);
   const accountReference = `TRD-${accountId}-${Date.now()}`;
 
   const result = await initiateNovtrupDeposit({
-    amount,
+    amount: amountKes,
     phoneNumber,
     accountReference,
     transactionDesc: "Deriv trading account deposit",
@@ -47,7 +49,7 @@ router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) 
   await db.insert(transactionsTable).values({
     accountId,
     type: "deposit",
-    amount: amount.toFixed(2),
+    amount: usdAmount.toFixed(2),
     status: "pending",
     provider: "novtrup_mpesa",
     providerReference: result.checkoutRequestId,
@@ -57,6 +59,36 @@ router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) 
     status: "pending",
     message: "Check your phone to approve the M-Pesa payment.",
     checkoutRequestId: result.checkoutRequestId,
+    amountKes,
+    estimatedUsd: usdAmount.toFixed(2),
+    rate: getKesPerUsdRate(),
+  });
+});
+
+router.get("/status", authenticate, async (req: AuthedRequest, res: Response) => {
+  const reference = req.query.reference as string | undefined;
+  if (!reference) {
+    return res.status(400).json({ error: "reference query param required" });
+  }
+
+  const transaction = await db.query.transactionsTable.findFirst({
+    where: eq(transactionsTable.providerReference, reference),
+  });
+  if (!transaction) {
+    return res.status(404).json({ error: "Transaction not found" });
+  }
+
+  const account = await db.query.accountsTable.findFirst({
+    where: eq(accountsTable.id, transaction.accountId),
+  });
+  if (!account || account.userId !== req.userId) {
+    return res.status(403).json({ error: "Not your transaction" });
+  }
+
+  res.json({
+    status: transaction.status,
+    amount: transaction.amount,
+    newBalance: transaction.status === "completed" ? account.balance : undefined,
   });
 });
 
@@ -78,12 +110,10 @@ router.post("/webhook/novtrup", async (req: Request, res: Response) => {
   });
 
   if (!transaction) {
-    // Not one of ours (or already deleted) — acknowledge so NOVTRUP doesn't retry forever
     return res.status(200).json({ ok: true, note: "No matching transaction" });
   }
 
   if (transaction.status !== "pending") {
-    // Already processed — idempotent no-op
     return res.status(200).json({ ok: true, note: "Already processed" });
   }
 
