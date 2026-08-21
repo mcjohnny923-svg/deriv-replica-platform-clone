@@ -117,6 +117,8 @@ export const transactionsTable = pgTable("transactions", {
     .references(() => accountsTable.id)
     .notNull(),
   type: transactionTypeEnum("type").notNull(),
+  provider: text("provider"),
+  providerReference: text("provider_reference").unique(),
   amount: numeric("amount", { precision: 15, scale: 2 }).notNull(),
   status: transactionStatusEnum("status").notNull().default("pending"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
