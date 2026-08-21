@@ -1,19 +1,28 @@
-import { useState } from 'react';
-import { CreditCard, Building, Smartphone, Shield } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Smartphone, Shield, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import DerivHeader from '@/components/DerivHeader';
 import DerivSidebar from '@/components/DerivSidebar';
 import MobileBottomNav from '@/components/MobileBottomNav';
-import { getStoredAccount } from '@/lib/auth-api';
+import { getStoredAccount, updateStoredAccountBalance } from '@/lib/auth-api';
+import { initiateDeposit, checkDepositStatus } from '@/lib/payments-api';
+
+type FlowState = 'form' | 'waiting' | 'success' | 'failed';
 
 const Deposit = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedMethod, setSelectedMethod] = useState('card');
-  const [amount, setAmount] = useState('100');
+  const [balanceRefreshKey, setBalanceRefreshKey] = useState(0);
   const account = getStoredAccount();
+
+  const [amountKes, setAmountKes] = useState('1300');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [flowState, setFlowState] = useState<FlowState>('form');
+  const [checkoutRequestId, setCheckoutRequestId] = useState<string | null>(null);
+  const [resultMessage, setResultMessage] = useState('');
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const balance = account
     ? `${account.currency} ${Number(account.balance).toLocaleString('en-US', {
@@ -22,36 +31,72 @@ const Deposit = () => {
       })}`
     : '—';
 
-  const paymentMethods = [
-    {
-      id: 'card',
-      name: 'Credit/Debit Card',
-      icon: CreditCard,
-      fee: 'No fee',
-      time: 'Instant',
-      description: 'Visa, Mastercard, American Express',
-    },
-    {
-      id: 'bank',
-      name: 'Bank Transfer',
-      icon: Building,
-      fee: 'No fee',
-      time: '1-3 business days',
-      description: 'Direct bank transfer',
-    },
-    {
-      id: 'ewallet',
-      name: 'E-Wallet',
-      icon: Smartphone,
-      fee: 'No fee',
-      time: 'Instant',
-      description: 'PayPal, Skrill, Neteller',
-    },
-  ];
+  const estimatedUsd = (parseFloat(amountKes) / 130).toFixed(2);
+
+  useEffect(() => {
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, []);
+
+  const handleSubmit = async () => {
+    if (!account) {
+      toast.error('Please log in first.');
+      return;
+    }
+    const kes = parseFloat(amountKes);
+    if (!kes || kes <= 0) {
+      toast.error('Enter a valid amount.');
+      return;
+    }
+    if (!/^254\d{9}$/.test(phoneNumber)) {
+      toast.error('Phone number must be in 2547XXXXXXXX format.');
+      return;
+    }
+
+    try {
+      const result = await initiateDeposit({
+        accountId: account.id,
+        amountKes: kes,
+        phoneNumber,
+      });
+      setCheckoutRequestId(result.checkoutRequestId);
+      setFlowState('waiting');
+      toast.success('STK push sent — approve it on your phone.');
+
+      pollRef.current = setInterval(async () => {
+        try {
+          const status = await checkDepositStatus(result.checkoutRequestId);
+          if (status.status === 'completed') {
+            if (pollRef.current) clearInterval(pollRef.current);
+            if (status.newBalance) updateStoredAccountBalance(status.newBalance);
+            setBalanceRefreshKey((k) => k + 1);
+            setResultMessage(`Deposit of USD ${status.amount} confirmed.`);
+            setFlowState('success');
+          } else if (status.status === 'failed') {
+            if (pollRef.current) clearInterval(pollRef.current);
+            setResultMessage('Payment was not completed. You can try again.');
+            setFlowState('failed');
+          }
+        } catch {
+          // transient error, keep polling
+        }
+      }, 3000);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to start deposit');
+    }
+  };
+
+  const resetFlow = () => {
+    if (pollRef.current) clearInterval(pollRef.current);
+    setFlowState('form');
+    setCheckoutRequestId(null);
+    setResultMessage('');
+  };
 
   return (
     <div className="min-h-screen bg-[#0e0e0e] text-white flex flex-col">
-      <DerivHeader onMenuClick={() => setIsSidebarOpen(true)} />
+      <DerivHeader onMenuClick={() => setIsSidebarOpen(true)} balanceRefreshKey={balanceRefreshKey} />
       <div className="flex flex-1 overflow-hidden">
         <DerivSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
 
@@ -65,111 +110,92 @@ const Deposit = () => {
               <div className="text-xs text-gray-400 capitalize mt-0.5">{account?.type ?? '—'} account</div>
             </div>
 
-            <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
-              <h2 className="text-sm font-semibold text-gray-300 mb-4">Add Money to Your Account</h2>
+            {flowState === 'form' && (
+              <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
+                <h2 className="text-sm font-semibold text-gray-300 mb-4 flex items-center">
+                  <Smartphone className="h-4 w-4 mr-2" />
+                  Deposit via M-Pesa
+                </h2>
 
-              {/* Amount Selection */}
-              <div className="mb-6">
-                <Label className="text-gray-300 mb-2 block text-xs">Deposit Amount</Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">$</span>
+                <div className="mb-4">
+                  <Label className="text-gray-300 mb-2 block text-xs">Amount (KES)</Label>
                   <Input
                     type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    className="bg-[#323738] border-[#414647] text-white pl-8 text-lg"
-                    placeholder="100"
+                    value={amountKes}
+                    onChange={(e) => setAmountKes(e.target.value)}
+                    className="bg-[#323738] border-[#414647] text-white text-lg"
+                    placeholder="1300"
                   />
-                </div>
-                <div className="grid grid-cols-4 gap-2 mt-3">
-                  {['50', '100', '250', '500'].map((preset) => (
-                    <Button
-                      key={preset}
-                      variant="ghost"
-                      onClick={() => setAmount(preset)}
-                      className="bg-[#323738] hover:bg-[#414647] text-gray-300 text-sm"
-                    >
-                      ${preset}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Payment Methods */}
-              <div className="mb-6">
-                <Label className="text-gray-300 mb-3 block text-xs">Payment Method</Label>
-                <RadioGroup value={selectedMethod} onValueChange={setSelectedMethod}>
-                  <div className="space-y-2">
-                    {paymentMethods.map((method) => (
-                      <div key={method.id} className="relative">
-                        <RadioGroupItem value={method.id} id={method.id} className="sr-only" />
-                        <label
-                          htmlFor={method.id}
-                          className={`flex items-center p-3 rounded-lg border-2 cursor-pointer transition-colors ${
-                            selectedMethod === method.id
-                              ? 'border-red-500 bg-red-500/10'
-                              : 'border-[#414647] bg-[#323738] hover:bg-[#414647]'
-                          }`}
-                        >
-                          <method.icon className="h-5 w-5 text-gray-400 mr-3 shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium text-white">{method.name}</div>
-                            <div className="text-xs text-gray-400 truncate">{method.description}</div>
-                          </div>
-                          <div className="text-right shrink-0 ml-2">
-                            <div className="text-xs text-gray-400">{method.fee}</div>
-                            <div className="text-[10px] text-gray-500">{method.time}</div>
-                          </div>
-                        </label>
-                      </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    ≈ USD {isNaN(Number(estimatedUsd)) ? '0.00' : estimatedUsd} credited to your account
+                  </div>
+                  <div className="grid grid-cols-4 gap-2 mt-3">
+                    {['650', '1300', '3250', '6500'].map((preset) => (
+                      <Button
+                        key={preset}
+                        variant="ghost"
+                        onClick={() => setAmountKes(preset)}
+                        className="bg-[#323738] hover:bg-[#414647] text-gray-300 text-sm"
+                      >
+                        {preset}
+                      </Button>
                     ))}
                   </div>
-                </RadioGroup>
-              </div>
-
-              {selectedMethod === 'card' && (
-                <div className="space-y-3 mb-6 p-3 bg-[#323738] rounded-lg">
-                  <div>
-                    <Label className="text-gray-300 text-xs">Card Number</Label>
-                    <Input
-                      type="text"
-                      placeholder="1234 5678 9012 3456"
-                      className="mt-1 bg-[#0e0e0e] border-[#414647] text-white"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label className="text-gray-300 text-xs">Expiry Date</Label>
-                      <Input
-                        type="text"
-                        placeholder="MM/YY"
-                        className="mt-1 bg-[#0e0e0e] border-[#414647] text-white"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-gray-300 text-xs">CVV</Label>
-                      <Input
-                        type="text"
-                        placeholder="123"
-                        className="mt-1 bg-[#0e0e0e] border-[#414647] text-white"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="text-gray-300 text-xs">Cardholder Name</Label>
-                    <Input
-                      type="text"
-                      placeholder="Full name on card"
-                      className="mt-1 bg-[#0e0e0e] border-[#414647] text-white"
-                    />
-                  </div>
                 </div>
-              )}
 
-              <Button className="w-full bg-red-600 hover:bg-red-700 text-white py-3 text-base">
-                Deposit ${amount}
-              </Button>
-            </div>
+                <div className="mb-6">
+                  <Label className="text-gray-300 mb-2 block text-xs">M-Pesa Phone Number</Label>
+                  <Input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="2547XXXXXXXX"
+                    className="bg-[#323738] border-[#414647] text-white"
+                  />
+                  <div className="text-xs text-gray-500 mt-1">Format: 254 followed by 9 digits, no + or spaces</div>
+                </div>
+
+                <Button
+                  onClick={handleSubmit}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white py-3 text-base"
+                >
+                  Send M-Pesa Request
+                </Button>
+              </div>
+            )}
+
+            {flowState === 'waiting' && (
+              <div className="bg-[#151717] rounded-lg p-8 border border-[#323738] text-center">
+                <Loader2 className="h-10 w-10 text-red-500 animate-spin mx-auto mb-4" />
+                <h3 className="text-white font-semibold mb-2">Check your phone</h3>
+                <p className="text-gray-400 text-sm">
+                  Enter your M-Pesa PIN on the prompt sent to {phoneNumber} to approve the payment of KES {amountKes}.
+                </p>
+                <p className="text-gray-500 text-xs mt-4">This page updates automatically once confirmed.</p>
+              </div>
+            )}
+
+            {flowState === 'success' && (
+              <div className="bg-[#151717] rounded-lg p-8 border border-[#323738] text-center">
+                <CheckCircle2 className="h-10 w-10 text-green-500 mx-auto mb-4" />
+                <h3 className="text-white font-semibold mb-2">Deposit successful</h3>
+                <p className="text-gray-400 text-sm mb-4">{resultMessage}</p>
+                <Button onClick={resetFlow} className="bg-red-600 hover:bg-red-700 text-white">
+                  Make another deposit
+                </Button>
+              </div>
+            )}
+
+            {flowState === 'failed' && (
+              <div className="bg-[#151717] rounded-lg p-8 border border-[#323738] text-center">
+                <XCircle className="h-10 w-10 text-red-500 mx-auto mb-4" />
+                <h3 className="text-white font-semibold mb-2">Deposit not completed</h3>
+                <p className="text-gray-400 text-sm mb-4">{resultMessage}</p>
+                <Button onClick={resetFlow} className="bg-red-600 hover:bg-red-700 text-white">
+                  Try again
+                </Button>
+              </div>
+            )}
 
             <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
               <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center">
@@ -177,29 +203,10 @@ const Deposit = () => {
                 Security & Safety
               </h3>
               <ul className="space-y-1.5 text-xs text-gray-400">
-                <li>• SSL encrypted transactions</li>
-                <li>• PCI DSS compliant</li>
-                <li>• Funds segregated in tier-1 banks</li>
-                <li>• Regulated by financial authorities</li>
+                <li>• Payments processed via M-Pesa STK push</li>
+                <li>• You approve every payment with your own PIN</li>
+                <li>• We never see or store your M-Pesa PIN</li>
               </ul>
-            </div>
-
-            <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
-              <h3 className="text-sm font-semibold text-gray-300 mb-3">Deposit Limits</h3>
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Minimum</span>
-                  <span className="text-white">$10</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Maximum (Daily)</span>
-                  <span className="text-white">$10,000</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Maximum (Monthly)</span>
-                  <span className="text-white">$50,000</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>
