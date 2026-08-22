@@ -1,7 +1,7 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { db, accountsTable, transactionsTable } from "@workspace/db";
+import { db, accountsTable, transactionsTable, usersTable } from "@workspace/db";
 import { authenticate, type AuthedRequest } from "../middlewares/authenticate";
 import {
   initiateNovtrupDeposit,
@@ -15,7 +15,6 @@ const router: IRouter = Router();
 const depositSchema = z.object({
   accountId: z.number(),
   amountKes: z.number().positive(),
-  phoneNumber: z.string().regex(/^254\d{9}$/, "Phone must be in 2547XXXXXXXX format"),
 });
 
 router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) => {
@@ -23,7 +22,16 @@ router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) 
   if (!parsed.success) {
     return res.status(400).json({ error: parsed.error.flatten() });
   }
-  const { accountId, amountKes, phoneNumber } = parsed.data;
+  const { accountId, amountKes } = parsed.data;
+
+  const user = await db.query.usersTable.findFirst({
+    where: eq(usersTable.id, req.userId!),
+  });
+  if (!user?.phoneNumber) {
+    return res.status(400).json({
+      error: "No M-Pesa number on file. Please set your phone number first.",
+    });
+  }
 
   const account = await db.query.accountsTable.findFirst({
     where: eq(accountsTable.id, accountId),
@@ -37,7 +45,7 @@ router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) 
 
   const result = await initiateNovtrupDeposit({
     amount: amountKes,
-    phoneNumber,
+    phoneNumber: user.phoneNumber,
     accountReference,
     transactionDesc: "Deriv trading account deposit",
   });

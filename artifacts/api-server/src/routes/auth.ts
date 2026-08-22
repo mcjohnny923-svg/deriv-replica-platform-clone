@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { db, usersTable, accountsTable } from "@workspace/db";
 import { hashPassword, comparePassword, signToken } from "../lib/auth";
 import { generateReferralCode } from "../lib/referral";
+import { authenticate, type AuthedRequest } from "../middlewares/authenticate";
 
 const router: IRouter = Router();
 
@@ -82,6 +83,7 @@ router.post("/register", async (req, res) => {
       fullName: user.fullName,
       createdAt: user.createdAt,
       referralCode: user.referralCode,
+      phoneNumber: user.phoneNumber,
     },
     accounts: [demoAccount, realAccount],
   });
@@ -111,7 +113,6 @@ router.post("/login", async (req, res) => {
     return res.status(401).json({ error: "Invalid email or password" });
   }
 
-  // Backfill a referral code for older accounts created before this feature existed
   let referralCode = user.referralCode;
   if (!referralCode) {
     referralCode = await generateUniqueReferralCode();
@@ -135,9 +136,36 @@ router.post("/login", async (req, res) => {
       fullName: user.fullName,
       createdAt: user.createdAt,
       referralCode,
+      phoneNumber: user.phoneNumber,
     },
     accounts,
   });
+});
+
+const phoneSchema = z.object({
+  phoneNumber: z.string().regex(/^254\d{9}$/, "Phone must be in 2547XXXXXXXX format"),
+});
+
+router.patch("/phone", authenticate, async (req: AuthedRequest, res) => {
+  const parsed = phoneSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+  const { phoneNumber } = parsed.data;
+
+  const existing = await db.query.usersTable.findFirst({
+    where: eq(usersTable.phoneNumber, phoneNumber),
+  });
+  if (existing && existing.id !== req.userId) {
+    return res.status(409).json({ error: "This phone number is already linked to another account" });
+  }
+
+  await db
+    .update(usersTable)
+    .set({ phoneNumber })
+    .where(eq(usersTable.id, req.userId!));
+
+  res.json({ phoneNumber });
 });
 
 export default router;
