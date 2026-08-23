@@ -27,7 +27,6 @@ function authHeaders(): HeadersInit {
 export async function initiateDeposit(input: {
   accountId: number;
   amountKes: number;
-  phoneNumber: string;
 }): Promise<DepositInitResponse> {
   const res = await fetch(`${API_BASE_URL}/api/payments/deposit`, {
     method: "POST",
