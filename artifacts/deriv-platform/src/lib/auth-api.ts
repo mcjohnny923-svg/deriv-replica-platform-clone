@@ -6,6 +6,7 @@ export interface AuthUser {
   fullName: string | null;
   createdAt: string;
   referralCode: string;
+  phoneNumber: string | null;
 }
 
 export interface AuthAccount {
@@ -71,11 +72,26 @@ export function updateStoredAccountBalance(balance: string) {
   localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(updated));
 }
 
+export function updateStoredUserPhone(phoneNumber: string) {
+  const user = getStoredUser();
+  if (user) {
+    localStorage.setItem(USER_KEY, JSON.stringify({ ...user, phoneNumber }));
+  }
+}
+
 export function clearAuth() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
   localStorage.removeItem(ACCOUNTS_KEY);
   localStorage.removeItem(ACTIVE_TYPE_KEY);
+}
+
+function authHeaders(): HeadersInit {
+  const token = getToken();
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
 }
 
 export async function registerUser(input: {
@@ -108,6 +124,19 @@ export async function loginUser(input: {
   const data = await res.json();
   if (!res.ok) {
     throw new Error(data.error ?? "Login failed");
+  }
+  return data;
+}
+
+export async function setPhoneNumber(phoneNumber: string): Promise<{ phoneNumber: string }> {
+  const res = await fetch(`${API_BASE_URL}/api/auth/phone`, {
+    method: "PATCH",
+    headers: authHeaders(),
+    body: JSON.stringify({ phoneNumber }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error?.formErrors?.[0] ?? data.error ?? "Failed to save phone number");
   }
   return data;
 }
