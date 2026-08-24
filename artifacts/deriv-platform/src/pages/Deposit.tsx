@@ -7,20 +7,32 @@ import { Label } from '@/components/ui/label';
 import DerivHeader from '@/components/DerivHeader';
 import DerivSidebar from '@/components/DerivSidebar';
 import MobileBottomNav from '@/components/MobileBottomNav';
-import { getStoredAccount, updateStoredAccountBalance } from '@/lib/auth-api';
+import {
+  getStoredAccount,
+  updateStoredAccountBalance,
+  getStoredUser,
+  updateStoredUserPhone,
+  setPhoneNumber,
+} from '@/lib/auth-api';
 import { initiateDeposit, checkDepositStatus } from '@/lib/payments-api';
 
 type FlowState = 'form' | 'waiting' | 'success' | 'failed';
+
+function maskPhone(phone: string): string {
+  return `${phone.slice(0, 3)}${'•'.repeat(phone.length - 5)}${phone.slice(-2)}`;
+}
 
 const Deposit = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [balanceRefreshKey, setBalanceRefreshKey] = useState(0);
   const account = getStoredAccount();
+  const [storedPhone, setStoredPhone] = useState(getStoredUser()?.phoneNumber ?? null);
+
+  const [phoneInput, setPhoneInput] = useState('');
+  const [savingPhone, setSavingPhone] = useState(false);
 
   const [amountKes, setAmountKes] = useState('1300');
-  const [phoneNumber, setPhoneNumber] = useState('');
   const [flowState, setFlowState] = useState<FlowState>('form');
-  const [checkoutRequestId, setCheckoutRequestId] = useState<string | null>(null);
   const [resultMessage, setResultMessage] = useState('');
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -39,6 +51,24 @@ const Deposit = () => {
     };
   }, []);
 
+  const handleSavePhone = async () => {
+    if (!/^254\d{9}$/.test(phoneInput)) {
+      toast.error('Phone number must be in 2547XXXXXXXX format.');
+      return;
+    }
+    setSavingPhone(true);
+    try {
+      await setPhoneNumber(phoneInput);
+      updateStoredUserPhone(phoneInput);
+      setStoredPhone(phoneInput);
+      toast.success('M-Pesa number saved.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to save phone number');
+    } finally {
+      setSavingPhone(false);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!account) {
       toast.error('Please log in first.');
@@ -49,18 +79,12 @@ const Deposit = () => {
       toast.error('Enter a valid amount.');
       return;
     }
-    if (!/^254\d{9}$/.test(phoneNumber)) {
-      toast.error('Phone number must be in 2547XXXXXXXX format.');
-      return;
-    }
 
     try {
       const result = await initiateDeposit({
         accountId: account.id,
         amountKes: kes,
-        phoneNumber,
       });
-      setCheckoutRequestId(result.checkoutRequestId);
       setFlowState('waiting');
       toast.success('STK push sent — approve it on your phone.');
 
@@ -90,7 +114,6 @@ const Deposit = () => {
   const resetFlow = () => {
     if (pollRef.current) clearInterval(pollRef.current);
     setFlowState('form');
-    setCheckoutRequestId(null);
     setResultMessage('');
   };
 
@@ -110,14 +133,40 @@ const Deposit = () => {
               <div className="text-xs text-gray-400 capitalize mt-0.5">{account?.type ?? '—'} account</div>
             </div>
 
-            {flowState === 'form' && (
+            {!storedPhone && (
+              <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
+                <h2 className="text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                  <Smartphone className="h-4 w-4 mr-2" />
+                  Link your M-Pesa number
+                </h2>
+                <p className="text-xs text-gray-500 mb-3">
+                  This is set once and used for all future deposits — no need to type it every time.
+                </p>
+                <Input
+                  type="tel"
+                  value={phoneInput}
+                  onChange={(e) => setPhoneInput(e.target.value)}
+                  placeholder="2547XXXXXXXX"
+                  className="bg-[#323738] border-[#414647] text-white mb-3"
+                />
+                <Button
+                  onClick={handleSavePhone}
+                  disabled={savingPhone}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white disabled:opacity-50"
+                >
+                  {savingPhone ? 'Saving...' : 'Save Number'}
+                </Button>
+              </div>
+            )}
+
+            {storedPhone && flowState === 'form' && (
               <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
                 <h2 className="text-sm font-semibold text-gray-300 mb-4 flex items-center">
                   <Smartphone className="h-4 w-4 mr-2" />
-                  Deposit via M-Pesa
+                  Deposit via M-Pesa — {maskPhone(storedPhone)}
                 </h2>
 
-                <div className="mb-4">
+                <div className="mb-6">
                   <Label className="text-gray-300 mb-2 block text-xs">Amount (KES)</Label>
                   <Input
                     type="number"
@@ -143,18 +192,6 @@ const Deposit = () => {
                   </div>
                 </div>
 
-                <div className="mb-6">
-                  <Label className="text-gray-300 mb-2 block text-xs">M-Pesa Phone Number</Label>
-                  <Input
-                    type="tel"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    placeholder="2547XXXXXXXX"
-                    className="bg-[#323738] border-[#414647] text-white"
-                  />
-                  <div className="text-xs text-gray-500 mt-1">Format: 254 followed by 9 digits, no + or spaces</div>
-                </div>
-
                 <Button
                   onClick={handleSubmit}
                   className="w-full bg-red-600 hover:bg-red-700 text-white py-3 text-base"
@@ -169,7 +206,7 @@ const Deposit = () => {
                 <Loader2 className="h-10 w-10 text-red-500 animate-spin mx-auto mb-4" />
                 <h3 className="text-white font-semibold mb-2">Check your phone</h3>
                 <p className="text-gray-400 text-sm">
-                  Enter your M-Pesa PIN on the prompt sent to {phoneNumber} to approve the payment of KES {amountKes}.
+                  Enter your M-Pesa PIN on the prompt sent to {storedPhone ? maskPhone(storedPhone) : 'your phone'} to approve the payment of KES {amountKes}.
                 </p>
                 <p className="text-gray-500 text-xs mt-4">This page updates automatically once confirmed.</p>
               </div>
@@ -205,7 +242,7 @@ const Deposit = () => {
               <ul className="space-y-1.5 text-xs text-gray-400">
                 <li>• Payments processed via M-Pesa STK push</li>
                 <li>• You approve every payment with your own PIN</li>
-                <li>• We never see or store your M-Pesa PIN</li>
+                <li>• Your M-Pesa number is linked once, only to your account</li>
               </ul>
             </div>
           </div>
