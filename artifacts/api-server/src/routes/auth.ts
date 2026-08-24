@@ -24,6 +24,7 @@ const registerSchema = z.object({
   password: z.string().min(6),
   fullName: z.string().optional(),
   referralCode: z.string().optional(),
+  phoneNumber: z.string().regex(/^254\d{9}$/, "Phone must be in 2547XXXXXXXX format").optional(),
 });
 
 router.post("/register", async (req, res) => {
@@ -31,13 +32,22 @@ router.post("/register", async (req, res) => {
   if (!parsed.success) {
     return res.status(400).json({ error: parsed.error.flatten() });
   }
-  const { email, password, fullName, referralCode } = parsed.data;
+  const { email, password, fullName, referralCode, phoneNumber } = parsed.data;
 
   const existing = await db.query.usersTable.findFirst({
     where: eq(usersTable.email, email),
   });
   if (existing) {
     return res.status(409).json({ error: "Email already registered" });
+  }
+
+  if (phoneNumber) {
+    const phoneTaken = await db.query.usersTable.findFirst({
+      where: eq(usersTable.phoneNumber, phoneNumber),
+    });
+    if (phoneTaken) {
+      return res.status(409).json({ error: "This phone number is already linked to another account" });
+    }
   }
 
   let referredByUserId: number | null = null;
@@ -61,6 +71,7 @@ router.post("/register", async (req, res) => {
       fullName,
       referralCode: ownReferralCode,
       referredByUserId,
+      phoneNumber,
     })
     .returning();
 
