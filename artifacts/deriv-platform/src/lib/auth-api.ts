@@ -99,6 +99,7 @@ export async function registerUser(input: {
   password: string;
   fullName?: string;
   referralCode?: string;
+  phoneNumber?: string;
 }): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
     method: "POST",
