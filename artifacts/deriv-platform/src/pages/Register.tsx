@@ -38,6 +38,11 @@ const Register = () => {
       return;
     }
 
+    if (!/^254\d{9}$/.test(formData.phone)) {
+      setError('Phone number must be in 2547XXXXXXXX format (e.g. 254712345678)');
+      return;
+    }
+
     setLoading(true);
     try {
       const fullName = `${formData.firstName} ${formData.lastName}`.trim();
@@ -46,6 +51,7 @@ const Register = () => {
         password: formData.password,
         fullName: fullName || undefined,
         referralCode,
+        phoneNumber: formData.phone,
       });
       saveAuth(data);
       navigate('/dashboard');
@@ -146,16 +152,19 @@ const Register = () => {
             </div>
 
             <div>
-              <Label htmlFor="phone" className="text-gray-300">Phone Number</Label>
+              <Label htmlFor="phone" className="text-gray-300">M-Pesa Phone Number</Label>
               <Input
                 id="phone"
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
                 className="mt-1 bg-gray-700 border-gray-600 text-white"
-                placeholder="+1 (555) 123-4567"
+                placeholder="254712345678"
                 required
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Format: 254 followed by 9 digits, no + or spaces. Used for M-Pesa deposits.
+              </p>
             </div>
 
             <div>
