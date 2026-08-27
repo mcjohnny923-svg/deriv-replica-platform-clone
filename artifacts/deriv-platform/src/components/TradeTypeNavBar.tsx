@@ -9,7 +9,13 @@ const TradeTypeNavBar = ({ tradeType, onTradeTypeChange }: TradeTypeNavBarProps)
   return (
     <div
       className="flex gap-2 overflow-x-auto px-3 py-2 bg-[#151717] border-b border-[#323738] [&::-webkit-scrollbar]:hidden"
-      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      style={{
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
+        WebkitOverflowScrolling: 'touch',
+        touchAction: 'pan-x',
+        overscrollBehaviorX: 'contain',
+      }}
     >
       {TRADE_TYPES.map((type) => (
         <button
