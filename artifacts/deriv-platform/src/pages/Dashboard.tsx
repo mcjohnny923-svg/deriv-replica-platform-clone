@@ -34,9 +34,9 @@ const Dashboard = () => {
       <div className="flex flex-1 overflow-hidden">
         <DerivSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
 
-        <div className="flex-1 flex flex-col">
-          <div className="flex-1 flex">
-            <div className="flex-1 flex flex-col pb-[27rem] md:pb-0">
+        <div className="flex-1 min-w-0 flex flex-col">
+          <div className="flex-1 min-w-0 flex">
+            <div className="flex-1 min-w-0 flex flex-col pb-[27rem] md:pb-0">
               <TradeTypeNavBar tradeType={tradeType} onTradeTypeChange={setTradeType} />
 
               {showDigitStats ? (
