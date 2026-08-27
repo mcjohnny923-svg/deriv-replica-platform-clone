@@ -8,6 +8,7 @@ import DigitStatsDisplay from '@/components/DigitStatsDisplay';
 import MobileTradeDrawer from '@/components/MobileTradeDrawer';
 import AssetPriceBar from '@/components/AssetPriceBar';
 import MobileBottomNav from '@/components/MobileBottomNav';
+import TradeTypeNavBar from '@/components/TradeTypeNavBar';
 import { isDigitContract } from '@/lib/trade-config';
 
 const Dashboard = () => {
@@ -36,6 +37,8 @@ const Dashboard = () => {
         <div className="flex-1 flex flex-col">
           <div className="flex-1 flex">
             <div className="flex-1 flex flex-col pb-[27rem] md:pb-0">
+              <TradeTypeNavBar tradeType={tradeType} onTradeTypeChange={setTradeType} />
+
               {showDigitStats ? (
                 <>
                   <AssetPriceBar selectedAsset={selectedAsset} onAssetChange={setSelectedAsset} />

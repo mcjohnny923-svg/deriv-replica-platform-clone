@@ -104,7 +104,6 @@ const MobileTradeDrawer = ({
 
   return (
     <div className="fixed bottom-16 md:bottom-0 left-0 right-0 z-30 bg-[#151717] border-t border-[#323738] md:hidden">
-      {/* Collapse handle */}
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
@@ -117,26 +116,11 @@ const MobileTradeDrawer = ({
 
       {expanded && (
         <div className="pb-4">
-          {/* Trade type dropdown */}
-          <div className="px-4 py-3 border-t border-[#323738]">
-            <Select value={tradeType} onValueChange={onTradeTypeChange}>
-              <SelectTrigger className="w-full bg-transparent border-none text-white text-base font-semibold justify-center gap-2 [&>svg]:hidden">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-red-500" />
-                  <SelectValue>{currentLabel}</SelectValue>
-                </div>
-              </SelectTrigger>
-              <SelectContent className="bg-[#323738] border-[#414647]">
-                {TRADE_TYPES.map((type) => (
-                  <SelectItem key={type.value} value={type.value} className="text-white hover:bg-[#414647]">
-                    {type.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="px-4 py-3 border-t border-[#323738] flex items-center justify-center gap-2">
+            <TrendingUp className="h-4 w-4 text-red-500" />
+            <span className="text-white text-base font-semibold">{currentLabel}</span>
           </div>
 
-          {/* Digit picker row, only for Matches/Differs and Over/Under */}
           {digitSelector && (
             <div className="grid grid-cols-5 gap-2 px-4 pb-3">
               {DIGITS.map((digit) => (
@@ -156,7 +140,6 @@ const MobileTradeDrawer = ({
             </div>
           )}
 
-          {/* Duration / stake row, both editable */}
           <div className="flex items-center gap-3 px-4 py-3 border-t border-[#323738]">
             <div className="flex-1">
               <label className="block text-[11px] text-gray-400 mb-1">Duration</label>
@@ -198,7 +181,6 @@ const MobileTradeDrawer = ({
             </div>
           </div>
 
-          {/* Equals checkbox, only for non-digit contracts */}
           {!digitContract && (
             <div className="flex items-center space-x-3 px-4 py-3 border-t border-[#323738]">
               <Checkbox
@@ -216,7 +198,6 @@ const MobileTradeDrawer = ({
             </div>
           )}
 
-          {/* Buy buttons */}
           <div className="grid grid-cols-2 gap-2 px-4 pt-2">
             {tradeType === 'matches_differs' && (
               <>
