@@ -29,11 +29,27 @@ const CHOICES_BY_TYPE: Record<string, [string, string]> = {
   over_under: ['over', 'under'],
 };
 
+const VOLATILITY_ASSETS = [
+  'Volatility 10 Index',
+  'Volatility 25 Index',
+  'Volatility 50 Index',
+  'Volatility 75 Index',
+  'Volatility 100 Index',
+  'Volatility 10 (1s) Index',
+  'Volatility 15 (1s) Index',
+  'Volatility 25 (1s) Index',
+  'Volatility 30 (1s) Index',
+  'Volatility 50 (1s) Index',
+  'Volatility 75 (1s) Index',
+  'Volatility 90 (1s) Index',
+  'Volatility 100 (1s) Index',
+];
+
 const Automate = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [balanceRefreshKey, setBalanceRefreshKey] = useState(0);
 
-  const [selectedAsset] = useState('Volatility 75 Index');
+  const [selectedAsset, setSelectedAsset] = useState('Volatility 75 Index');
   const [tradeType, setTradeType] = useState('rise_fall');
   const [choiceIndex, setChoiceIndex] = useState(0);
   const [selectedDigit, setSelectedDigit] = useState(5);
@@ -208,20 +224,37 @@ const Automate = () => {
               )}
 
               <div className="bg-[#151717] border border-[#323738] rounded-lg divide-y divide-[#323738]">
-                <div className="p-3">
-                  <label className="block text-xs text-gray-300 mb-1.5">Trade type</label>
-                  <Select value={tradeType} onValueChange={setTradeType} disabled={isRunning}>
-                    <SelectTrigger className="bg-[#323738] border-[#414647] text-white h-9">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#323738] border-[#414647]">
-                      {TRADE_TYPES.map((t) => (
-                        <SelectItem key={t.value} value={t.value} className="text-white hover:bg-[#414647]">
-                          {t.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="p-3 grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-gray-300 mb-1.5">Volatility</label>
+                    <Select value={selectedAsset} onValueChange={setSelectedAsset} disabled={isRunning}>
+                      <SelectTrigger className="bg-[#323738] border-[#414647] text-white h-9">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#323738] border-[#414647] max-h-72">
+                        {VOLATILITY_ASSETS.map((asset) => (
+                          <SelectItem key={asset} value={asset} className="text-white hover:bg-[#414647]">
+                            {asset}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-300 mb-1.5">Trade type</label>
+                    <Select value={tradeType} onValueChange={setTradeType} disabled={isRunning}>
+                      <SelectTrigger className="bg-[#323738] border-[#414647] text-white h-9">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#323738] border-[#414647]">
+                        {TRADE_TYPES.map((t) => (
+                          <SelectItem key={t.value} value={t.value} className="text-white hover:bg-[#414647]">
+                            {t.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 <div className="p-3">
