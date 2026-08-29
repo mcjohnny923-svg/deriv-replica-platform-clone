@@ -10,6 +10,7 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import Deposit from "./pages/Deposit";
 import Cashier from "./pages/Cashier";
+import Admin from "./pages/Admin";
 import Positions from "./pages/Positions";
 import Automate from "./pages/Automate";
 import Partners from "./pages/Partners";
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/deposit" element={<Deposit />} />
           <Route path="/withdrawal" element={<Deposit />} />
           <Route path="/cashier" element={<Cashier />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/reports" element={<Dashboard />} />
           <Route path="/portfolio" element={<Dashboard />} />
           <Route path="/markets" element={<Dashboard />} />
