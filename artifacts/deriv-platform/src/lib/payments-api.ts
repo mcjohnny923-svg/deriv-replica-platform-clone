@@ -1,6 +1,8 @@
 import { API_BASE_URL } from "./api-config";
 import { getToken } from "./auth-api";
 
+export type DepositProvider = "mpesa" | "paystack";
+
 export interface DepositInitResponse {
   status: "pending";
   message: string;
@@ -27,11 +29,16 @@ function authHeaders(): HeadersInit {
 export async function initiateDeposit(input: {
   accountId: number;
   amountKes: number;
+  provider?: DepositProvider;
 }): Promise<DepositInitResponse> {
   const res = await fetch(`${API_BASE_URL}/api/payments/deposit`, {
     method: "POST",
     headers: authHeaders(),
-    body: JSON.stringify(input),
+    body: JSON.stringify({
+      accountId: input.accountId,
+      amountKes: input.amountKes,
+      provider: input.provider ?? "mpesa",
+    }),
   });
   const data = await res.json();
   if (!res.ok) {

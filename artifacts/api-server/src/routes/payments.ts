@@ -5,6 +5,7 @@ import { db, accountsTable, transactionsTable, usersTable } from "@workspace/db"
 import { authenticate, type AuthedRequest } from "../middlewares/authenticate";
 import {
   initiateNovtrupDeposit,
+  initiateNovtrupPaystackDeposit,
   verifyNovtrupSignature,
   type NovtrupWebhookPayload,
 } from "../lib/novtrup";
@@ -15,6 +16,7 @@ const router: IRouter = Router();
 const depositSchema = z.object({
   accountId: z.number(),
   amountKes: z.number().positive(),
+  provider: z.enum(["mpesa", "paystack"]).default("mpesa"),
 });
 
 router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) => {
@@ -22,7 +24,7 @@ router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) 
   if (!parsed.success) {
     return res.status(400).json({ error: parsed.error.flatten() });
   }
-  const { accountId, amountKes } = parsed.data;
+  const { accountId, amountKes, provider } = parsed.data;
 
   const user = await db.query.usersTable.findFirst({
     where: eq(usersTable.id, req.userId!),
@@ -42,6 +44,37 @@ router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) 
 
   const usdAmount = kesToUsd(amountKes);
   const accountReference = `TRD-${accountId}-${Date.now()}`;
+
+  if (provider === "paystack") {
+    const result = await initiateNovtrupPaystackDeposit({
+      amount: amountKes,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      accountReference,
+    });
+
+    if (!result.ok || !result.reference) {
+      return res.status(502).json({ error: result.error ?? "Deposit initiation failed" });
+    }
+
+    await db.insert(transactionsTable).values({
+      accountId,
+      type: "deposit",
+      amount: usdAmount.toFixed(2),
+      status: "pending",
+      provider: "novtrup_paystack",
+      providerReference: result.reference,
+    });
+
+    return res.status(202).json({
+      status: "pending",
+      message: result.message ?? "Check your phone to approve the payment.",
+      checkoutRequestId: result.reference,
+      amountKes,
+      estimatedUsd: usdAmount.toFixed(2),
+      rate: getKesPerUsdRate(),
+    });
+  }
 
   const result = await initiateNovtrupDeposit({
     amount: amountKes,

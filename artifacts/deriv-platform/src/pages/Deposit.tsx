@@ -14,13 +14,18 @@ import {
   updateStoredUserPhone,
   setPhoneNumber,
 } from '@/lib/auth-api';
-import { initiateDeposit, checkDepositStatus } from '@/lib/payments-api';
+import { initiateDeposit, checkDepositStatus, type DepositProvider } from '@/lib/payments-api';
 
 type FlowState = 'form' | 'waiting' | 'success' | 'failed';
 
 function maskPhone(phone: string): string {
   return `${phone.slice(0, 3)}${'•'.repeat(phone.length - 5)}${phone.slice(-2)}`;
 }
+
+const PROVIDERS: { value: DepositProvider; label: string }[] = [
+  { value: 'mpesa', label: 'M-Pesa Direct' },
+  { value: 'paystack', label: 'Paystack' },
+];
 
 const Deposit = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -31,6 +36,7 @@ const Deposit = () => {
   const [phoneInput, setPhoneInput] = useState('');
   const [savingPhone, setSavingPhone] = useState(false);
 
+  const [provider, setProvider] = useState<DepositProvider>('mpesa');
   const [amountKes, setAmountKes] = useState('1300');
   const [flowState, setFlowState] = useState<FlowState>('form');
   const [resultMessage, setResultMessage] = useState('');
@@ -84,9 +90,10 @@ const Deposit = () => {
       const result = await initiateDeposit({
         accountId: account.id,
         amountKes: kes,
+        provider,
       });
       setFlowState('waiting');
-      toast.success('STK push sent — approve it on your phone.');
+      toast.success('Request sent — approve it on your phone.');
 
       pollRef.current = setInterval(async () => {
         try {
@@ -163,8 +170,26 @@ const Deposit = () => {
               <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
                 <h2 className="text-sm font-semibold text-gray-300 mb-4 flex items-center">
                   <Smartphone className="h-4 w-4 mr-2" />
-                  Deposit via M-Pesa — {maskPhone(storedPhone)}
+                  Deposit — {maskPhone(storedPhone)}
                 </h2>
+
+                {/* Provider tabs */}
+                <div className="flex gap-2 mb-5">
+                  {PROVIDERS.map((p) => (
+                    <button
+                      key={p.value}
+                      type="button"
+                      onClick={() => setProvider(p.value)}
+                      className={`flex-1 py-2.5 rounded-lg text-sm font-semibold border transition-colors ${
+                        provider === p.value
+                          ? 'bg-red-600 border-red-500 text-white'
+                          : 'bg-[#323738] border-[#414647] text-gray-300 hover:bg-[#414647]'
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
 
                 <div className="mb-6">
                   <Label className="text-gray-300 mb-2 block text-xs">Amount (KES)</Label>
@@ -196,7 +221,7 @@ const Deposit = () => {
                   onClick={handleSubmit}
                   className="w-full bg-red-600 hover:bg-red-700 text-white py-3 text-base"
                 >
-                  Send M-Pesa Request
+                  {provider === 'paystack' ? 'Pay with Paystack' : 'Send M-Pesa Request'}
                 </Button>
               </div>
             )}
@@ -240,7 +265,7 @@ const Deposit = () => {
                 Security & Safety
               </h3>
               <ul className="space-y-1.5 text-xs text-gray-400">
-                <li>• Payments processed via M-Pesa STK push</li>
+                <li>• Payments processed via M-Pesa STK push (direct or via Paystack)</li>
                 <li>• You approve every payment with your own PIN</li>
                 <li>• Your M-Pesa number is linked once, only to your account</li>
               </ul>

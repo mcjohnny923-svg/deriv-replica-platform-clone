@@ -36,7 +36,7 @@ export async function initiateNovtrupDeposit(input: {
       }),
     });
 
-    const data = await res.json();
+    const data: any = await res.json();
 
     if (!res.ok) {
       return { ok: false, error: data.error ?? `NOVTRUP returned ${res.status}` };
@@ -46,6 +46,57 @@ export async function initiateNovtrupDeposit(input: {
       ok: true,
       merchantRequestId: data.merchant_request_id,
       checkoutRequestId: data.checkout_request_id,
+    };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Request to NOVTRUP failed" };
+  }
+}
+
+export interface NovtrupPaystackDepositResult {
+  ok: boolean;
+  reference?: string;
+  message?: string;
+  error?: string;
+}
+
+// Same NOVTRUP broker, different rail: mobile money via Paystack's Charge
+// API instead of Daraja direct. Requires an email in addition to the
+// phone number (Paystack uses it for receipts/fraud checks).
+export async function initiateNovtrupPaystackDeposit(input: {
+  amount: number;
+  email: string;
+  phoneNumber: string;
+  accountReference: string;
+}): Promise<NovtrupPaystackDepositResult> {
+  if (!NOVTRUP_BASE_URL || !NOVTRUP_API_KEY) {
+    return { ok: false, error: "NOVTRUP integration not configured" };
+  }
+
+  try {
+    const res = await fetch(`${NOVTRUP_BASE_URL}/api/paystack/deposit`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-Key": NOVTRUP_API_KEY,
+      },
+      body: JSON.stringify({
+        amount: input.amount,
+        email: input.email,
+        phone_number: input.phoneNumber,
+        account_reference: input.accountReference,
+      }),
+    });
+
+    const data: any = await res.json();
+
+    if (!res.ok) {
+      return { ok: false, error: data.error ?? `NOVTRUP returned ${res.status}` };
+    }
+
+    return {
+      ok: true,
+      reference: data.reference,
+      message: data.message,
     };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : "Request to NOVTRUP failed" };
