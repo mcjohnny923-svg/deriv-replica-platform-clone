@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import Deposit from "./pages/Deposit";
+import Cashier from "./pages/Cashier";
 import Positions from "./pages/Positions";
 import Automate from "./pages/Automate";
 import Partners from "./pages/Partners";
@@ -28,7 +29,7 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/deposit" element={<Deposit />} />
           <Route path="/withdrawal" element={<Deposit />} />
-          <Route path="/cashier" element={<Deposit />} />
+          <Route path="/cashier" element={<Cashier />} />
           <Route path="/reports" element={<Dashboard />} />
           <Route path="/portfolio" element={<Dashboard />} />
           <Route path="/markets" element={<Dashboard />} />
