@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ChevronDown, Check, HelpCircle, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getStoredAccounts, getActiveAccountType, setActiveAccountType, type AuthAccount } from '@/lib/auth-api';
+import TopUpModal from '@/components/TopUpModal';
 
 interface DerivHeaderProps {
   onMenuClick?: () => void;
@@ -12,6 +13,7 @@ interface DerivHeaderProps {
 
 const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivHeaderProps) => {
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
+  const [topUpOpen, setTopUpOpen] = useState(false);
   const [accounts, setAccounts] = useState<AuthAccount[]>(getStoredAccounts());
   const [activeType, setActiveType] = useState(getActiveAccountType());
 
@@ -123,13 +125,16 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
           )}
         </div>
 
-        {/* Deposit button */}
-        <Link to="/deposit">
-          <Button className="bg-red-500 hover:bg-red-600 text-white h-9 px-4 rounded-full font-semibold text-sm">
-            Deposit
-          </Button>
-        </Link>
+        {/* Deposit button - opens the Top Up Funds modal */}
+        <Button
+          onClick={() => setTopUpOpen(true)}
+          className="bg-red-500 hover:bg-red-600 text-white h-9 px-4 rounded-full font-semibold text-sm"
+        >
+          Deposit
+        </Button>
       </div>
+
+      <TopUpModal open={topUpOpen} onOpenChange={setTopUpOpen} />
     </header>
   );
 };

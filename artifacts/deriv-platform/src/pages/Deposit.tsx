@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Smartphone, Shield, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -18,16 +19,23 @@ import { initiateDeposit, checkDepositStatus, type DepositProvider } from '@/lib
 
 type FlowState = 'form' | 'waiting' | 'success' | 'failed';
 
+const KES_PER_USD = 130;
+
+const PROVIDER_LABELS: Record<DepositProvider, string> = {
+  mpesa: 'M-Pesa',
+  paystack: 'Paystack',
+};
+
 function maskPhone(phone: string): string {
   return `${phone.slice(0, 3)}${'•'.repeat(phone.length - 5)}${phone.slice(-2)}`;
 }
 
-const PROVIDERS: { value: DepositProvider; label: string }[] = [
-  { value: 'mpesa', label: 'M-Pesa Direct' },
-  { value: 'paystack', label: 'Paystack' },
-];
-
 const Deposit = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const provider: DepositProvider =
+    (location.state as { provider?: DepositProvider } | null)?.provider ?? 'mpesa';
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [balanceRefreshKey, setBalanceRefreshKey] = useState(0);
   const account = getStoredAccount();
@@ -36,8 +44,7 @@ const Deposit = () => {
   const [phoneInput, setPhoneInput] = useState('');
   const [savingPhone, setSavingPhone] = useState(false);
 
-  const [provider, setProvider] = useState<DepositProvider>('mpesa');
-  const [amountKes, setAmountKes] = useState('1300');
+  const [amountUsd, setAmountUsd] = useState('10');
   const [flowState, setFlowState] = useState<FlowState>('form');
   const [resultMessage, setResultMessage] = useState('');
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -49,7 +56,9 @@ const Deposit = () => {
       })}`
     : '—';
 
-  const estimatedUsd = (parseFloat(amountKes) / 130).toFixed(2);
+  const parsedUsd = parseFloat(amountUsd);
+  const kesAmount = Number.isFinite(parsedUsd) && parsedUsd > 0 ? parsedUsd * KES_PER_USD : 0;
+  const kesDisplay = kesAmount.toLocaleString('en-US', { maximumFractionDigits: 0 });
 
   useEffect(() => {
     return () => {
@@ -80,8 +89,7 @@ const Deposit = () => {
       toast.error('Please log in first.');
       return;
     }
-    const kes = parseFloat(amountKes);
-    if (!kes || kes <= 0) {
+    if (!parsedUsd || parsedUsd <= 0) {
       toast.error('Enter a valid amount.');
       return;
     }
@@ -89,7 +97,7 @@ const Deposit = () => {
     try {
       const result = await initiateDeposit({
         accountId: account.id,
-        amountKes: kes,
+        amountKes: kesAmount,
         provider,
       });
       setFlowState('waiting');
@@ -170,48 +178,30 @@ const Deposit = () => {
               <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
                 <h2 className="text-sm font-semibold text-gray-300 mb-4 flex items-center">
                   <Smartphone className="h-4 w-4 mr-2" />
-                  Deposit — {maskPhone(storedPhone)}
+                  {PROVIDER_LABELS[provider]} — {maskPhone(storedPhone)}
                 </h2>
 
-                {/* Provider tabs */}
-                <div className="flex gap-2 mb-5">
-                  {PROVIDERS.map((p) => (
-                    <button
-                      key={p.value}
-                      type="button"
-                      onClick={() => setProvider(p.value)}
-                      className={`flex-1 py-2.5 rounded-lg text-sm font-semibold border transition-colors ${
-                        provider === p.value
-                          ? 'bg-red-600 border-red-500 text-white'
-                          : 'bg-[#323738] border-[#414647] text-gray-300 hover:bg-[#414647]'
-                      }`}
-                    >
-                      {p.label}
-                    </button>
-                  ))}
-                </div>
-
                 <div className="mb-6">
-                  <Label className="text-gray-300 mb-2 block text-xs">Amount (KES)</Label>
+                  <Label className="text-gray-300 mb-2 block text-xs">Amount (USD)</Label>
                   <Input
                     type="number"
-                    value={amountKes}
-                    onChange={(e) => setAmountKes(e.target.value)}
+                    value={amountUsd}
+                    onChange={(e) => setAmountUsd(e.target.value)}
                     className="bg-[#323738] border-[#414647] text-white text-lg"
-                    placeholder="1300"
+                    placeholder="10"
                   />
                   <div className="text-xs text-gray-500 mt-1">
-                    ≈ USD {isNaN(Number(estimatedUsd)) ? '0.00' : estimatedUsd} credited to your account
+                    = {kesDisplay} KES will be charged (rate: {KES_PER_USD} KES/USD)
                   </div>
                   <div className="grid grid-cols-4 gap-2 mt-3">
-                    {['650', '1300', '3250', '6500'].map((preset) => (
+                    {['5', '10', '25', '50'].map((preset) => (
                       <Button
                         key={preset}
                         variant="ghost"
-                        onClick={() => setAmountKes(preset)}
+                        onClick={() => setAmountUsd(preset)}
                         className="bg-[#323738] hover:bg-[#414647] text-gray-300 text-sm"
                       >
-                        {preset}
+                        ${preset}
                       </Button>
                     ))}
                   </div>
@@ -223,6 +213,14 @@ const Deposit = () => {
                 >
                   {provider === 'paystack' ? 'Pay with Paystack' : 'Send M-Pesa Request'}
                 </Button>
+
+                <button
+                  type="button"
+                  onClick={() => navigate('/deposit', { state: null, replace: true })}
+                  className="w-full text-center text-xs text-gray-500 hover:text-gray-300 mt-3"
+                >
+                  Change payment method
+                </button>
               </div>
             )}
 
@@ -231,7 +229,7 @@ const Deposit = () => {
                 <Loader2 className="h-10 w-10 text-red-500 animate-spin mx-auto mb-4" />
                 <h3 className="text-white font-semibold mb-2">Check your phone</h3>
                 <p className="text-gray-400 text-sm">
-                  Enter your M-Pesa PIN on the prompt sent to {storedPhone ? maskPhone(storedPhone) : 'your phone'} to approve the payment of KES {amountKes}.
+                  Enter your M-Pesa PIN on the prompt sent to {storedPhone ? maskPhone(storedPhone) : 'your phone'} to approve the payment of KES {kesDisplay}.
                 </p>
                 <p className="text-gray-500 text-xs mt-4">This page updates automatically once confirmed.</p>
               </div>
