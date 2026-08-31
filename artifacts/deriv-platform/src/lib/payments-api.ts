@@ -18,6 +18,17 @@ export interface DepositStatusResponse {
   newBalance?: string;
 }
 
+export interface WithdrawResponse {
+  status: "pending";
+  message: string;
+  amountUsd: number;
+  newBalance: string;
+}
+
+export interface RateResponse {
+  rate: number;
+}
+
 function authHeaders(): HeadersInit {
   const token = getToken();
   return {
@@ -55,6 +66,33 @@ export async function checkDepositStatus(reference: string): Promise<DepositStat
   const data = await res.json();
   if (!res.ok) {
     throw new Error(data.error ?? "Failed to check deposit status");
+  }
+  return data;
+}
+
+export async function initiateWithdraw(input: {
+  accountId: number;
+  amountUsd: number;
+}): Promise<WithdrawResponse> {
+  const res = await fetch(`${API_BASE_URL}/api/payments/withdraw`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(input),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error?.formErrors?.[0] ?? data.error ?? "Withdrawal failed to start");
+  }
+  return data;
+}
+
+export async function getExchangeRate(): Promise<RateResponse> {
+  const res = await fetch(`${API_BASE_URL}/api/payments/rate`, {
+    headers: authHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error ?? "Failed to fetch exchange rate");
   }
   return data;
 }

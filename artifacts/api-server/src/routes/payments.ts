@@ -1,7 +1,7 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { z } from "zod";
-import { eq } from "drizzle-orm";
-import { db, accountsTable, transactionsTable, usersTable } from "@workspace/db";
+import { eq, and, desc, gt } from "drizzle-orm";
+import { db, accountsTable, transactionsTable, usersTable, tradesTable } from "@workspace/db";
 import { authenticate, type AuthedRequest } from "../middlewares/authenticate";
 import {
   initiateNovtrupDeposit,
@@ -104,6 +104,79 @@ router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) 
     estimatedUsd: usdAmount.toFixed(2),
     rate: getKesPerUsdRate(),
   });
+});
+
+const withdrawSchema = z.object({
+  accountId: z.number(),
+  amountUsd: z.number().min(5, "Minimum withdrawal is $5"),
+});
+
+router.post("/withdraw", authenticate, async (req: AuthedRequest, res: Response) => {
+  const parsed = withdrawSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+  const { accountId, amountUsd } = parsed.data;
+
+  const account = await db.query.accountsTable.findFirst({
+    where: eq(accountsTable.id, accountId),
+  });
+  if (!account || account.userId !== req.userId) {
+    return res.status(403).json({ error: "Account not found or not owned by you" });
+  }
+
+  if (Number(account.balance) < amountUsd) {
+    return res.status(400).json({ error: "Insufficient balance" });
+  }
+
+  const lastDeposit = await db.query.transactionsTable.findFirst({
+    where: and(
+      eq(transactionsTable.accountId, accountId),
+      eq(transactionsTable.type, "deposit"),
+      eq(transactionsTable.status, "completed"),
+    ),
+    orderBy: [desc(transactionsTable.createdAt)],
+  });
+
+  if (lastDeposit) {
+    const tradeSinceDeposit = await db.query.tradesTable.findFirst({
+      where: and(
+        eq(tradesTable.accountId, accountId),
+        gt(tradesTable.openedAt, lastDeposit.createdAt),
+      ),
+    });
+
+    if (!tradeSinceDeposit) {
+      return res.status(400).json({
+        error: "Please place at least one trade since your last deposit before withdrawing.",
+      });
+    }
+  }
+
+  const newBalance = Number(account.balance) - amountUsd;
+  await db
+    .update(accountsTable)
+    .set({ balance: newBalance.toFixed(2) })
+    .where(eq(accountsTable.id, accountId));
+
+  await db.insert(transactionsTable).values({
+    accountId,
+    type: "withdrawal",
+    amount: amountUsd.toFixed(2),
+    status: "pending",
+    provider: "manual",
+  });
+
+  res.status(202).json({
+    status: "pending",
+    message: "Your withdrawal request has been submitted and will be processed shortly.",
+    amountUsd,
+    newBalance: newBalance.toFixed(2),
+  });
+});
+
+router.get("/rate", authenticate, async (_req: AuthedRequest, res: Response) => {
+  res.json({ rate: getKesPerUsdRate() });
 });
 
 router.get("/status", authenticate, async (req: AuthedRequest, res: Response) => {
