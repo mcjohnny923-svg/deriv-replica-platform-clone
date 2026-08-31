@@ -20,11 +20,50 @@ import { initiateDeposit, checkDepositStatus, type DepositProvider } from '@/lib
 type FlowState = 'form' | 'waiting' | 'success' | 'failed';
 
 const KES_PER_USD = 130;
+const PAYSTACK_INLINE_SRC = 'https://js.paystack.co/v1/inline.js';
 
 const PROVIDER_LABELS: Record<DepositProvider, string> = {
   mpesa: 'M-Pesa',
   paystack: 'Paystack',
+  card: 'Card',
 };
+
+declare global {
+  interface Window {
+    PaystackPop?: {
+      setup: (options: {
+        key: string;
+        email: string;
+        amount: number;
+        currency: string;
+        ref: string;
+        onClose?: () => void;
+        callback?: (response: { reference: string }) => void;
+      }) => { openIframe: () => void };
+    };
+  }
+}
+
+function loadPaystackScript(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (window.PaystackPop) {
+      resolve();
+      return;
+    }
+    const existing = document.querySelector(`script[src="${PAYSTACK_INLINE_SRC}"]`);
+    if (existing) {
+      existing.addEventListener('load', () => resolve());
+      existing.addEventListener('error', () => reject(new Error('Failed to load Paystack')));
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = PAYSTACK_INLINE_SRC;
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('Failed to load Paystack'));
+    document.body.appendChild(script);
+  });
+}
 
 function maskPhone(phone: string): string {
   return `${phone.slice(0, 3)}${'•'.repeat(phone.length - 5)}${phone.slice(-2)}`;
@@ -35,6 +74,7 @@ const Deposit = () => {
   const navigate = useNavigate();
   const provider: DepositProvider =
     (location.state as { provider?: DepositProvider } | null)?.provider ?? 'mpesa';
+  const isCard = provider === 'card';
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [balanceRefreshKey, setBalanceRefreshKey] = useState(0);
@@ -47,6 +87,7 @@ const Deposit = () => {
   const [amountUsd, setAmountUsd] = useState('10');
   const [flowState, setFlowState] = useState<FlowState>('form');
   const [resultMessage, setResultMessage] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const balance = account
@@ -84,6 +125,27 @@ const Deposit = () => {
     }
   };
 
+  const startPolling = (reference: string) => {
+    pollRef.current = setInterval(async () => {
+      try {
+        const status = await checkDepositStatus(reference);
+        if (status.status === 'completed') {
+          if (pollRef.current) clearInterval(pollRef.current);
+          if (status.newBalance) updateStoredAccountBalance(status.newBalance);
+          setBalanceRefreshKey((k) => k + 1);
+          setResultMessage(`Deposit of USD ${status.amount} confirmed.`);
+          setFlowState('success');
+        } else if (status.status === 'failed') {
+          if (pollRef.current) clearInterval(pollRef.current);
+          setResultMessage('Payment was not completed. You can try again.');
+          setFlowState('failed');
+        }
+      } catch {
+        // transient error, keep polling
+      }
+    }, 3000);
+  };
+
   const handleSubmit = async () => {
     if (!account) {
       toast.error('Please log in first.');
@@ -94,35 +156,49 @@ const Deposit = () => {
       return;
     }
 
+    setSubmitting(true);
     try {
       const result = await initiateDeposit({
         accountId: account.id,
         amountKes: kesAmount,
         provider,
       });
-      setFlowState('waiting');
-      toast.success('Request sent — approve it on your phone.');
 
-      pollRef.current = setInterval(async () => {
-        try {
-          const status = await checkDepositStatus(result.checkoutRequestId);
-          if (status.status === 'completed') {
-            if (pollRef.current) clearInterval(pollRef.current);
-            if (status.newBalance) updateStoredAccountBalance(status.newBalance);
-            setBalanceRefreshKey((k) => k + 1);
-            setResultMessage(`Deposit of USD ${status.amount} confirmed.`);
-            setFlowState('success');
-          } else if (status.status === 'failed') {
-            if (pollRef.current) clearInterval(pollRef.current);
-            setResultMessage('Payment was not completed. You can try again.');
-            setFlowState('failed');
-          }
-        } catch {
-          // transient error, keep polling
+      if (isCard) {
+        if (!result.publicKey || !result.email) {
+          toast.error('Card payments are not available right now.');
+          return;
         }
-      }, 3000);
+        await loadPaystackScript();
+        if (!window.PaystackPop) {
+          toast.error('Could not load the card payment popup. Please try again.');
+          return;
+        }
+
+        window.PaystackPop.setup({
+          key: result.publicKey,
+          email: result.email,
+          amount: Math.round(kesAmount * 100),
+          currency: 'KES',
+          ref: result.checkoutRequestId,
+          onClose: () => {
+            // user closed the popup without paying — stay on the form
+          },
+          callback: () => {
+            setFlowState('waiting');
+            toast.success('Confirming your payment...');
+            startPolling(result.checkoutRequestId);
+          },
+        }).openIframe();
+      } else {
+        setFlowState('waiting');
+        toast.success('Request sent — approve it on your phone.');
+        startPolling(result.checkoutRequestId);
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to start deposit');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -131,6 +207,10 @@ const Deposit = () => {
     setFlowState('form');
     setResultMessage('');
   };
+
+  const buttonLabel = isCard ? 'Pay with Card' : provider === 'paystack' ? 'Pay with Paystack' : 'Send M-Pesa Request';
+  const showPhoneGate = !isCard && !storedPhone;
+  const showForm = (isCard || storedPhone) && flowState === 'form';
 
   return (
     <div className="min-h-screen bg-[#0e0e0e] text-white flex flex-col">
@@ -148,7 +228,7 @@ const Deposit = () => {
               <div className="text-xs text-gray-400 capitalize mt-0.5">{account?.type ?? '—'} account</div>
             </div>
 
-            {!storedPhone && (
+            {showPhoneGate && (
               <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
                 <h2 className="text-sm font-semibold text-gray-300 mb-3 flex items-center">
                   <Smartphone className="h-4 w-4 mr-2" />
@@ -174,11 +254,12 @@ const Deposit = () => {
               </div>
             )}
 
-            {storedPhone && flowState === 'form' && (
+            {showForm && (
               <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
                 <h2 className="text-sm font-semibold text-gray-300 mb-4 flex items-center">
                   <Smartphone className="h-4 w-4 mr-2" />
-                  {PROVIDER_LABELS[provider]} — {maskPhone(storedPhone)}
+                  {PROVIDER_LABELS[provider]}
+                  {!isCard && storedPhone ? ` — ${maskPhone(storedPhone)}` : ''}
                 </h2>
 
                 <div className="mb-6">
@@ -209,9 +290,10 @@ const Deposit = () => {
 
                 <Button
                   onClick={handleSubmit}
-                  className="w-full bg-red-600 hover:bg-red-700 text-white py-3 text-base"
+                  disabled={submitting}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white py-3 text-base disabled:opacity-50"
                 >
-                  {provider === 'paystack' ? 'Pay with Paystack' : 'Send M-Pesa Request'}
+                  {submitting ? 'Please wait...' : buttonLabel}
                 </Button>
 
                 <button
@@ -227,9 +309,13 @@ const Deposit = () => {
             {flowState === 'waiting' && (
               <div className="bg-[#151717] rounded-lg p-8 border border-[#323738] text-center">
                 <Loader2 className="h-10 w-10 text-red-500 animate-spin mx-auto mb-4" />
-                <h3 className="text-white font-semibold mb-2">Check your phone</h3>
+                <h3 className="text-white font-semibold mb-2">
+                  {isCard ? 'Confirming your payment' : 'Check your phone'}
+                </h3>
                 <p className="text-gray-400 text-sm">
-                  Enter your M-Pesa PIN on the prompt sent to {storedPhone ? maskPhone(storedPhone) : 'your phone'} to approve the payment of KES {kesDisplay}.
+                  {isCard
+                    ? `We're confirming your card payment of KES ${kesDisplay} — this usually takes a few seconds.`
+                    : `Enter your M-Pesa PIN on the prompt sent to ${storedPhone ? maskPhone(storedPhone) : 'your phone'} to approve the payment of KES ${kesDisplay}.`}
                 </p>
                 <p className="text-gray-500 text-xs mt-4">This page updates automatically once confirmed.</p>
               </div>
@@ -263,8 +349,8 @@ const Deposit = () => {
                 Security & Safety
               </h3>
               <ul className="space-y-1.5 text-xs text-gray-400">
-                <li>• Payments processed via M-Pesa STK push (direct or via Paystack)</li>
-                <li>• You approve every payment with your own PIN</li>
+                <li>• Payments processed via M-Pesa STK push or Paystack card checkout</li>
+                <li>• Card details are entered directly on Paystack's secure popup — we never see them</li>
                 <li>• Your M-Pesa number is linked once, only to your account</li>
               </ul>
             </div>

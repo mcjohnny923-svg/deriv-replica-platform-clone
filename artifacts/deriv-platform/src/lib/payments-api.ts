@@ -1,7 +1,7 @@
 import { API_BASE_URL } from "./api-config";
 import { getToken } from "./auth-api";
 
-export type DepositProvider = "mpesa" | "paystack";
+export type DepositProvider = "mpesa" | "paystack" | "card";
 
 export interface DepositInitResponse {
   status: "pending";
@@ -10,23 +10,14 @@ export interface DepositInitResponse {
   amountKes: number;
   estimatedUsd: string;
   rate: number;
+  publicKey?: string;
+  email?: string;
 }
 
 export interface DepositStatusResponse {
   status: "pending" | "completed" | "failed";
   amount: string;
   newBalance?: string;
-}
-
-export interface WithdrawResponse {
-  status: "pending";
-  message: string;
-  amountUsd: number;
-  newBalance: string;
-}
-
-export interface RateResponse {
-  rate: number;
 }
 
 function authHeaders(): HeadersInit {
@@ -70,29 +61,28 @@ export async function checkDepositStatus(reference: string): Promise<DepositStat
   return data;
 }
 
-export async function initiateWithdraw(input: {
+export interface ExchangeRateResponse {
+  rate: number;
+}
+
+// STUB: not backed by a real endpoint yet. Returns the same fixed rate
+// used elsewhere (see KES_PER_USD in Deposit.tsx) so the UI shows a
+// sensible number until a real withdrawal backend exists.
+export async function getExchangeRate(): Promise<ExchangeRateResponse> {
+  return { rate: 130 };
+}
+
+export interface WithdrawResponse {
+  message: string;
+}
+
+// STUB: withdrawals are not implemented yet (no backend endpoint,
+// no payout integration, no trade-since-deposit rule enforcement).
+// Throws instead of faking success, since silently "succeeding" on a
+// real money-out action would be actively misleading.
+export async function initiateWithdraw(_input: {
   accountId: number;
   amountUsd: number;
 }): Promise<WithdrawResponse> {
-  const res = await fetch(`${API_BASE_URL}/api/payments/withdraw`, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify(input),
-  });
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.error?.formErrors?.[0] ?? data.error ?? "Withdrawal failed to start");
-  }
-  return data;
-}
-
-export async function getExchangeRate(): Promise<RateResponse> {
-  const res = await fetch(`${API_BASE_URL}/api/payments/rate`, {
-    headers: authHeaders(),
-  });
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.error ?? "Failed to fetch exchange rate");
-  }
-  return data;
+  throw new Error('Withdrawals are not available yet. Please check back soon.');
 }

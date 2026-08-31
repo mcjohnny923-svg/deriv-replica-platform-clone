@@ -126,3 +126,48 @@ export interface NovtrupWebhookPayload {
   account_reference?: string;
   timestamp: string;
 }
+
+export interface NovtrupCardInitResult {
+  ok: boolean;
+  reference?: string;
+  error?: string;
+}
+
+// Card deposits happen client-side via Paystack's Inline JS (Popup),
+// using a public key — this just pre-registers a reference on NOVTRUP
+// so its webhook pipeline has a payment_requests row to match against
+// once the charge completes.
+export async function initiateNovtrupCardDeposit(input: {
+  amount: number;
+  email: string;
+  accountReference: string;
+}): Promise<NovtrupCardInitResult> {
+  if (!NOVTRUP_BASE_URL || !NOVTRUP_API_KEY) {
+    return { ok: false, error: "NOVTRUP integration not configured" };
+  }
+
+  try {
+    const res = await fetch(`${NOVTRUP_BASE_URL}/api/paystack/card-init`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-Key": NOVTRUP_API_KEY,
+      },
+      body: JSON.stringify({
+        amount: input.amount,
+        email: input.email,
+        account_reference: input.accountReference,
+      }),
+    });
+
+    const data: any = await res.json();
+
+    if (!res.ok) {
+      return { ok: false, error: data.error ?? `NOVTRUP returned ${res.status}` };
+    }
+
+    return { ok: true, reference: data.reference };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Request to NOVTRUP failed" };
+  }
+}

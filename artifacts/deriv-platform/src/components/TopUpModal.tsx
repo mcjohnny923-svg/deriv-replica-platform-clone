@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { Smartphone, Zap, CreditCard, ChevronRight } from 'lucide-react';
-import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -64,16 +63,17 @@ const TopUpModal = ({ open, onOpenChange }: TopUpModalProps) => {
 
           <button
             type="button"
-            onClick={() => toast.info('Card payments are coming soon.')}
-            className="w-full flex items-center gap-4 p-4 rounded-xl border border-[#323738] opacity-50 cursor-not-allowed"
+            onClick={() => goToDeposit('card')}
+            className="w-full flex items-center gap-4 p-4 rounded-xl border border-[#323738] hover:bg-[#1c1f1f] transition-colors"
           >
             <div className="w-11 h-11 rounded-lg bg-[#232728] flex items-center justify-center shrink-0">
               <CreditCard className="h-5 w-5 text-white" />
             </div>
             <div className="flex-1 text-left">
               <div className="text-white font-semibold">Credit / Debit Card</div>
-              <div className="text-gray-400 text-sm">Coming soon</div>
+              <div className="text-gray-400 text-sm">Visa, Mastercard</div>
             </div>
+            <ChevronRight className="h-5 w-5 text-gray-500" />
           </button>
         </div>
       </DialogContent>
