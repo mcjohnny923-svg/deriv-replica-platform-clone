@@ -55,7 +55,7 @@ router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) 
 
   if (provider === "card") {
     if (!PAYSTACK_PUBLIC_KEY) {
-      return res.status(502).json({ error: "Card payments are not configured yet." });
+      return res.status(500).json({ error: "Card payments are not configured yet." });
     }
 
     const result = await initiateNovtrupCardDeposit({
@@ -65,7 +65,7 @@ router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) 
     });
 
     if (!result.ok || !result.reference) {
-      return res.status(502).json({ error: result.error ?? "Deposit initiation failed" });
+      return res.status(500).json({ error: result.error ?? "Deposit initiation failed" });
     }
 
     await db.insert(transactionsTable).values({
@@ -98,7 +98,7 @@ router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) 
     });
 
     if (!result.ok || !result.reference) {
-      return res.status(502).json({ error: result.error ?? "Deposit initiation failed" });
+      return res.status(500).json({ error: result.error ?? "Deposit initiation failed" });
     }
 
     await db.insert(transactionsTable).values({
@@ -128,7 +128,7 @@ router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) 
   });
 
   if (!result.ok || !result.checkoutRequestId) {
-    return res.status(502).json({ error: result.error ?? "Deposit initiation failed" });
+    return res.status(500).json({ error: result.error ?? "Deposit initiation failed" });
   }
 
   await db.insert(transactionsTable).values({
