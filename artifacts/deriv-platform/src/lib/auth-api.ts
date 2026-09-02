@@ -158,3 +158,15 @@ export async function refreshAccounts(): Promise<AuthAccount[]> {
   localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
   return accounts;
 }
+
+export async function resetDemoBalance(accountId: number): Promise<{ newBalance: string }> {
+  const res = await fetch(`${API_BASE_URL}/api/auth/accounts/${accountId}/reset-demo`, {
+    method: "POST",
+    headers: authHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error ?? "Failed to reset demo balance");
+  }
+  return data;
+}

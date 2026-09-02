@@ -189,4 +189,22 @@ router.get("/accounts", authenticate, async (req: AuthedRequest, res) => {
   res.json({ accounts });
 });
 
+router.post("/accounts/:id/reset-demo", authenticate, async (req: AuthedRequest, res) => {
+  const accountId = Number(req.params.id);
+  const account = await db.query.accountsTable.findFirst({
+    where: eq(accountsTable.id, accountId),
+  });
+  if (!account || account.userId !== req.userId) {
+    return res.status(403).json({ error: "Account not found or not owned by you" });
+  }
+  if (account.type !== "demo") {
+    return res.status(400).json({ error: "Only demo accounts can be reset" });
+  }
+  await db
+    .update(accountsTable)
+    .set({ balance: "10000.00" })
+    .where(eq(accountsTable.id, accountId));
+  res.json({ ok: true, newBalance: "10000.00" });
+});
+
 export default router;

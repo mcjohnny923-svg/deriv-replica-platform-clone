@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown, Check, HelpCircle, Menu } from 'lucide-react';
+import { ChevronDown, Check, HelpCircle, Menu, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getStoredAccounts, getActiveAccountType, setActiveAccountType, refreshAccounts, type AuthAccount } from '@/lib/auth-api';
+import { toast } from 'sonner';
+import { getStoredAccounts, getActiveAccountType, setActiveAccountType, refreshAccounts, resetDemoBalance, type AuthAccount } from '@/lib/auth-api';
 import TopUpModal from '@/components/TopUpModal';
 
 interface DerivHeaderProps {
@@ -56,6 +57,19 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
     setActiveType(type);
     setAccountDropdownOpen(false);
     onAccountSwitch?.();
+  };
+
+  const handleResetDemo = async (e: React.MouseEvent, accountId: number) => {
+    e.stopPropagation();
+    if (!window.confirm('Reset your demo balance to USD 10,000.00?')) return;
+    try {
+      await resetDemoBalance(accountId);
+      const fresh = await refreshAccounts();
+      setAccounts(fresh);
+      toast.success('Demo balance reset to USD 10,000.00');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to reset demo balance');
+    }
   };
 
   return (
@@ -125,10 +139,13 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
                   : '0.00';
                 const colorClass = type === 'real' ? 'text-green-500' : 'text-orange-400';
                 return (
-                  <button
+                  <div
                     key={type}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => handleSwitch(type)}
-                    className="flex items-center justify-between w-full px-4 py-3 hover:bg-[#414647] transition-colors"
+                    onKeyDown={(e) => e.key === 'Enter' && handleSwitch(type)}
+                    className="flex items-center justify-between w-full px-4 py-3 hover:bg-[#414647] transition-colors cursor-pointer"
                   >
                     <div className="text-left">
                       <div className={`text-sm font-semibold capitalize ${colorClass}`}>{type}</div>
@@ -136,8 +153,20 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
                         {acc?.currency ?? 'USD'} {balance}
                       </div>
                     </div>
-                    {activeType === type && <Check className="h-4 w-4 text-red-500" />}
-                  </button>
+                    <div className="flex items-center gap-2">
+                      {type === 'demo' && acc && (
+                        <button
+                          type="button"
+                          onClick={(e) => handleResetDemo(e, acc.id)}
+                          title="Reset demo balance to USD 10,000.00"
+                          className="p-1.5 rounded hover:bg-[#525858] text-gray-400 hover:text-white transition-colors"
+                        >
+                          <RotateCcw className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                      {activeType === type && <Check className="h-4 w-4 text-red-500" />}
+                    </div>
+                  </div>
                 );
               })}
             </div>
