@@ -118,6 +118,9 @@ router.post("/login", async (req, res) => {
   if (!user) {
     return res.status(401).json({ error: "Invalid email or password" });
   }
+  if (user.isSuspended) {
+    return res.status(403).json({ error: "This account has been suspended. Contact support." });
+  }
 
   const valid = await comparePassword(password, user.passwordHash);
   if (!valid) {
