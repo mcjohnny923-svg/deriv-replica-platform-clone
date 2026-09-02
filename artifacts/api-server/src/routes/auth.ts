@@ -182,4 +182,11 @@ router.patch("/phone", authenticate, async (req: AuthedRequest, res) => {
   res.json({ phoneNumber });
 });
 
+router.get("/accounts", authenticate, async (req: AuthedRequest, res) => {
+  const accounts = await db.query.accountsTable.findMany({
+    where: eq(accountsTable.userId, req.userId!),
+  });
+  res.json({ accounts });
+});
+
 export default router;

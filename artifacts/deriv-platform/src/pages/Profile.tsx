@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User, Shield, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,12 +7,18 @@ import { Switch } from '@/components/ui/switch';
 import DerivHeader from '@/components/DerivHeader';
 import DerivSidebar from '@/components/DerivSidebar';
 import MobileBottomNav from '@/components/MobileBottomNav';
-import { getStoredUser, getStoredAccount } from '@/lib/auth-api';
+import { getStoredUser, getStoredAccount, refreshAccounts, type AuthAccount } from '@/lib/auth-api';
 
 const Profile = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const storedUser = getStoredUser();
-  const account = getStoredAccount();
+  const [account, setAccount] = useState<AuthAccount | null>(getStoredAccount());
+
+  useEffect(() => {
+    refreshAccounts()
+      .then(() => setAccount(getStoredAccount()))
+      .catch(() => {});
+  }, []);
 
   const [firstName, lastName] = (storedUser?.fullName ?? '').split(' ');
 

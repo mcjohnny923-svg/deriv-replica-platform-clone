@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, Check, HelpCircle, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getStoredAccounts, getActiveAccountType, setActiveAccountType, type AuthAccount } from '@/lib/auth-api';
+import { getStoredAccounts, getActiveAccountType, setActiveAccountType, refreshAccounts, type AuthAccount } from '@/lib/auth-api';
 import TopUpModal from '@/components/TopUpModal';
 
 interface DerivHeaderProps {
@@ -20,7 +20,26 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
   useEffect(() => {
     setAccounts(getStoredAccounts());
     setActiveType(getActiveAccountType());
+    refreshAccounts()
+      .then((fresh) => setAccounts(fresh))
+      .catch(() => {});
   }, [balanceRefreshKey]);
+
+  useEffect(() => {
+    const refresh = () => {
+      refreshAccounts()
+        .then((fresh) => setAccounts(fresh))
+        .catch(() => {});
+    };
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+    const interval = setInterval(refresh, 20000);
+    return () => {
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+      clearInterval(interval);
+    };
+  }, []);
 
   const activeAccount = accounts.find((a) => a.type === activeType) ?? accounts[0];
   const displayBalance = activeAccount

@@ -1,17 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowDownCircle, ArrowUpCircle, ChevronRight } from 'lucide-react';
 import DerivHeader from '@/components/DerivHeader';
 import DerivSidebar from '@/components/DerivSidebar';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import TopUpModal from '@/components/TopUpModal';
 import WithdrawModal from '@/components/WithdrawModal';
-import { getStoredAccount } from '@/lib/auth-api';
+import { getStoredAccount, refreshAccounts, type AuthAccount } from '@/lib/auth-api';
 
 const Cashier = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [topUpOpen, setTopUpOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
-  const account = getStoredAccount();
+  const [account, setAccount] = useState<AuthAccount | null>(getStoredAccount());
+
+  useEffect(() => {
+    refreshAccounts()
+      .then(() => setAccount(getStoredAccount()))
+      .catch(() => {});
+  }, []);
   const balance = account
     ? `${account.currency} ${Number(account.balance).toLocaleString('en-US', {
         minimumFractionDigits: 2,

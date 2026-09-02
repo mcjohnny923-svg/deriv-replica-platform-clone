@@ -141,3 +141,20 @@ export async function setPhoneNumber(phoneNumber: string): Promise<{ phoneNumber
   }
   return data;
 }
+
+export async function fetchAccounts(): Promise<AuthAccount[]> {
+  const res = await fetch(`${API_BASE_URL}/api/auth/accounts`, {
+    headers: authHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error ?? "Failed to fetch accounts");
+  }
+  return data.accounts;
+}
+
+export async function refreshAccounts(): Promise<AuthAccount[]> {
+  const accounts = await fetchAccounts();
+  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+  return accounts;
+}

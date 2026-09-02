@@ -14,6 +14,8 @@ import {
   getStoredUser,
   updateStoredUserPhone,
   setPhoneNumber,
+  refreshAccounts,
+  type AuthAccount,
 } from '@/lib/auth-api';
 import { initiateDeposit, checkDepositStatus, type DepositProvider } from '@/lib/payments-api';
 
@@ -78,7 +80,13 @@ const Deposit = () => {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [balanceRefreshKey, setBalanceRefreshKey] = useState(0);
-  const account = getStoredAccount();
+  const [account, setAccount] = useState<AuthAccount | null>(getStoredAccount());
+
+  useEffect(() => {
+    refreshAccounts()
+      .then(() => setAccount(getStoredAccount()))
+      .catch(() => {});
+  }, []);
   const [storedPhone, setStoredPhone] = useState(getStoredUser()?.phoneNumber ?? null);
 
   const [phoneInput, setPhoneInput] = useState('');
