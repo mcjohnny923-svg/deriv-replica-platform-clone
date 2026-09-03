@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 import DerivHeader from '@/components/DerivHeader';
 import DerivSidebar from '@/components/DerivSidebar';
@@ -16,8 +16,9 @@ import {
 } from '@/lib/trade-config';
 import { getStoredAccount, updateStoredAccountBalance } from '@/lib/auth-api';
 import { buyTrade, getTradeHistory, type Trade } from '@/lib/trades-api';
+import EntryScannerModal, { type ScannerLaunchConfig } from '@/components/EntryScannerModal';
 
-type Strategy = 'martingale' | 'dalembert' | 'oscars_grind';
+type Strategy = 'martingale' | 'dalembert' | 'oscars_grind' | 'flat';
 
 const CHOICES_BY_TYPE: Record<string, [string, string]> = {
   rise_fall: ['rise', 'fall'],
@@ -68,6 +69,9 @@ const Automate = () => {
   const [runningPL, setRunningPL] = useState(0);
   const [tradesRun, setTradesRun] = useState(0);
   const [currentStake, setCurrentStake] = useState('2');
+  const [winsTarget, setWinsTarget] = useState(0);
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [pendingAutoStart, setPendingAutoStart] = useState(false);
 
   const runningRef = useRef(false);
 
@@ -89,6 +93,7 @@ const Automate = () => {
   const nextStakeAfterLoss = (current: number): number => {
     const multiplier = parseFloat(stakeMultiplier) || 2;
     const unit = parseFloat(baseStake) || 1;
+    if (strategy === 'flat') return unit;
     if (strategy === 'martingale') return current * multiplier;
     if (strategy === 'dalembert') return current + unit;
     return parseFloat(baseStake);
@@ -96,6 +101,7 @@ const Automate = () => {
 
   const nextStakeAfterWin = (current: number): number => {
     const unit = parseFloat(baseStake) || 1;
+    if (strategy === 'flat') return unit;
     if (strategy === 'dalembert') return Math.max(unit, current - unit);
     if (strategy === 'oscars_grind') return current + unit;
     return parseFloat(baseStake);
@@ -113,6 +119,7 @@ const Automate = () => {
     let stake = parseFloat(baseStake) || 1;
     let cumulativePL = 0;
     let count = 0;
+    let winsCount = 0;
     setCurrentStake(stake.toFixed(2));
 
     while (runningRef.current) {
@@ -156,6 +163,7 @@ const Automate = () => {
       const profit = won ? Number(settled.payout ?? 0) - Number(settled.stake) : -Number(settled.stake);
       cumulativePL += profit;
       count += 1;
+      if (won) winsCount += 1;
       setRunningPL(cumulativePL);
       setTradesRun(count);
 
@@ -175,13 +183,17 @@ const Automate = () => {
         toast.error(`Loss threshold reached: ${cumulativePL.toFixed(2)} USD`);
         break;
       }
+      if (winsTarget && winsCount >= winsTarget) {
+        toast.success(`Target of ${winsTarget} wins reached.`);
+        break;
+      }
     }
 
     runningRef.current = false;
     setIsRunning(false);
   }, [
     baseStake, maxStake, selectedAsset, choiceIndex, choices, tradeType, digitSelector,
-    selectedDigit, durationValue, durationUnit, waitForSettlement, profitThreshold, lossThreshold, strategy, stakeMultiplier,
+    selectedDigit, durationValue, durationUnit, waitForSettlement, profitThreshold, lossThreshold, strategy, stakeMultiplier, winsTarget,
   ]);
 
   const handleRun = () => {
@@ -196,6 +208,39 @@ const Automate = () => {
     runningRef.current = true;
     setIsRunning(true);
     runLoop();
+  };
+
+  useEffect(() => {
+    if (pendingAutoStart) {
+      setPendingAutoStart(false);
+      handleRun();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingAutoStart, handleRun]);
+
+  const applyScannerLaunch = (config: ScannerLaunchConfig) => {
+    if (isRunning) {
+      toast.error('Stop the current bot before launching a new one.');
+      return;
+    }
+    setSelectedAsset(config.asset);
+    setTradeType(config.tradeType);
+    setChoiceIndex(config.choiceIndex);
+    if (config.digit !== undefined) setSelectedDigit(config.digit);
+    setBaseStake(config.stake.toFixed(2));
+    setStrategy(config.useMartingale ? 'martingale' : 'flat');
+    setStakeMultiplier(config.martingaleMultiplier.toString());
+    setWinsTarget(config.winsTarget);
+    setProfitThreshold(config.profitTarget.toString());
+    setLossThreshold(config.stopLoss.toString());
+    setMaxStake('');
+
+    if (config.autoStart) {
+      setPendingAutoStart(true);
+      toast.success('Deep Scanner Bot launched.');
+    } else {
+      toast.success('Deep Scanner settings loaded — review and press Run.');
+    }
   };
 
   return (
@@ -437,6 +482,23 @@ const Automate = () => {
         </div>
       </div>
       <MobileBottomNav onMenuClick={() => setIsSidebarOpen(true)} />
+
+      {/* Floating AI Entry Scanner button */}
+      <button
+        type="button"
+        onClick={() => setScannerOpen(true)}
+        className="fixed bottom-20 right-4 md:bottom-6 z-40 w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 shadow-lg flex items-center justify-center text-white font-bold text-sm hover:scale-105 transition-transform"
+      >
+        AI
+        <span className="absolute top-1 right-1 w-3 h-3 bg-green-400 border-2 border-[#0e0e0e] rounded-full" />
+      </button>
+
+      <EntryScannerModal
+        open={scannerOpen}
+        onOpenChange={setScannerOpen}
+        markets={VOLATILITY_ASSETS}
+        onLaunch={applyScannerLaunch}
+      />
     </div>
   );
 };
