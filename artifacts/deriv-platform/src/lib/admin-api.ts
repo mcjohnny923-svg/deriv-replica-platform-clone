@@ -14,6 +14,7 @@ export interface AdminUser {
   phoneNumber: string | null;
   createdAt: string;
   isSuspended: boolean;
+  autoWithdraw: boolean;
   accounts: AdminAccount[];
 }
 
@@ -91,6 +92,23 @@ export async function setUserSuspended(
   const data = await res.json();
   if (!res.ok) {
     throw new Error(data.error ?? "Failed to update suspension");
+  }
+  return data;
+}
+
+export async function setUserAutoWithdraw(
+  adminKey: string,
+  userId: number,
+  autoWithdraw: boolean,
+): Promise<{ autoWithdraw: boolean }> {
+  const res = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/auto-withdraw`, {
+    method: "POST",
+    headers: authHeaders(adminKey),
+    body: JSON.stringify({ autoWithdraw }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error ?? "Failed to update auto-withdraw setting");
   }
   return data;
 }

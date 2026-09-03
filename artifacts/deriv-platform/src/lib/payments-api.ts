@@ -65,24 +65,34 @@ export interface ExchangeRateResponse {
   rate: number;
 }
 
-// STUB: not backed by a real endpoint yet. Returns the same fixed rate
-// used elsewhere (see KES_PER_USD in Deposit.tsx) so the UI shows a
-// sensible number until a real withdrawal backend exists.
 export async function getExchangeRate(): Promise<ExchangeRateResponse> {
   return { rate: 130 };
 }
 
 export interface WithdrawResponse {
+  status: "pending";
   message: string;
+  transactionId: number;
+  amountUsd: string;
+  amountKes: number;
+  newBalance: string;
 }
 
-// STUB: withdrawals are not implemented yet (no backend endpoint,
-// no payout integration, no trade-since-deposit rule enforcement).
-// Throws instead of faking success, since silently "succeeding" on a
-// real money-out action would be actively misleading.
-export async function initiateWithdraw(_input: {
+export async function initiateWithdraw(input: {
   accountId: number;
   amountUsd: number;
 }): Promise<WithdrawResponse> {
-  throw new Error('Withdrawals are not available yet. Please check back soon.');
+  const res = await fetch(`${API_BASE_URL}/api/payments/withdraw`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({
+      accountId: input.accountId,
+      amountUsd: input.amountUsd,
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error?.formErrors?.[0] ?? data.error ?? "Withdrawal failed to start");
+  }
+  return data;
 }

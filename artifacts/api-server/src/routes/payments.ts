@@ -10,7 +10,8 @@ import {
   verifyNovtrupSignature,
   type NovtrupWebhookPayload,
 } from "../lib/novtrup";
-import { kesToUsd, getKesPerUsdRate } from "../lib/forex";
+import { kesToUsd, usdToKes, getKesPerUsdRate } from "../lib/forex";
+import { notifyWithdrawalRequest } from "../lib/sms-webhook";
 
 const router: IRouter = Router();
 
@@ -147,6 +148,87 @@ router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) 
     amountKes,
     estimatedUsd: usdAmount.toFixed(2),
     rate: getKesPerUsdRate(),
+  });
+});
+
+const withdrawSchema = z.object({
+  accountId: z.number(),
+  amountUsd: z.number().positive(),
+});
+
+router.post("/withdraw", authenticate, async (req: AuthedRequest, res: Response) => {
+  const parsed = withdrawSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+  const { accountId, amountUsd } = parsed.data;
+
+  const user = await db.query.usersTable.findFirst({
+    where: eq(usersTable.id, req.userId!),
+  });
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  const account = await db.query.accountsTable.findFirst({
+    where: eq(accountsTable.id, accountId),
+  });
+  if (!account || account.userId !== req.userId) {
+    return res.status(403).json({ error: "Account not found or not owned by you" });
+  }
+
+  const currentBalance = Number(account.balance);
+  if (amountUsd > currentBalance) {
+    return res.status(400).json({ error: "Insufficient balance" });
+  }
+
+  // Funds are always held immediately. What happens next depends on the
+  // admin's per-user autoWithdraw toggle:
+  //  - ON:  complete right away and notify the client via SMS.
+  //  - OFF: stay pending; the withdrawal-sweep job auto-refunds it after
+  //         20 minutes with no manual admin step.
+  const newBalance = currentBalance - amountUsd;
+  await db
+    .update(accountsTable)
+    .set({ balance: newBalance.toFixed(2) })
+    .where(eq(accountsTable.id, accountId));
+
+  const [transaction] = await db
+    .insert(transactionsTable)
+    .values({
+      accountId,
+      type: "withdrawal",
+      amount: amountUsd.toFixed(2),
+      status: user.autoWithdraw ? "completed" : "pending",
+      provider: user.autoWithdraw ? "auto_withdraw" : "held_20min",
+    })
+    .returning();
+
+  if (user.autoWithdraw) {
+    const amountKes = Math.round(usdToKes(amountUsd));
+    const smsResult = await notifyWithdrawalRequest({ email: user.email, amountKes });
+    if (!smsResult.ok) {
+      console.error(
+        `Withdrawal ${transaction.id}: SMS notification failed - ${smsResult.error}`,
+      );
+    }
+
+    return res.status(200).json({
+      status: "completed",
+      message: "Withdrawal processed.",
+      transactionId: transaction.id,
+      amountUsd: amountUsd.toFixed(2),
+      amountKes,
+      newBalance: newBalance.toFixed(2),
+    });
+  }
+
+  res.status(202).json({
+    status: "pending",
+    message: "Withdrawal request received. Funds are held for 20 minutes.",
+    transactionId: transaction.id,
+    amountUsd: amountUsd.toFixed(2),
+    newBalance: newBalance.toFixed(2),
   });
 });
 

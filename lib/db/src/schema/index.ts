@@ -35,6 +35,7 @@ export const usersTable = pgTable("users", {
   referredByUserId: integer("referred_by_user_id"),
   phoneNumber: text("phone_number").unique(),
   isSuspended: boolean("is_suspended").notNull().default(false),
+  autoWithdraw: boolean("auto_withdraw").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

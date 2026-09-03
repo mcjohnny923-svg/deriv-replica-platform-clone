@@ -25,6 +25,7 @@ router.get("/users", adminAuth, async (_req: Request, res: Response) => {
       phoneNumber: u.phoneNumber,
       createdAt: u.createdAt,
       isSuspended: u.isSuspended,
+      autoWithdraw: u.autoWithdraw,
       accounts: u.accounts.map((a) => ({
         id: a.id,
         type: a.type,
@@ -166,6 +167,32 @@ router.get("/partners", adminAuth, async (_req: Request, res: Response) => {
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : "Failed to load partners" });
   }
+});
+
+const autoWithdrawSchema = z.object({
+  autoWithdraw: z.boolean(),
+});
+
+router.post("/users/:id/auto-withdraw", adminAuth, async (req: Request, res: Response) => {
+  const parsed = autoWithdrawSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+  const userId = Number(req.params.id);
+
+  const user = await db.query.usersTable.findFirst({
+    where: eq(usersTable.id, userId),
+  });
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  await db
+    .update(usersTable)
+    .set({ autoWithdraw: parsed.data.autoWithdraw })
+    .where(eq(usersTable.id, userId));
+
+  res.json({ ok: true, autoWithdraw: parsed.data.autoWithdraw });
 });
 
 export default router;

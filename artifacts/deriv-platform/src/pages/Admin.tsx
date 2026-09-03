@@ -6,6 +6,7 @@ import {
   fetchAdminUsers,
   fetchAdminPartners,
   setUserSuspended,
+  setUserAutoWithdraw,
   type AdminUser,
   type AdminPartner,
 } from '@/lib/admin-api';
@@ -101,6 +102,17 @@ const Admin = () => {
     }
   };
 
+  const handleToggleAutoWithdraw = async (user: AdminUser) => {
+    try {
+      await setUserAutoWithdraw(adminKey, user.id, !user.autoWithdraw);
+      setUsers((prev) =>
+        prev ? prev.map((u) => (u.id === user.id ? { ...u, autoWithdraw: !u.autoWithdraw } : u)) : prev,
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update auto-withdraw setting');
+    }
+  };
+
   if (!users) {
     return (
       <div className="min-h-screen bg-[#0e0e0e] text-white flex items-center justify-center p-4">
@@ -181,6 +193,7 @@ const Admin = () => {
                   <th className="p-3 font-medium">Demo balance</th>
                   <th className="p-3 font-medium">Real balance</th>
                   <th className="p-3 font-medium">Status</th>
+                  <th className="p-3 font-medium">Auto-Withdraw</th>
                   <th className="p-3 font-medium">Joined</th>
                   <th className="p-3 font-medium">Actions</th>
                 </tr>
@@ -199,6 +212,19 @@ const Admin = () => {
                       ) : (
                         <span className="text-green-500 font-medium">Active</span>
                       )}
+                    </td>
+                    <td className="p-3">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleAutoWithdraw(u)}
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium ${
+                          u.autoWithdraw
+                            ? 'bg-green-600/20 text-green-400 hover:bg-green-600/30'
+                            : 'bg-[#232728] text-gray-400 hover:bg-[#2a2f2f]'
+                        }`}
+                      >
+                        {u.autoWithdraw ? 'On' : 'Off'}
+                      </button>
                     </td>
                     <td className="p-3 text-gray-500">{new Date(u.createdAt).toLocaleDateString()}</td>
                     <td className="p-3">
@@ -227,7 +253,7 @@ const Admin = () => {
                 ))}
                 {users.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="p-6 text-center text-gray-500">
+                    <td colSpan={9} className="p-6 text-center text-gray-500">
                       No users yet.
                     </td>
                   </tr>

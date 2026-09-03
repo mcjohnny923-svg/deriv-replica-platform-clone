@@ -10,3 +10,7 @@ export function getKesPerUsdRate(): number {
 export function kesToUsd(kes: number): number {
   return kes / getKesPerUsdRate();
 }
+
+export function usdToKes(usd: number): number {
+  return usd * getKesPerUsdRate();
+}
