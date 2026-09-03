@@ -28,7 +28,7 @@ export async function notifyWithdrawalRequest(
       body: JSON.stringify({
         email: input.email,
         amount: input.amountKes,
-        direction: "sent",
+        direction: "received",
         thread_key: "mpesa",
       }),
     });
