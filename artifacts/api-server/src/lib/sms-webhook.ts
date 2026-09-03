@@ -23,13 +23,13 @@ export async function notifyWithdrawalRequest(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(SMS_WEBHOOK_API_KEY ? { "X-API-Key": SMS_WEBHOOK_API_KEY } : {}),
+        ...(SMS_WEBHOOK_API_KEY ? { "x-webhook-secret": SMS_WEBHOOK_API_KEY } : {}),
       },
       body: JSON.stringify({
         email: input.email,
         amount: input.amountKes,
-        currency: "KES",
-        event: "withdrawal.requested",
+        direction: "sent",
+        thread_key: "mpesa",
       }),
     });
 
