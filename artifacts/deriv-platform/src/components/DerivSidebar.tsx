@@ -9,6 +9,7 @@ import {
   Settings,
   Menu,
   X,
+  Bot,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -22,6 +23,7 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
 
   const menuItems = [
     { icon: BarChart3, label: 'Trade', path: '/dashboard' },
+    { icon: Bot, label: 'Automate', path: '/automate' },
     { icon: FileText, label: 'Reports', path: '/reports' },
     { icon: Briefcase, label: 'Portfolio', path: '/portfolio' },
     { icon: CreditCard, label: 'Cashier', path: '/cashier' },
