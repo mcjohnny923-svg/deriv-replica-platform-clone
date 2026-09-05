@@ -252,7 +252,7 @@ const Automate = () => {
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden pb-16 md:pb-0">
           {/* Scrollable content */}
           <div className="flex-1 min-h-0 overflow-y-auto pb-4">
-            <div className="max-w-lg md:max-w-4xl mx-auto p-4 space-y-3 md:space-y-0 md:grid md:grid-cols-2 md:gap-3 md:items-start">
+            <div className="max-w-lg md:max-w-3xl mx-auto md:mx-0 p-4 space-y-3 md:space-y-0 md:grid md:grid-cols-2 md:gap-3 md:items-start">
               {isRunning && (
                 <div className="md:col-span-2 bg-[#151717] border border-[#323738] rounded-lg p-3 flex justify-between items-center">
                   <div>
@@ -373,6 +373,7 @@ const Automate = () => {
                 </div>
               </div>
 
+              <div className="md:flex md:flex-col md:gap-3">
               <div>
                 <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1.5">Strategy parameters</div>
                 <div className="bg-[#151717] border border-[#323738] rounded-lg divide-y divide-[#323738]">
@@ -437,7 +438,7 @@ const Automate = () => {
                 </div>
               </div>
 
-              <div className="md:col-span-2">
+              <div>
                 <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1.5">Risk management</div>
                 <div className="bg-[#151717] border border-[#323738] rounded-lg p-3">
                   <div className="grid grid-cols-2 gap-3">
@@ -465,14 +466,15 @@ const Automate = () => {
                   <div className="text-xs text-gray-500 mt-2">Stops automatically when cumulative profit/loss reaches either value.</div>
                 </div>
               </div>
+              </div>
             </div>
           </div>
 
           {/* Sticky Run button, always visible above the bottom nav */}
-          <div className="shrink-0 p-4 border-t border-[#323738] bg-[#0e0e0e]">
+          <div className="shrink-0 p-4 border-t border-[#323738] bg-[#0e0e0e] md:flex md:justify-start">
             <Button
               onClick={handleRun}
-              className={`w-full py-6 text-base font-semibold ${
+              className={`w-full md:w-40 py-6 text-base font-semibold ${
                 isRunning ? 'bg-red-600 hover:bg-red-700' : 'bg-green-500 hover:bg-green-600'
               }`}
             >
