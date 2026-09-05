@@ -550,10 +550,10 @@ const Automate = () => {
           </div>
 
           {/* Sticky Run button, always visible above the bottom nav */}
-          <div className="shrink-0 p-4 border-t border-[#323738] bg-[#0e0e0e] md:flex md:justify-start">
+          <div className="md:hidden shrink-0 p-4 border-t border-[#323738] bg-[#0e0e0e]">
             <Button
               onClick={handleRun}
-              className={`w-full md:w-40 py-6 text-base font-semibold ${
+              className={`w-full py-6 text-base font-semibold ${
                 isRunning ? 'bg-red-600 hover:bg-red-700' : 'bg-green-500 hover:bg-green-600'
               }`}
             >
@@ -573,6 +573,17 @@ const Automate = () => {
         AI
         <span className="absolute top-1 right-1 w-3 h-3 bg-green-400 border-2 border-[#0e0e0e] rounded-full" />
       </button>
+
+      <div className="hidden md:block fixed bottom-6 right-24 z-40">
+        <Button
+          onClick={handleRun}
+          className={`px-6 py-3 text-base font-semibold rounded-full shadow-lg ${
+            isRunning ? 'bg-red-600 hover:bg-red-700' : 'bg-green-500 hover:bg-green-600'
+          }`}
+        >
+          {isRunning ? 'Stop' : 'Run'}
+        </Button>
+      </div>
 
       <EntryScannerModal
         open={scannerOpen}
