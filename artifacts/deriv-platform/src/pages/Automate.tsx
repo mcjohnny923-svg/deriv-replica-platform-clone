@@ -288,7 +288,7 @@ const Automate = () => {
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden pb-16 md:pb-0">
           {/* Scrollable content */}
           <div className="flex-1 min-h-0 overflow-y-auto pb-4">
-            <div className="max-w-lg md:max-w-3xl mx-auto md:mx-0 p-4 space-y-3 md:space-y-0 md:grid md:grid-cols-2 md:gap-3 md:items-start">
+            <div className="max-w-lg md:max-w-5xl mx-auto md:mx-0 p-4 space-y-3 md:space-y-0 md:grid md:grid-cols-2 md:gap-3 md:items-start">
               {isRunning && (
                 <div className="md:col-span-2 bg-[#151717] border border-[#323738] rounded-lg p-3 flex justify-between items-center">
                   <div>
@@ -474,6 +474,7 @@ const Automate = () => {
                 </div>
               </div>
 
+              <div className="md:grid md:grid-cols-2 md:gap-3 space-y-3 md:space-y-0">
               <div>
                 <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1.5">Risk management</div>
                 <div className="bg-[#151717] border border-[#323738] rounded-lg p-3">
@@ -542,6 +543,7 @@ const Automate = () => {
                     Reset
                   </button>
                 </div>
+              </div>
               </div>
               </div>
             </div>
