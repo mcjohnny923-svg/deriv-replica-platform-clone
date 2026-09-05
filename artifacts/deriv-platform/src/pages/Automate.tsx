@@ -70,6 +70,10 @@ const Automate = () => {
   const [tradesRun, setTradesRun] = useState(0);
   const [currentStake, setCurrentStake] = useState('2');
   const [winsTarget, setWinsTarget] = useState(0);
+  const [totalStake, setTotalStake] = useState(0);
+  const [totalPayout, setTotalPayout] = useState(0);
+  const [contractsWon, setContractsWon] = useState(0);
+  const [contractsLost, setContractsLost] = useState(0);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [pendingAutoStart, setPendingAutoStart] = useState(false);
 
@@ -120,6 +124,10 @@ const Automate = () => {
     let cumulativePL = 0;
     let count = 0;
     let winsCount = 0;
+    let stakeSum = 0;
+    let payoutSum = 0;
+    let wonCount = 0;
+    let lostCount = 0;
     setCurrentStake(stake.toFixed(2));
 
     while (runningRef.current) {
@@ -155,6 +163,8 @@ const Automate = () => {
       // Deduct stake from displayed balance immediately
       updateStoredAccountBalance(placed.newBalance);
       bumpBalanceRefresh();
+      stakeSum += stake;
+      setTotalStake(stakeSum);
 
       const settled = await waitForSettlement(placed.trade.id, account.id);
       if (!settled || !runningRef.current) break;
@@ -166,6 +176,16 @@ const Automate = () => {
       if (won) winsCount += 1;
       setRunningPL(cumulativePL);
       setTradesRun(count);
+
+      if (won) {
+        wonCount += 1;
+        payoutSum += Number(settled.payout ?? 0);
+      } else {
+        lostCount += 1;
+      }
+      setContractsWon(wonCount);
+      setContractsLost(lostCount);
+      setTotalPayout(payoutSum);
 
       // Balance already credited server-side on win — refresh header to show it
       bumpBalanceRefresh();
@@ -205,9 +225,25 @@ const Automate = () => {
     }
     setRunningPL(0);
     setTradesRun(0);
+    setTotalStake(0);
+    setTotalPayout(0);
+    setContractsWon(0);
+    setContractsLost(0);
     runningRef.current = true;
     setIsRunning(true);
     runLoop();
+  };
+
+  const handleResetStats = () => {
+    runningRef.current = false;
+    setIsRunning(false);
+    setRunningPL(0);
+    setTradesRun(0);
+    setTotalStake(0);
+    setTotalPayout(0);
+    setContractsWon(0);
+    setContractsLost(0);
+    setCurrentStake(baseStake);
   };
 
   useEffect(() => {
@@ -464,6 +500,47 @@ const Automate = () => {
                     </div>
                   </div>
                   <div className="text-xs text-gray-500 mt-2">Stops automatically when cumulative profit/loss reaches either value.</div>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1.5">Bot statistics</div>
+                <div className="bg-[#151717] border border-[#323738] rounded-lg p-3 space-y-3">
+                  <div className="grid grid-cols-3 gap-3 text-center">
+                    <div>
+                      <div className="text-[11px] text-gray-400">Total stake</div>
+                      <div className="text-sm font-semibold text-white">{totalStake.toFixed(2)} USD</div>
+                    </div>
+                    <div>
+                      <div className="text-[11px] text-gray-400">Total payout</div>
+                      <div className="text-sm font-semibold text-white">{totalPayout.toFixed(2)} USD</div>
+                    </div>
+                    <div>
+                      <div className="text-[11px] text-gray-400">No. of runs</div>
+                      <div className="text-sm font-semibold text-white">{tradesRun}</div>
+                    </div>
+                    <div>
+                      <div className="text-[11px] text-gray-400">Contracts lost</div>
+                      <div className="text-sm font-semibold text-red-400">{contractsLost}</div>
+                    </div>
+                    <div>
+                      <div className="text-[11px] text-gray-400">Contracts won</div>
+                      <div className="text-sm font-semibold text-green-400">{contractsWon}</div>
+                    </div>
+                    <div>
+                      <div className="text-[11px] text-gray-400">Total profit/loss</div>
+                      <div className={`text-sm font-semibold ${runningPL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {runningPL >= 0 ? '+' : ''}{runningPL.toFixed(2)} USD
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleResetStats}
+                    className="w-full py-2 rounded-lg border border-[#414647] text-sm font-medium text-gray-300 hover:bg-[#232728] transition-colors"
+                  >
+                    Reset
+                  </button>
                 </div>
               </div>
               </div>
