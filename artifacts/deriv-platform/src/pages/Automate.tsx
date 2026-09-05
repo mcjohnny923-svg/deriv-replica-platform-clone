@@ -410,6 +410,7 @@ const Automate = () => {
               </div>
 
               <div className="md:flex md:flex-col md:gap-3">
+              <div className="md:grid md:grid-cols-2 md:gap-3 space-y-3 md:space-y-0">
               <div>
                 <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1.5">Strategy parameters</div>
                 <div className="bg-[#151717] border border-[#323738] rounded-lg divide-y divide-[#323738]">
@@ -474,7 +475,6 @@ const Automate = () => {
                 </div>
               </div>
 
-              <div className="md:grid md:grid-cols-2 md:gap-3 space-y-3 md:space-y-0">
               <div>
                 <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1.5">Risk management</div>
                 <div className="bg-[#151717] border border-[#323738] rounded-lg p-3">
@@ -502,6 +502,7 @@ const Automate = () => {
                   </div>
                   <div className="text-xs text-gray-500 mt-2">Stops automatically when cumulative profit/loss reaches either value.</div>
                 </div>
+              </div>
               </div>
 
               <div>
@@ -543,7 +544,6 @@ const Automate = () => {
                     Reset
                   </button>
                 </div>
-              </div>
               </div>
               </div>
             </div>
