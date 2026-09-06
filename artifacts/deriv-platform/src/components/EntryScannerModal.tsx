@@ -176,20 +176,20 @@ const EntryScannerModal = ({ open, onOpenChange, markets, onLaunch }: EntryScann
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && resetAndClose()}>
-      <DialogContent className="bg-white text-gray-900 sm:max-w-md max-h-[85vh] overflow-y-auto">
+      <DialogContent className="bg-white text-gray-900 sm:max-w-sm max-h-[75vh] overflow-y-auto p-4 gap-2.5">
         {view === 'scan' ? (
           <>
-            <DialogHeader>
-              <DialogTitle className="text-xl font-bold">Entry Scanner</DialogTitle>
+            <DialogHeader className="space-y-0">
+              <DialogTitle className="text-base font-bold">Entry Scanner</DialogTitle>
             </DialogHeader>
 
-            <div className="bg-gray-100 rounded-lg p-4 text-sm text-gray-600">
+            <div className="bg-gray-100 rounded-md p-2.5 text-xs text-gray-600">
               Deep scanner evaluates all synthetic index random markets, then finds the best entry
               point digit and strategy profile from historical tick data.
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            <div className="space-y-1">
+              <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">
                 Number of ticks to scan
               </label>
               <Input
@@ -197,26 +197,26 @@ const EntryScannerModal = ({ open, onOpenChange, markets, onLaunch }: EntryScann
                 value={ticksToScan}
                 onChange={(e) => setTicksToScan(e.target.value)}
                 disabled={scanning}
-                className="font-bold"
+                className="font-bold h-8 text-sm"
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Best market</label>
-              <Input readOnly value={best?.market ?? '—'} className="font-bold text-indigo-700" />
+            <div className="grid grid-cols-3 gap-2">
+              <div className="space-y-1">
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Best market</label>
+                <Input readOnly value={best?.market ?? '—'} className="font-bold text-indigo-700 h-8 text-xs px-2" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Strategy</label>
+                <Input readOnly value={best?.strategy.label ?? '—'} className="font-bold text-indigo-700 h-8 text-xs px-2" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Entry digit</label>
+                <Input readOnly value={best?.strategy.digit ?? '—'} className="font-bold text-indigo-700 h-8 text-xs px-2" />
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Strategy</label>
-              <Input readOnly value={best?.strategy.label ?? '—'} className="font-bold text-indigo-700" />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Entry digit</label>
-              <Input readOnly value={best?.strategy.digit ?? '—'} className="font-bold text-indigo-700" />
-            </div>
-
-            <div className="bg-indigo-50 rounded-lg px-4 py-3 text-sm flex flex-wrap gap-x-4 gap-y-1">
+            <div className="bg-indigo-50 rounded-md px-3 py-2 text-[11px] flex flex-wrap gap-x-3 gap-y-0.5">
               <span>Win Rate: <b>{best ? `${best.winRate.toFixed(1)}%` : '—'}</b></span>
               <span>Sample Size: <b>{best ? best.sampleSize : '—'}</b></span>
               <span>Quality Score: <b>{best ? `${best.qualityScore.toFixed(1)}%` : '—'}</b></span>
@@ -225,11 +225,11 @@ const EntryScannerModal = ({ open, onOpenChange, markets, onLaunch }: EntryScann
 
             {progress && (
               <div className="space-y-1">
-                <div className="flex justify-between text-sm font-semibold">
+                <div className="flex justify-between text-xs font-semibold">
                   <span>{progress.label}</span>
                   <span className="text-indigo-700">{progress.index}/{progress.total}</span>
                 </div>
-                <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-indigo-600 transition-all"
                     style={{ width: `${(progress.index / progress.total) * 100}%` }}
@@ -239,7 +239,7 @@ const EntryScannerModal = ({ open, onOpenChange, markets, onLaunch }: EntryScann
             )}
 
             {!scanning && best && (
-              <div className="border-l-4 border-indigo-600 bg-gray-50 rounded p-3 text-sm">
+              <div className="border-l-4 border-indigo-600 bg-gray-50 rounded p-2 text-xs">
                 <b>Best market:</b> {best.market} | {best.strategy.label} | Entry {best.strategy.digit ?? '—'} | Quality {best.qualityScore.toFixed(2)}%
               </div>
             )}
@@ -248,7 +248,7 @@ const EntryScannerModal = ({ open, onOpenChange, markets, onLaunch }: EntryScann
               <button
                 type="button"
                 onClick={handleStop}
-                className="w-full py-3 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 transition-colors"
+                className="w-full py-2 rounded-md bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition-colors"
               >
                 ■ Stop Scan
               </button>
@@ -256,7 +256,7 @@ const EntryScannerModal = ({ open, onOpenChange, markets, onLaunch }: EntryScann
               <button
                 type="button"
                 onClick={runScan}
-                className="w-full py-3 rounded-lg bg-gradient-to-r from-indigo-700 to-indigo-500 text-white font-bold hover:opacity-90 transition-opacity"
+                className="w-full py-2 rounded-md bg-gradient-to-r from-indigo-700 to-indigo-500 text-white text-sm font-bold hover:opacity-90 transition-opacity"
               >
                 Deep Scan for Best Market
               </button>
@@ -266,85 +266,85 @@ const EntryScannerModal = ({ open, onOpenChange, markets, onLaunch }: EntryScann
               type="button"
               onClick={handleLoadBot}
               disabled={!best || scanning}
-              className="w-full py-3 rounded-lg border border-indigo-300 text-indigo-600 font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-indigo-50 transition-colors"
+              className="w-full py-2 rounded-md border border-indigo-300 text-indigo-600 text-sm font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-indigo-50 transition-colors"
             >
               Load Deep Scanner Bot
             </button>
           </>
         ) : (
           <>
-            <DialogHeader>
-              <DialogTitle className="text-xl font-bold">Scanner Parameters</DialogTitle>
+            <DialogHeader className="space-y-0">
+              <DialogTitle className="text-base font-bold">Scanner Parameters</DialogTitle>
             </DialogHeader>
 
-            <div className="bg-indigo-50 rounded-lg p-4 space-y-1">
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Best market</div>
-              <div className="font-bold text-indigo-700">{best?.market}</div>
+            <div className="bg-indigo-50 rounded-md p-2.5 space-y-0.5">
+              <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Best market</div>
+              <div className="font-bold text-indigo-700 text-sm">{best?.market}</div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-indigo-50 rounded-lg p-3">
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Strategy</div>
-                <div className="font-bold text-indigo-700">{best?.strategy.label}</div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-indigo-50 rounded-md p-2">
+                <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Strategy</div>
+                <div className="font-bold text-indigo-700 text-sm">{best?.strategy.label}</div>
               </div>
-              <div className="bg-indigo-50 rounded-lg p-3">
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Entry digit</div>
-                <div className="font-bold text-indigo-700 text-lg">{best?.strategy.digit ?? '—'}</div>
+              <div className="bg-indigo-50 rounded-md p-2">
+                <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Entry digit</div>
+                <div className="font-bold text-indigo-700 text-base">{best?.strategy.digit ?? '—'}</div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Stake</label>
-                <Input type="number" step="0.01" value={stake} onChange={(e) => setStake(e.target.value)} />
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Stake</label>
+                <Input type="number" step="0.01" value={stake} onChange={(e) => setStake(e.target.value)} className="h-8 text-sm" />
               </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Martingale</label>
-                <Input type="number" step="0.1" value={martingale} onChange={(e) => setMartingale(e.target.value)} />
+              <div className="space-y-1">
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Martingale</label>
+                <Input type="number" step="0.1" value={martingale} onChange={(e) => setMartingale(e.target.value)} className="h-8 text-sm" />
               </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Number of wins</label>
-                <Input type="number" value={numberOfWins} onChange={(e) => setNumberOfWins(e.target.value)} />
+              <div className="space-y-1">
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Number of wins</label>
+                <Input type="number" value={numberOfWins} onChange={(e) => setNumberOfWins(e.target.value)} className="h-8 text-sm" />
               </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">No. of digits to check</label>
-                <Input type="number" value={digitsToCheck} onChange={(e) => setDigitsToCheck(e.target.value)} />
+              <div className="space-y-1">
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">No. of digits to check</label>
+                <Input type="number" value={digitsToCheck} onChange={(e) => setDigitsToCheck(e.target.value)} className="h-8 text-sm" />
               </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Expected profit</label>
-                <Input type="number" value={expectedProfit} onChange={(e) => setExpectedProfit(e.target.value)} />
+              <div className="space-y-1">
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Expected profit</label>
+                <Input type="number" value={expectedProfit} onChange={(e) => setExpectedProfit(e.target.value)} className="h-8 text-sm" />
               </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Stop loss</label>
-                <Input type="number" value={stopLoss} onChange={(e) => setStopLoss(e.target.value)} />
+              <div className="space-y-1">
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Stop loss</label>
+                <Input type="number" value={stopLoss} onChange={(e) => setStopLoss(e.target.value)} className="h-8 text-sm" />
               </div>
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="font-semibold">Use Martingale</span>
+              <span className="text-sm font-semibold">Use Martingale</span>
               <Switch checked={useMartingale} onCheckedChange={setUseMartingale} />
             </div>
 
             <div className="flex items-center justify-between gap-4">
               <div>
-                <div className="font-semibold">Auto-Start Trading</div>
-                <div className="text-xs text-gray-500">Bot runs immediately without further review</div>
+                <div className="text-sm font-semibold">Auto-Start Trading</div>
+                <div className="text-[11px] text-gray-500">Bot runs immediately without further review</div>
               </div>
               <Switch checked={autoStart} onCheckedChange={setAutoStart} />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setView('scan')}
-                className="py-3 rounded-lg bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition-colors"
+                className="py-2 rounded-md bg-gray-100 text-gray-700 text-sm font-bold hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleLaunch}
-                className="py-3 rounded-lg bg-gradient-to-r from-indigo-700 to-indigo-500 text-white font-bold hover:opacity-90 transition-opacity"
+                className="py-2 rounded-md bg-gradient-to-r from-indigo-700 to-indigo-500 text-white text-sm font-bold hover:opacity-90 transition-opacity"
               >
                 ▶ Launch Bot
               </button>
