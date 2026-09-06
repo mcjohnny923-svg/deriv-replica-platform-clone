@@ -7,6 +7,7 @@ export interface AuthUser {
   createdAt: string;
   referralCode: string;
   phoneNumber: string | null;
+  country: string | null;
 }
 
 export interface AuthAccount {
@@ -79,6 +80,13 @@ export function updateStoredUserPhone(phoneNumber: string) {
   }
 }
 
+export function updateStoredUserFields(fields: Partial<Pick<AuthUser, 'fullName' | 'country' | 'phoneNumber'>>) {
+  const user = getStoredUser();
+  if (user) {
+    localStorage.setItem(USER_KEY, JSON.stringify({ ...user, ...fields }));
+  }
+}
+
 export function clearAuth() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
@@ -100,6 +108,7 @@ export async function registerUser(input: {
   fullName?: string;
   referralCode?: string;
   phoneNumber?: string;
+  country?: string;
 }): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
     method: "POST",
@@ -138,6 +147,23 @@ export async function setPhoneNumber(phoneNumber: string): Promise<{ phoneNumber
   const data = await res.json();
   if (!res.ok) {
     throw new Error(data.error?.formErrors?.[0] ?? data.error ?? "Failed to save phone number");
+  }
+  return data;
+}
+
+export async function updateProfile(input: {
+  fullName?: string;
+  country?: string;
+  phoneNumber?: string;
+}): Promise<{ fullName: string | null; country: string | null; phoneNumber: string | null }> {
+  const res = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+    method: "PATCH",
+    headers: authHeaders(),
+    body: JSON.stringify(input),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error?.formErrors?.[0] ?? data.error ?? "Failed to save profile");
   }
   return data;
 }

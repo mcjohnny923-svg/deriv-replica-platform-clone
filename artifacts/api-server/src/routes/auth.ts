@@ -25,6 +25,7 @@ const registerSchema = z.object({
   fullName: z.string().optional(),
   referralCode: z.string().optional(),
   phoneNumber: z.string().regex(/^254\d{9}$/, "Phone must be in 2547XXXXXXXX format").optional(),
+  country: z.string().optional(),
 });
 
 router.post("/register", async (req, res) => {
@@ -32,7 +33,7 @@ router.post("/register", async (req, res) => {
   if (!parsed.success) {
     return res.status(400).json({ error: parsed.error.flatten() });
   }
-  const { email, password, fullName, referralCode, phoneNumber } = parsed.data;
+  const { email, password, fullName, referralCode, phoneNumber, country } = parsed.data;
 
   const existing = await db.query.usersTable.findFirst({
     where: eq(usersTable.email, email),
@@ -72,6 +73,7 @@ router.post("/register", async (req, res) => {
       referralCode: ownReferralCode,
       referredByUserId,
       phoneNumber,
+      country,
     })
     .returning();
 
@@ -95,6 +97,7 @@ router.post("/register", async (req, res) => {
       createdAt: user.createdAt,
       referralCode: user.referralCode,
       phoneNumber: user.phoneNumber,
+      country: user.country,
     },
     accounts: [demoAccount, realAccount],
   });
@@ -151,6 +154,7 @@ router.post("/login", async (req, res) => {
       createdAt: user.createdAt,
       referralCode,
       phoneNumber: user.phoneNumber,
+      country: user.country,
     },
     accounts,
   });
@@ -180,6 +184,50 @@ router.patch("/phone", authenticate, async (req: AuthedRequest, res) => {
     .where(eq(usersTable.id, req.userId!));
 
   res.json({ phoneNumber });
+});
+
+const profileUpdateSchema = z.object({
+  fullName: z.string().min(1).optional(),
+  country: z.string().optional(),
+  phoneNumber: z.string().regex(/^254\d{9}$/, "Phone must be in 2547XXXXXXXX format").optional(),
+});
+
+router.patch("/profile", authenticate, async (req: AuthedRequest, res) => {
+  const parsed = profileUpdateSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+  const { fullName, country, phoneNumber } = parsed.data;
+
+  if (phoneNumber) {
+    const existing = await db.query.usersTable.findFirst({
+      where: eq(usersTable.phoneNumber, phoneNumber),
+    });
+    if (existing && existing.id !== req.userId) {
+      return res.status(409).json({ error: "This phone number is already linked to another account" });
+    }
+  }
+
+  const updates: Partial<{ fullName: string; country: string; phoneNumber: string }> = {};
+  if (fullName !== undefined) updates.fullName = fullName;
+  if (country !== undefined) updates.country = country;
+  if (phoneNumber !== undefined) updates.phoneNumber = phoneNumber;
+
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({ error: "No fields to update" });
+  }
+
+  const [updated] = await db
+    .update(usersTable)
+    .set(updates)
+    .where(eq(usersTable.id, req.userId!))
+    .returning();
+
+  res.json({
+    fullName: updated.fullName,
+    country: updated.country,
+    phoneNumber: updated.phoneNumber,
+  });
 });
 
 router.get("/accounts", authenticate, async (req: AuthedRequest, res) => {

@@ -52,6 +52,7 @@ const Register = () => {
         fullName: fullName || undefined,
         referralCode,
         phoneNumber: formData.phone,
+        country: formData.country || undefined,
       });
       saveAuth(data);
       navigate('/dashboard');

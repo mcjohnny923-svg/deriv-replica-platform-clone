@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { User, Shield, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +8,14 @@ import { Switch } from '@/components/ui/switch';
 import DerivHeader from '@/components/DerivHeader';
 import DerivSidebar from '@/components/DerivSidebar';
 import MobileBottomNav from '@/components/MobileBottomNav';
-import { getStoredUser, getStoredAccount, refreshAccounts, type AuthAccount } from '@/lib/auth-api';
+import {
+  getStoredUser,
+  getStoredAccount,
+  refreshAccounts,
+  updateProfile,
+  updateStoredUserFields,
+  type AuthAccount,
+} from '@/lib/auth-api';
 
 const Profile = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -26,9 +34,10 @@ const Profile = () => {
     firstName: firstName ?? '',
     lastName: lastName ?? '',
     email: storedUser?.email ?? '',
-    phone: '',
-    country: '',
+    phone: storedUser?.phoneNumber ?? '',
+    country: storedUser?.country ?? '',
   });
+  const [savingProfile, setSavingProfile] = useState(false);
 
   const [notifications, setNotifications] = useState({
     email: true,
@@ -39,6 +48,24 @@ const Profile = () => {
 
   const handleProfileUpdate = (field: string, value: string) => {
     setProfile((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveProfile = async () => {
+    const fullName = `${profile.firstName} ${profile.lastName}`.trim();
+    setSavingProfile(true);
+    try {
+      const result = await updateProfile({
+        fullName: fullName || undefined,
+        country: profile.country || undefined,
+        phoneNumber: profile.phone || undefined,
+      });
+      updateStoredUserFields(result);
+      toast.success('Profile updated.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to update profile');
+    } finally {
+      setSavingProfile(false);
+    }
   };
 
   const handleNotificationToggle = (type: keyof typeof notifications, value: boolean) => {
@@ -144,7 +171,13 @@ const Profile = () => {
                 </div>
               </div>
 
-              <Button className="mt-4 w-full bg-red-600 hover:bg-red-700">Save Changes</Button>
+              <Button
+                onClick={handleSaveProfile}
+                disabled={savingProfile}
+                className="mt-4 w-full bg-red-600 hover:bg-red-700 disabled:opacity-50"
+              >
+                {savingProfile ? 'Saving…' : 'Save Changes'}
+              </Button>
             </div>
 
             {/* Security */}
