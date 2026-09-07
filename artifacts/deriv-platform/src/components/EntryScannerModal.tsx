@@ -133,13 +133,13 @@ const EntryScannerModal = ({ open, onOpenChange, markets, onLaunch }: EntryScann
 
       if (!bestSoFar || candidate.qualityScore > bestSoFar.qualityScore) {
         bestSoFar = candidate;
-        setBest(candidate);
       }
     }
 
     setScanning(false);
     setProgress(null);
     if (bestSoFar) {
+      setBest(bestSoFar);
       advanceRotation(index);
     }
   };
