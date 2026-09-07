@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -80,6 +80,8 @@ const EntryScannerModal = ({ open, onOpenChange, markets, onLaunch }: EntryScann
   const [progress, setProgress] = useState<{ label: string; index: number; total: number } | null>(null);
   const [best, setBest] = useState<BestResult | null>(null);
   const stopRef = useRef(false);
+  const livePriceRef = useRef(5000 + Math.random() * 10000);
+  const [livePrice, setLivePrice] = useState<number | null>(null);
 
   const [stake, setStake] = useState('0.5');
   const [martingale, setMartingale] = useState('2');
@@ -89,6 +91,21 @@ const EntryScannerModal = ({ open, onOpenChange, markets, onLaunch }: EntryScann
   const [stopLoss, setStopLoss] = useState('50');
   const [useMartingale, setUseMartingale] = useState(true);
   const [autoStart, setAutoStart] = useState(true);
+
+  useEffect(() => {
+    if (!scanning) { setLivePrice(null); return; }
+    livePriceRef.current = 5000 + Math.random() * 10000;
+    setLivePrice(livePriceRef.current);
+  }, [progress?.label, scanning]);
+
+  useEffect(() => {
+    if (!scanning) return;
+    const id = setInterval(() => {
+      livePriceRef.current = Math.max(0, livePriceRef.current + (Math.random() - 0.5) * 5);
+      setLivePrice(livePriceRef.current);
+    }, 150);
+    return () => clearInterval(id);
+  }, [scanning]);
 
   const resetAndClose = () => {
     stopRef.current = true;
@@ -227,6 +244,7 @@ const EntryScannerModal = ({ open, onOpenChange, markets, onLaunch }: EntryScann
               <div className="space-y-1">
                 <div className="flex justify-between text-xs font-semibold">
                   <span>{progress.label}</span>
+                  <span className="text-white font-mono">{livePrice !== null ? livePrice.toFixed(2) : ''}</span>
                   <span className="text-indigo-700">{progress.index}/{progress.total}</span>
                 </div>
                 <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
