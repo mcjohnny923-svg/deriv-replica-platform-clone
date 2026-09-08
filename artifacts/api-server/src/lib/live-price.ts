@@ -4,6 +4,7 @@
 // exactly what determines their trade's outcome.
 
 import { getAssetBasePrice } from "./asset-base-prices";
+import { pickWeightedDigit } from "./asset-digit-weights";
 
 interface PriceState {
   price: number;
@@ -18,9 +19,17 @@ function seedPrice(symbol: string): number {
   return base + (Math.random() - 0.5) * base * 0.01;
 }
 
-function stepPrice(price: number): number {
-  const change = (Math.random() - 0.5) * 3;
-  return Math.max(0, price + change);
+// Step size scales with price so a ~0.65 forex pair and a ~65000 index
+// both move by a sensible amount each tick, then the hundredths-place
+// digit is overridden per the asset's own weighted distribution so each
+// market's digit percentages look distinct over time.
+function stepPrice(price: number, symbol: string): number {
+  const change = (Math.random() - 0.5) * price * 0.0003;
+  const rawNext = Math.max(0, price + change);
+  const digit = pickWeightedDigit(symbol);
+  const cents = Math.floor(rawNext * 100);
+  const adjustedCents = cents - (cents % 10) + digit;
+  return adjustedCents / 100;
 }
 
 export function getLivePrice(symbol: string): { price: number; digit: number } {
@@ -36,7 +45,7 @@ export function getLivePrice(symbol: string): { price: number; digit: number } {
   const ticksToApply = Math.min(elapsedTicks, MAX_CATCHUP_TICKS);
 
   for (let i = 0; i < ticksToApply; i++) {
-    state.price = stepPrice(state.price);
+    state.price = stepPrice(state.price, symbol);
   }
   if (ticksToApply > 0) {
     state.lastTickAt = now;
