@@ -10,6 +10,7 @@ import AssetPriceBar from '@/components/AssetPriceBar';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import TradeTypeNavBar from '@/components/TradeTypeNavBar';
 import { isDigitContract } from '@/lib/trade-config';
+import { useDigitPriceFeed } from '@/hooks/useDigitPriceFeed';
 
 const Dashboard = () => {
   const [selectedAsset, setSelectedAsset] = useState('Volatility 75 Index');
@@ -22,6 +23,7 @@ const Dashboard = () => {
   const [balanceRefreshKey, setBalanceRefreshKey] = useState(0);
 
   const showDigitStats = isDigitContract(tradeType);
+  const priceFeed = useDigitPriceFeed(selectedAsset);
 
   const handleTradePlaced = () => {
     setBalanceRefreshKey((k) => k + 1);
@@ -41,8 +43,17 @@ const Dashboard = () => {
 
               {showDigitStats ? (
                 <>
-                  <AssetPriceBar selectedAsset={selectedAsset} onAssetChange={setSelectedAsset} />
-                  <DigitStatsDisplay selectedDigit={selectedDigit} />
+                  <AssetPriceBar
+                    selectedAsset={selectedAsset}
+                    onAssetChange={setSelectedAsset}
+                    price={priceFeed.price}
+                    priceChange={priceFeed.priceChange}
+                  />
+                  <DigitStatsDisplay
+                    selectedDigit={selectedDigit}
+                    digitHistory={priceFeed.digitHistory}
+                    lastDigit={priceFeed.lastDigit}
+                  />
                 </>
               ) : (
                 <DerivChart selectedAsset={selectedAsset} onAssetChange={setSelectedAsset} />

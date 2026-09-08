@@ -9,24 +9,30 @@ export interface DigitFlashEvent {
 interface DigitStatsDisplayProps {
   selectedDigit: number | null;
   flash?: DigitFlashEvent | null;
+  digitHistory?: number[];
+  lastDigit?: number;
 }
 
 const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 const RADIUS = 26;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-const HISTORY_LENGTH = 120;
+const HISTORY_LENGTH = 1000;
 
 function randomDigit() {
   return Math.floor(Math.random() * 10);
 }
 
-const DigitStatsDisplay = ({ selectedDigit, flash }: DigitStatsDisplayProps) => {
-  const [history, setHistory] = useState<number[]>(() =>
+const DigitStatsDisplay = ({ selectedDigit, flash, digitHistory, lastDigit }: DigitStatsDisplayProps) => {
+  const isControlled = digitHistory !== undefined;
+  const [internalHistory, setInternalHistory] = useState<number[]>(() =>
     Array.from({ length: HISTORY_LENGTH }, randomDigit),
   );
-  const [lastTickDigit, setLastTickDigit] = useState<number>(history[history.length - 1]);
+  const [internalLastTick, setInternalLastTick] = useState<number>(internalHistory[internalHistory.length - 1]);
   const [activeFlash, setActiveFlash] = useState<{ digit: number; won: boolean } | null>(null);
   const [fading, setFading] = useState(false);
+
+  const history = isControlled ? digitHistory! : internalHistory;
+  const lastTickDigit = isControlled ? (lastDigit ?? history[history.length - 1]) : internalLastTick;
 
   useEffect(() => {
     if (!flash) return;
@@ -42,16 +48,17 @@ const DigitStatsDisplay = ({ selectedDigit, flash }: DigitStatsDisplayProps) => 
   }, [flash?.key]);
 
   useEffect(() => {
+    if (isControlled) return;
     const interval = setInterval(() => {
-      setHistory((prev) => {
+      setInternalHistory((prev) => {
         const next = randomDigit();
-        setLastTickDigit(next);
+        setInternalLastTick(next);
         const updated = [...prev.slice(1), next];
         return updated;
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isControlled]);
 
   const counts = DIGITS.map(
     (d) => history.filter((h) => h === d).length,

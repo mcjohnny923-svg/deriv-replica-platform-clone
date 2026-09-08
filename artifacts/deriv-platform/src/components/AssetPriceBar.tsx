@@ -4,6 +4,8 @@ import { ChevronDown, TrendingUp, TrendingDown } from 'lucide-react';
 interface AssetPriceBarProps {
   selectedAsset: string;
   onAssetChange: (asset: string) => void;
+  price?: number;
+  priceChange?: number;
 }
 
 interface AssetGroup {
@@ -11,10 +13,14 @@ interface AssetGroup {
   assets: string[];
 }
 
-const AssetPriceBar = ({ selectedAsset, onAssetChange }: AssetPriceBarProps) => {
-  const [currentPrice, setCurrentPrice] = useState(12547.89);
-  const [priceChange, setPriceChange] = useState(+12.34);
+const AssetPriceBar = ({ selectedAsset, onAssetChange, price, priceChange: controlledPriceChange }: AssetPriceBarProps) => {
+  const isControlled = price !== undefined;
+  const [internalPrice, setInternalPrice] = useState(12547.89);
+  const [internalPriceChange, setInternalPriceChange] = useState(+12.34);
   const [isAssetDropdownOpen, setIsAssetDropdownOpen] = useState(false);
+
+  const currentPrice = isControlled ? price : internalPrice;
+  const priceChange = isControlled ? (controlledPriceChange ?? 0) : internalPriceChange;
 
   const assetGroups: AssetGroup[] = [
     {
@@ -47,17 +53,18 @@ const AssetPriceBar = ({ selectedAsset, onAssetChange }: AssetPriceBarProps) => 
   ];
 
   useEffect(() => {
+    if (isControlled) return;
     const interval = setInterval(() => {
-      setCurrentPrice((prev) => {
+      setInternalPrice((prev) => {
         const change = (Math.random() - 0.5) * 3;
         const newPrice = Math.max(0, prev + change);
-        setPriceChange(change);
+        setInternalPriceChange(change);
         return newPrice;
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [selectedAsset]);
+  }, [selectedAsset, isControlled]);
 
   const percentChange = ((priceChange / currentPrice) * 100).toFixed(2);
 

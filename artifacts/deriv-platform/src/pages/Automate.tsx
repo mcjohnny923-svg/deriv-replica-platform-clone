@@ -20,6 +20,7 @@ import { getStoredAccount, updateStoredAccountBalance } from '@/lib/auth-api';
 import { buyTrade, getTradeHistory, type Trade } from '@/lib/trades-api';
 import EntryScannerModal, { type ScannerLaunchConfig } from '@/components/EntryScannerModal';
 import DigitStatsDisplay, { type DigitFlashEvent } from '@/components/DigitStatsDisplay';
+import { useDigitPriceFeed } from '@/hooks/useDigitPriceFeed';
 
 type Strategy = 'martingale' | 'dalembert' | 'oscars_grind' | 'flat';
 
@@ -85,6 +86,7 @@ const Automate = () => {
 
   const digitSelector = needsDigitSelector(tradeType);
   const digitFlashEligible = isDigitContract(tradeType);
+  const priceFeed = useDigitPriceFeed(selectedAsset);
   const choices = CHOICES_BY_TYPE[tradeType] ?? ['rise', 'fall'];
 
   const bumpBalanceRefresh = () => setBalanceRefreshKey((k) => k + 1);
@@ -425,6 +427,8 @@ const Automate = () => {
                 <DigitStatsDisplay
                   selectedDigit={digitSelector ? selectedDigit : null}
                   flash={digitFlashEligible ? digitFlash : null}
+                  digitHistory={priceFeed.digitHistory}
+                  lastDigit={priceFeed.lastDigit}
                 />
               </div>
 
