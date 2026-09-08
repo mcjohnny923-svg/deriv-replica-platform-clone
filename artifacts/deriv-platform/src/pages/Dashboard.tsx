@@ -53,6 +53,7 @@ const Dashboard = () => {
                     selectedDigit={selectedDigit}
                     digitHistory={priceFeed.digitHistory}
                     lastDigit={priceFeed.lastDigit}
+                    twoRowOnMobile
                   />
                 </>
               ) : (
