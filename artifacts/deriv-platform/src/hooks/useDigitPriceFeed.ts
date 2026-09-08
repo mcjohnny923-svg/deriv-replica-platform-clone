@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { API_BASE_URL } from '@/lib/api-config';
+import { assetToMarketInfo } from '@/lib/trade-config';
 
 const HISTORY_LENGTH = 1000;
 
@@ -13,43 +15,48 @@ export interface DigitPriceFeed {
   digitHistory: number[];
 }
 
-// One shared "live price" generator per asset. Ticks every second, and the
-// hundredths-place digit of the price (matching what's displayed, e.g.
-// 12545.97 -> 7) drives both the price readout and the digit stats circles,
-// so they always agree with each other.
-export function useDigitPriceFeed(seedKey: string, basePrice = 12547.89): DigitPriceFeed {
-  const priceRef = useRef(basePrice);
-  const [price, setPrice] = useState(basePrice);
+// Polls the backend's live price for the selected asset every second.
+// This is the same value the backend uses to settle digit-contract trades,
+// so what the user watches ticking on screen is exactly what determines
+// their trade outcomes - no separate client-side random simulation.
+export function useDigitPriceFeed(assetName: string, fallbackBase = 12547.89): DigitPriceFeed {
+  const lastPriceRef = useRef(fallbackBase);
+  const [price, setPrice] = useState(fallbackBase);
   const [priceChange, setPriceChange] = useState(0);
   const [digitHistory, setDigitHistory] = useState<number[]>(() =>
     Array.from({ length: HISTORY_LENGTH }, randomDigit),
   );
   const [lastDigit, setLastDigit] = useState<number>(digitHistory[digitHistory.length - 1]);
 
-  // Reseed when the selected asset changes
   useEffect(() => {
-    const seeded = basePrice + (Math.random() - 0.5) * 200;
-    priceRef.current = seeded;
-    setPrice(seeded);
-    setDigitHistory(Array.from({ length: HISTORY_LENGTH }, randomDigit));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [seedKey]);
+    let cancelled = false;
+    const { symbol } = assetToMarketInfo(assetName);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const change = (Math.random() - 0.5) * 3;
-      const newPrice = Math.max(0, priceRef.current + change);
-      priceRef.current = newPrice;
-      setPrice(newPrice);
-      setPriceChange(change);
+    const poll = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/markets/tick?symbol=${encodeURIComponent(symbol)}`);
+        if (!res.ok) return;
+        const data: { price: number; digit: number } = await res.json();
+        if (cancelled) return;
 
-      const cents = Math.round(newPrice * 100);
-      const digit = Math.abs(cents % 10);
-      setLastDigit(digit);
-      setDigitHistory((prev) => [...prev.slice(1), digit]);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+        const prevPrice = lastPriceRef.current;
+        lastPriceRef.current = data.price;
+        setPrice(data.price);
+        setPriceChange(data.price - prevPrice);
+        setLastDigit(data.digit);
+        setDigitHistory((prev) => [...prev.slice(1), data.digit]);
+      } catch {
+        // Network hiccup - keep showing the last known value, try again next tick.
+      }
+    };
+
+    poll();
+    const interval = setInterval(poll, 1000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [assetName]);
 
   return { price, priceChange, lastDigit, digitHistory };
 }

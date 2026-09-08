@@ -16,6 +16,7 @@ import {
   durationToSeconds,
   isDigitContract,
 } from "../lib/trade-config";
+import { getLivePrice } from "../lib/live-price";
 import { REFERRAL_COMMISSION_RATE } from "../lib/referral";
 
 const router: IRouter = Router();
@@ -71,6 +72,7 @@ async function settleDueTrades(accountId: number) {
       eq(tradesTable.status, "open"),
       lte(tradesTable.settlesAt, now),
     ),
+    with: { market: true },
   });
 
   for (const trade of dueTrades) {
@@ -81,16 +83,12 @@ async function settleDueTrades(accountId: number) {
     let exitPrice: number;
 
     if (isDigitContract(trade.tradeType)) {
-      // Generate a genuinely random exit price, then derive win/loss
-      // from its actual last digit (hundredths place, matching the
-      // 2-decimal price shown to the user, e.g. 12545.97 -> digit 7).
-      const priceDrift = (Math.random() - 0.5) * 40;
-      const rawExitPrice = Number(trade.entryPrice) + priceDrift;
-      const outcomeDigit = Math.floor(Math.random() * 10);
-      // Force the hundredths-place digit of the exit price to equal outcomeDigit
-      let cents = Math.floor(rawExitPrice * 100);
-      cents = cents - (cents % 10) + outcomeDigit;
-      exitPrice = cents / 100;
+      // Use the same live price the frontend is displaying for this
+      // market, so the outcome digit the user watched ticking on screen
+      // is exactly what determines win/loss - no separate random roll.
+      const live = getLivePrice(trade.market?.symbol ?? String(trade.marketId));
+      const outcomeDigit = live.digit;
+      exitPrice = live.price;
 
       const stakedDigit = trade.digit ?? 0;
       if (trade.direction === "over") {
