@@ -3,6 +3,8 @@
 // reads from the same state, so the number a user watches ticking is
 // exactly what determines their trade's outcome.
 
+import { getAssetBasePrice } from "./asset-base-prices";
+
 interface PriceState {
   price: number;
   lastTickAt: number;
@@ -11,8 +13,9 @@ interface PriceState {
 const priceStore = new Map<string, PriceState>();
 const MAX_CATCHUP_TICKS = 5;
 
-function seedPrice(): number {
-  return 10000 + Math.random() * 5000;
+function seedPrice(symbol: string): number {
+  const base = getAssetBasePrice(symbol);
+  return base + (Math.random() - 0.5) * base * 0.01;
 }
 
 function stepPrice(price: number): number {
@@ -25,7 +28,7 @@ export function getLivePrice(symbol: string): { price: number; digit: number } {
   let state = priceStore.get(symbol);
 
   if (!state) {
-    state = { price: seedPrice(), lastTickAt: now };
+    state = { price: seedPrice(symbol), lastTickAt: now };
     priceStore.set(symbol, state);
   }
 

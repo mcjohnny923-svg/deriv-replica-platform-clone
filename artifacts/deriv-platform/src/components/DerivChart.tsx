@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChevronDown, TrendingUp, TrendingDown } from 'lucide-react';
+import { getAssetBasePrice } from '@/lib/asset-base-prices';
 import {
   createChart,
   AreaSeries,
@@ -39,10 +40,11 @@ const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
   const areaSeriesRef = useRef<ISeriesApi<'Area'> | null>(null);
   const candleSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
   const lastCandleRef = useRef<{ time: number; open: number; high: number; low: number; close: number } | null>(null);
-  const priceRef = useRef(12547.89);
+  const priceRef = useRef(getAssetBasePrice(selectedAsset));
+  const seededAssetRef = useRef(selectedAsset);
 
-  const [currentPrice, setCurrentPrice] = useState(12547.89);
-  const [priceChange, setPriceChange] = useState(+12.34);
+  const [currentPrice, setCurrentPrice] = useState(() => getAssetBasePrice(selectedAsset));
+  const [priceChange, setPriceChange] = useState(0);
   const [isAssetDropdownOpen, setIsAssetDropdownOpen] = useState(false);
   const [isTimeframeDropdownOpen, setIsTimeframeDropdownOpen] = useState(false);
   const [selectedTimeframe, setSelectedTimeframe] = useState('1T');
@@ -150,6 +152,10 @@ const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
     }
 
     const now = Math.floor(Date.now() / 1000);
+    if (seededAssetRef.current !== selectedAsset) {
+      priceRef.current = getAssetBasePrice(selectedAsset);
+      seededAssetRef.current = selectedAsset;
+    }
     let basePrice = priceRef.current;
 
     if (isTickMode) {
