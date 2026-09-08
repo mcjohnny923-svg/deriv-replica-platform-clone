@@ -14,6 +14,7 @@ import {
   getPayoutMultiplier,
   getWinProbability,
   durationToSeconds,
+  isDigitContract,
 } from "../lib/trade-config";
 import { REFERRAL_COMMISSION_RATE } from "../lib/referral";
 
@@ -73,13 +74,46 @@ async function settleDueTrades(accountId: number) {
   });
 
   for (const trade of dueTrades) {
-    const winProbability = getWinProbability(trade.tradeType);
-    const won = Math.random() < winProbability;
     const stakeNum = Number(trade.stake);
     const multiplier = Number(trade.payoutMultiplier);
+
+    let won: boolean;
+    let exitPrice: number;
+
+    if (isDigitContract(trade.tradeType)) {
+      // Generate a genuinely random exit price, then derive win/loss
+      // from its actual last digit so the outcome is consistent with
+      // what gets displayed to the user.
+      const priceDrift = (Math.random() - 0.5) * 40;
+      const rawExitPrice = Number(trade.entryPrice) + priceDrift;
+      const outcomeDigit = Math.floor(Math.random() * 10);
+      // Force the last digit of the exit price to equal outcomeDigit
+      exitPrice = Math.floor(rawExitPrice) + outcomeDigit / 10;
+
+      const stakedDigit = trade.digit ?? 0;
+      if (trade.direction === "over") {
+        won = outcomeDigit > stakedDigit;
+      } else if (trade.direction === "under") {
+        won = outcomeDigit < stakedDigit;
+      } else if (trade.direction === "even") {
+        won = outcomeDigit % 2 === 0;
+      } else if (trade.direction === "odd") {
+        won = outcomeDigit % 2 === 1;
+      } else if (trade.direction === "matches") {
+        won = outcomeDigit === stakedDigit;
+      } else if (trade.direction === "differs") {
+        won = outcomeDigit !== stakedDigit;
+      } else {
+        won = false;
+      }
+    } else {
+      const winProbability = getWinProbability(trade.tradeType);
+      won = Math.random() < winProbability;
+      const priceDrift = (Math.random() - 0.5) * 40;
+      exitPrice = Number(trade.entryPrice) + priceDrift;
+    }
+
     const payout = won ? stakeNum * multiplier : 0;
-    const priceDrift = (Math.random() - 0.5) * 40;
-    const exitPrice = Number(trade.entryPrice) + priceDrift;
 
     await db
       .update(tradesTable)
