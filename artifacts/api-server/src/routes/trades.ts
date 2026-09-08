@@ -82,13 +82,15 @@ async function settleDueTrades(accountId: number) {
 
     if (isDigitContract(trade.tradeType)) {
       // Generate a genuinely random exit price, then derive win/loss
-      // from its actual last digit so the outcome is consistent with
-      // what gets displayed to the user.
+      // from its actual last digit (hundredths place, matching the
+      // 2-decimal price shown to the user, e.g. 12545.97 -> digit 7).
       const priceDrift = (Math.random() - 0.5) * 40;
       const rawExitPrice = Number(trade.entryPrice) + priceDrift;
       const outcomeDigit = Math.floor(Math.random() * 10);
-      // Force the last digit of the exit price to equal outcomeDigit
-      exitPrice = Math.floor(rawExitPrice) + outcomeDigit / 10;
+      // Force the hundredths-place digit of the exit price to equal outcomeDigit
+      let cents = Math.floor(rawExitPrice * 100);
+      cents = cents - (cents % 10) + outcomeDigit;
+      exitPrice = cents / 100;
 
       const stakedDigit = trade.digit ?? 0;
       if (trade.direction === "over") {
@@ -119,7 +121,7 @@ async function settleDueTrades(accountId: number) {
       .update(tradesTable)
       .set({
         status: won ? "won" : "lost",
-        exitPrice: exitPrice.toFixed(5),
+        exitPrice: isDigitContract(trade.tradeType) ? exitPrice.toFixed(2) : exitPrice.toFixed(5),
         payout: payout.toFixed(2),
         closedAt: now,
       })

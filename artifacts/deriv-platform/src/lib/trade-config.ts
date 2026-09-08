@@ -59,10 +59,12 @@ export function directionFor(tradeType: string, choice: string): string {
 
 export function getOutcomeDigit(exitPrice: string | null | undefined): number | null {
   if (!exitPrice) return null;
-  const digitsOnly = exitPrice.replace(/[^0-9]/g, '');
-  if (!digitsOnly) return null;
-  const lastChar = digitsOnly[digitsOnly.length - 1];
-  return parseInt(lastChar, 10);
+  const num = parseFloat(exitPrice);
+  if (Number.isNaN(num)) return null;
+  // Outcome digit is the hundredths-place digit of the displayed price
+  // (e.g. 12545.97 -> 7), matching the standard 2-decimal price format.
+  const cents = Math.round(num * 100);
+  return Math.abs(cents % 10);
 }
 
 export function durationUnitLabel(unit: string): string {
