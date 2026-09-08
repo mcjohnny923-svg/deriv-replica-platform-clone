@@ -57,6 +57,14 @@ export function directionFor(tradeType: string, choice: string): string {
   return map[tradeType]?.[choice] ?? choice;
 }
 
+export function getOutcomeDigit(exitPrice: string | null | undefined): number | null {
+  if (!exitPrice) return null;
+  const digitsOnly = exitPrice.replace(/[^0-9]/g, '');
+  if (!digitsOnly) return null;
+  const lastChar = digitsOnly[digitsOnly.length - 1];
+  return parseInt(lastChar, 10);
+}
+
 export function durationUnitLabel(unit: string): string {
   return { t: 'Ticks', s: 'Seconds', m: 'Minutes' }[unit] ?? 'Ticks';
 }

@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import {
   TRADE_TYPES,
   needsDigitSelector,
+  isDigitContract,
+  getOutcomeDigit,
   DIGITS,
   assetToMarketInfo,
   directionFor,
@@ -82,6 +84,7 @@ const Automate = () => {
   const runningRef = useRef(false);
 
   const digitSelector = needsDigitSelector(tradeType);
+  const digitFlashEligible = isDigitContract(tradeType);
   const choices = CHOICES_BY_TYPE[tradeType] ?? ['rise', 'fall'];
 
   const bumpBalanceRefresh = () => setBalanceRefreshKey((k) => k + 1);
@@ -179,8 +182,11 @@ const Automate = () => {
       setRunningPL(cumulativePL);
       setTradesRun(count);
 
-      if (digitSelector) {
-        setDigitFlash({ digit: selectedDigit, won, key: Date.now() });
+      if (digitFlashEligible) {
+        const outcomeDigit = getOutcomeDigit(settled.exitPrice);
+        if (outcomeDigit !== null) {
+          setDigitFlash({ digit: outcomeDigit, won, key: Date.now() });
+        }
       }
 
       if (won) {
@@ -418,7 +424,7 @@ const Automate = () => {
               <div className="md:col-span-2">
                 <DigitStatsDisplay
                   selectedDigit={digitSelector ? selectedDigit : null}
-                  flash={digitSelector ? digitFlash : null}
+                  flash={digitFlashEligible ? digitFlash : null}
                 />
               </div>
 

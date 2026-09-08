@@ -83,9 +83,10 @@ const DigitStatsDisplay = ({ selectedDigit, flash }: DigitStatsDisplayProps) => 
               <div className="relative w-full aspect-square">
                 {activeFlash && activeFlash.digit === digit && (
                   <div
-                    className={`absolute inset-0 -m-2 rounded-full blur-md transition-opacity duration-1000 ${
+                    className={`absolute inset-0 -m-3 rounded-full blur-lg transition-opacity duration-1000 ${
                       activeFlash.won ? 'bg-green-400' : 'bg-red-500'
-                    } ${fading ? 'opacity-0' : 'opacity-70'}`}
+                    } ${fading ? 'opacity-0' : 'opacity-100'}`}
+                    style={{ boxShadow: activeFlash.won ? '0 0 24px 8px rgba(0,214,143,0.9)' : '0 0 24px 8px rgba(255,68,79,0.9)' }}
                   />
                 )}
                 <svg
