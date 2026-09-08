@@ -47,8 +47,8 @@ const DigitStatsDisplay = ({ selectedDigit }: DigitStatsDisplayProps) => {
   };
 
   return (
-    <div className="bg-[#151717] border border-[#323738] rounded-lg px-3 py-4">
-      <div className="flex flex-nowrap gap-3 overflow-x-auto sm:justify-center">
+    <div className="bg-[#151717] border border-[#323738] rounded-lg px-2 py-3">
+      <div className="grid grid-cols-10 gap-1">
         {DIGITS.map((digit) => {
           const pct = percentages[digit];
           const isSelected = selectedDigit === digit;
@@ -56,11 +56,11 @@ const DigitStatsDisplay = ({ selectedDigit }: DigitStatsDisplayProps) => {
           const arcLength = Math.min(pct / 20, 1) * CIRCUMFERENCE;
 
           return (
-            <div key={digit} className="relative flex flex-col items-center flex-shrink-0">
-              <div className="relative w-14 h-14">
+            <div key={digit} className="relative flex flex-col items-center">
+              <div className="relative w-full aspect-square">
                 <svg
                   viewBox="0 0 64 64"
-                  className="w-14 h-14 -rotate-90"
+                  className="w-full h-full -rotate-90"
                 >
                   {/* Background track */}
                   <circle
@@ -95,15 +95,15 @@ const DigitStatsDisplay = ({ selectedDigit }: DigitStatsDisplayProps) => {
                     />
                   )}
                 </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <div className="absolute inset-0 flex flex-col items-center justify-center leading-none">
                   <span
-                    className={`text-sm font-semibold ${
+                    className={`text-[10px] font-semibold ${
                       isSelected ? 'text-[#7c5cff]' : 'text-white'
                     }`}
                   >
                     {digit}
                   </span>
-                  <span className="text-[10px] text-gray-400">
+                  <span className="text-[6px] text-gray-400 mt-0.5">
                     {pct.toFixed(1)}%
                   </span>
                 </div>
