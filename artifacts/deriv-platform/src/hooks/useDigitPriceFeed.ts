@@ -36,7 +36,7 @@ export function useDigitPriceFeed(assetName: string, fallbackBase = 12547.89): D
       try {
         const res = await fetch(`${API_BASE_URL}/api/markets/tick?symbol=${encodeURIComponent(symbol)}`);
         if (!res.ok) return;
-        const data: { price: number; digit: number } = await res.json();
+        const data: { price: number; digit: number; digitHistory: number[] } = await res.json();
         if (cancelled) return;
 
         const prevPrice = lastPriceRef.current;
@@ -44,7 +44,11 @@ export function useDigitPriceFeed(assetName: string, fallbackBase = 12547.89): D
         setPrice(data.price);
         setPriceChange(data.price - prevPrice);
         setLastDigit(data.digit);
-        setDigitHistory((prev) => [...prev.slice(1), data.digit]);
+        // Backend owns the rolling history for this asset - replace our
+        // buffer with it entirely so switching assets shows the correct
+        // distribution immediately, instead of slowly drifting from
+        // whatever the previously selected asset's buffer looked like.
+        setDigitHistory(data.digitHistory);
       } catch {
         // Network hiccup - keep showing the last known value, try again next tick.
       }

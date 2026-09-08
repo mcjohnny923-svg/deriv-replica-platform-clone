@@ -9,10 +9,16 @@ import { pickWeightedDigit } from "./asset-digit-weights";
 interface PriceState {
   price: number;
   lastTickAt: number;
+  digitHistory: number[];
 }
 
 const priceStore = new Map<string, PriceState>();
 const MAX_CATCHUP_TICKS = 5;
+const HISTORY_LENGTH = 1000;
+
+function buildInitialHistory(symbol: string): number[] {
+  return Array.from({ length: HISTORY_LENGTH }, () => pickWeightedDigit(symbol));
+}
 
 function seedPrice(symbol: string): number {
   const base = getAssetBasePrice(symbol);
@@ -32,12 +38,16 @@ function stepPrice(price: number, symbol: string): number {
   return adjustedCents / 100;
 }
 
-export function getLivePrice(symbol: string): { price: number; digit: number } {
+export function getLivePrice(symbol: string): { price: number; digit: number; digitHistory: number[] } {
   const now = Date.now();
   let state = priceStore.get(symbol);
 
   if (!state) {
-    state = { price: seedPrice(symbol), lastTickAt: now };
+    state = {
+      price: seedPrice(symbol),
+      lastTickAt: now,
+      digitHistory: buildInitialHistory(symbol),
+    };
     priceStore.set(symbol, state);
   }
 
@@ -46,6 +56,12 @@ export function getLivePrice(symbol: string): { price: number; digit: number } {
 
   for (let i = 0; i < ticksToApply; i++) {
     state.price = stepPrice(state.price, symbol);
+    const cents = Math.round(state.price * 100);
+    const tickDigit = Math.abs(cents % 10);
+    state.digitHistory.push(tickDigit);
+    if (state.digitHistory.length > HISTORY_LENGTH) {
+      state.digitHistory.shift();
+    }
   }
   if (ticksToApply > 0) {
     state.lastTickAt = now;
@@ -54,5 +70,5 @@ export function getLivePrice(symbol: string): { price: number; digit: number } {
   const cents = Math.round(state.price * 100);
   const digit = Math.abs(cents % 10);
 
-  return { price: state.price, digit };
+  return { price: state.price, digit, digitHistory: state.digitHistory };
 }

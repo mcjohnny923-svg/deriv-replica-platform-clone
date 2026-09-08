@@ -9,8 +9,8 @@ router.get("/tick", (req: Request, res: Response) => {
     res.status(400).json({ error: "symbol query param required" });
     return;
   }
-  const { price, digit } = getLivePrice(symbol);
-  res.json({ symbol, price, digit });
+  const { price, digit, digitHistory } = getLivePrice(symbol);
+  res.json({ symbol, price, digit, digitHistory });
 });
 
 export default router;
