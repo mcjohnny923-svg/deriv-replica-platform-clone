@@ -17,6 +17,7 @@ import {
 import { getStoredAccount, updateStoredAccountBalance } from '@/lib/auth-api';
 import { buyTrade, getTradeHistory, type Trade } from '@/lib/trades-api';
 import EntryScannerModal, { type ScannerLaunchConfig } from '@/components/EntryScannerModal';
+import DigitStatsDisplay from '@/components/DigitStatsDisplay';
 
 type Strategy = 'martingale' | 'dalembert' | 'oscars_grind' | 'flat';
 
@@ -407,6 +408,10 @@ const Automate = () => {
                   <span className="text-sm text-gray-300">Allow equals</span>
                   <Switch checked={allowEquals} onCheckedChange={setAllowEquals} disabled={isRunning} />
                 </div>
+              </div>
+
+              <div className="md:col-span-2">
+                <DigitStatsDisplay selectedDigit={digitSelector ? selectedDigit : null} />
               </div>
 
               <div className="md:flex md:flex-col md:gap-3">

@@ -47,8 +47,8 @@ const DigitStatsDisplay = ({ selectedDigit }: DigitStatsDisplayProps) => {
   };
 
   return (
-    <div className="bg-[#151717] border-t border-[#323738] px-4 py-6">
-      <div className="grid grid-cols-5 sm:grid-cols-10 gap-4 justify-items-center">
+    <div className="bg-[#151717] border border-[#323738] rounded-lg px-3 py-4">
+      <div className="flex flex-nowrap gap-3 overflow-x-auto sm:justify-center">
         {DIGITS.map((digit) => {
           const pct = percentages[digit];
           const isSelected = selectedDigit === digit;
@@ -56,11 +56,11 @@ const DigitStatsDisplay = ({ selectedDigit }: DigitStatsDisplayProps) => {
           const arcLength = Math.min(pct / 20, 1) * CIRCUMFERENCE;
 
           return (
-            <div key={digit} className="relative flex flex-col items-center">
-              <div className="relative w-16 h-16">
+            <div key={digit} className="relative flex flex-col items-center flex-shrink-0">
+              <div className="relative w-14 h-14">
                 <svg
                   viewBox="0 0 64 64"
-                  className="w-16 h-16 -rotate-90"
+                  className="w-14 h-14 -rotate-90"
                 >
                   {/* Background track */}
                   <circle
