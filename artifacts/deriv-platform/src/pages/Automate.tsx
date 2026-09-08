@@ -17,7 +17,7 @@ import {
 import { getStoredAccount, updateStoredAccountBalance } from '@/lib/auth-api';
 import { buyTrade, getTradeHistory, type Trade } from '@/lib/trades-api';
 import EntryScannerModal, { type ScannerLaunchConfig } from '@/components/EntryScannerModal';
-import DigitStatsDisplay from '@/components/DigitStatsDisplay';
+import DigitStatsDisplay, { type DigitFlashEvent } from '@/components/DigitStatsDisplay';
 
 type Strategy = 'martingale' | 'dalembert' | 'oscars_grind' | 'flat';
 
@@ -77,6 +77,7 @@ const Automate = () => {
   const [contractsLost, setContractsLost] = useState(0);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [pendingAutoStart, setPendingAutoStart] = useState(false);
+  const [digitFlash, setDigitFlash] = useState<DigitFlashEvent | null>(null);
 
   const runningRef = useRef(false);
 
@@ -177,6 +178,10 @@ const Automate = () => {
       if (won) winsCount += 1;
       setRunningPL(cumulativePL);
       setTradesRun(count);
+
+      if (digitSelector) {
+        setDigitFlash({ digit: selectedDigit, won, key: Date.now() });
+      }
 
       if (won) {
         wonCount += 1;
@@ -411,7 +416,10 @@ const Automate = () => {
               </div>
 
               <div className="md:col-span-2">
-                <DigitStatsDisplay selectedDigit={digitSelector ? selectedDigit : null} />
+                <DigitStatsDisplay
+                  selectedDigit={digitSelector ? selectedDigit : null}
+                  flash={digitSelector ? digitFlash : null}
+                />
               </div>
 
               <div className="md:flex md:flex-col md:gap-3">

@@ -1,7 +1,14 @@
 import { useEffect, useState } from 'react';
 
+export interface DigitFlashEvent {
+  digit: number;
+  won: boolean;
+  key: number;
+}
+
 interface DigitStatsDisplayProps {
   selectedDigit: number | null;
+  flash?: DigitFlashEvent | null;
 }
 
 const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -13,11 +20,26 @@ function randomDigit() {
   return Math.floor(Math.random() * 10);
 }
 
-const DigitStatsDisplay = ({ selectedDigit }: DigitStatsDisplayProps) => {
+const DigitStatsDisplay = ({ selectedDigit, flash }: DigitStatsDisplayProps) => {
   const [history, setHistory] = useState<number[]>(() =>
     Array.from({ length: HISTORY_LENGTH }, randomDigit),
   );
   const [lastTickDigit, setLastTickDigit] = useState<number>(history[history.length - 1]);
+  const [activeFlash, setActiveFlash] = useState<{ digit: number; won: boolean } | null>(null);
+  const [fading, setFading] = useState(false);
+
+  useEffect(() => {
+    if (!flash) return;
+    setActiveFlash({ digit: flash.digit, won: flash.won });
+    setFading(false);
+    const fadeTimer = setTimeout(() => setFading(true), 300);
+    const clearTimer = setTimeout(() => setActiveFlash(null), 1800);
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(clearTimer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [flash?.key]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -41,6 +63,7 @@ const DigitStatsDisplay = ({ selectedDigit }: DigitStatsDisplayProps) => {
   const minDigit = percentages.indexOf(minPct);
 
   const ringColor = (digit: number) => {
+    if (activeFlash && activeFlash.digit === digit) return activeFlash.won ? '#00d68f' : '#ff444f';
     if (digit === maxDigit) return '#00d68f';
     if (digit === minDigit) return '#ff444f';
     return '#6b7280';
@@ -58,6 +81,13 @@ const DigitStatsDisplay = ({ selectedDigit }: DigitStatsDisplayProps) => {
           return (
             <div key={digit} className="relative flex flex-col items-center">
               <div className="relative w-full aspect-square">
+                {activeFlash && activeFlash.digit === digit && (
+                  <div
+                    className={`absolute inset-0 -m-2 rounded-full blur-md transition-opacity duration-1000 ${
+                      activeFlash.won ? 'bg-green-400' : 'bg-red-500'
+                    } ${fading ? 'opacity-0' : 'opacity-70'}`}
+                  />
+                )}
                 <svg
                   viewBox="0 0 64 64"
                   className="w-full h-full -rotate-90"
