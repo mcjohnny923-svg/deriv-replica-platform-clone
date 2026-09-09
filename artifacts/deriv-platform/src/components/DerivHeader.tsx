@@ -51,6 +51,7 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
     : '0.00';
   const displayCurrency = activeAccount?.currency ?? 'USD';
   const typeColorClass = activeType === 'real' ? 'text-green-500' : 'text-orange-400';
+  const isLoggedIn = accounts.length > 0;
 
   const handleSwitch = (type: 'demo' | 'real') => {
     setActiveAccountType(type);
@@ -113,6 +114,14 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
         </Button>
 
         {/* Account switcher */}
+        {!isLoggedIn ? (
+          <Link
+            to="/login"
+            className="flex items-center px-4 py-1.5 bg-red-500 hover:bg-red-600 rounded text-white text-sm font-semibold transition-colors"
+          >
+            Log in
+          </Link>
+        ) : (
         <div className="relative">
           <button
             onClick={() => setAccountDropdownOpen(!accountDropdownOpen)}
@@ -172,6 +181,7 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
             </div>
           )}
         </div>
+        )}
 
         {/* Deposit button - opens the Top Up Funds modal */}
         <Button
