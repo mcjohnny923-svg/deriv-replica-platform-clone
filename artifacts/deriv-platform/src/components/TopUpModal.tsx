@@ -8,6 +8,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import type { DepositProvider } from '@/lib/payments-api';
+import { toast } from 'sonner';
 
 interface TopUpModalProps {
   open: boolean;
@@ -63,7 +64,7 @@ const TopUpModal = ({ open, onOpenChange }: TopUpModalProps) => {
 
           <button
             type="button"
-            onClick={() => goToDeposit('card')}
+            onClick={() => toast('Card payments are temporarily unavailable — please try again later.')}
             className="w-full flex items-center gap-4 p-4 rounded-xl border border-[#323738] hover:bg-[#1c1f1f] transition-colors"
           >
             <div className="w-11 h-11 rounded-lg bg-[#232728] flex items-center justify-center shrink-0">
