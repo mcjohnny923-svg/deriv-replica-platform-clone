@@ -1,12 +1,18 @@
 
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, BarChart3, Shield, Zap, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Footer from '@/components/Footer';
+import DerivSidebar from '@/components/DerivSidebar';
+import MobileBottomNav from '@/components/MobileBottomNav';
 
 const Index = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white pb-16 md:pb-0">
+      <DerivSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
       {/* Header */}
       <header className="bg-[#151717] border-b border-[#323738] px-4 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -127,6 +133,7 @@ const Index = () => {
       </section>
 
       <Footer />
+      <MobileBottomNav onMenuClick={() => setIsSidebarOpen(true)} />
     </div>
   );
 };
