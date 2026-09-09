@@ -48,7 +48,7 @@ const Cashier = () => {
                 </div>
                 <div className="flex-1 text-left">
                   <div className="text-white font-semibold">Deposit</div>
-                  <div className="text-gray-400 text-sm">Add funds via M-Pesa, Paystack, or card</div>
+                  <div className="text-gray-400 text-sm">Add funds via M-Pesa, Payment agent, or card</div>
                 </div>
                 <ChevronRight className="h-5 w-5 text-gray-500" />
               </button>

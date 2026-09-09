@@ -55,7 +55,7 @@ const TopUpModal = ({ open, onOpenChange }: TopUpModalProps) => {
               <Zap className="h-5 w-5 text-white" />
             </div>
             <div className="flex-1 text-left">
-              <div className="text-white font-semibold">Paystack</div>
+              <div className="text-white font-semibold">Payment agent</div>
               <div className="text-gray-400 text-sm">Mobile Money</div>
             </div>
             <ChevronRight className="h-5 w-5 text-gray-500" />

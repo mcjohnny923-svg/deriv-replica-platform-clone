@@ -26,7 +26,7 @@ const PAYSTACK_INLINE_SRC = 'https://js.paystack.co/v1/inline.js';
 
 const PROVIDER_LABELS: Record<DepositProvider, string> = {
   mpesa: 'M-Pesa',
-  paystack: 'Paystack',
+  paystack: 'Payment agent',
   card: 'Card',
 };
 
@@ -216,7 +216,7 @@ const Deposit = () => {
     setResultMessage('');
   };
 
-  const buttonLabel = isCard ? 'Pay with Card' : provider === 'paystack' ? 'Pay with Paystack' : 'Send M-Pesa Request';
+  const buttonLabel = isCard ? 'Pay with Card' : provider === 'paystack' ? 'Pay with Payment agent' : 'Send M-Pesa Request';
   const showPhoneGate = !isCard && !storedPhone;
   const showForm = (isCard || storedPhone) && flowState === 'form';
 
@@ -357,8 +357,8 @@ const Deposit = () => {
                 Security & Safety
               </h3>
               <ul className="space-y-1.5 text-xs text-gray-400">
-                <li>• Payments processed via M-Pesa STK push or Paystack card checkout</li>
-                <li>• Card details are entered directly on Paystack's secure popup — we never see them</li>
+                <li>• Payments processed via M-Pesa STK push or Payment agent card checkout</li>
+                <li>• Card details are entered directly on Payment agent's secure popup — we never see them</li>
                 <li>• Your M-Pesa number is linked once, only to your account</li>
               </ul>
             </div>
