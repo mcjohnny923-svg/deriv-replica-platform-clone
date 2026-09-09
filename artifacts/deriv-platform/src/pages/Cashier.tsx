@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowDownCircle, ArrowUpCircle, ChevronRight } from 'lucide-react';
 import DerivHeader from '@/components/DerivHeader';
 import DerivSidebar from '@/components/DerivSidebar';
@@ -8,10 +9,12 @@ import WithdrawModal from '@/components/WithdrawModal';
 import { getStoredAccount, refreshAccounts, type AuthAccount } from '@/lib/auth-api';
 
 const Cashier = () => {
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [topUpOpen, setTopUpOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [account, setAccount] = useState<AuthAccount | null>(getStoredAccount());
+  const isLoggedIn = account !== null;
 
   useEffect(() => {
     refreshAccounts()
@@ -40,7 +43,7 @@ const Cashier = () => {
             <div className="space-y-3">
               <button
                 type="button"
-                onClick={() => setTopUpOpen(true)}
+                onClick={() => (isLoggedIn ? setTopUpOpen(true) : navigate('/login'))}
                 className="w-full flex items-center gap-4 p-4 bg-[#151717] rounded-lg border border-[#323738] hover:bg-[#1c1f1f] transition-colors"
               >
                 <div className="w-11 h-11 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
@@ -54,7 +57,7 @@ const Cashier = () => {
               </button>
               <button
                 type="button"
-                onClick={() => setWithdrawOpen(true)}
+                onClick={() => (isLoggedIn ? setWithdrawOpen(true) : navigate('/login'))}
                 className="w-full flex items-center gap-4 p-4 bg-[#151717] rounded-lg border border-[#323738] hover:bg-[#1c1f1f] transition-colors"
               >
                 <div className="w-11 h-11 rounded-lg bg-red-500/10 flex items-center justify-center shrink-0">

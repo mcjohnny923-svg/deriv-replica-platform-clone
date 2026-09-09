@@ -1,8 +1,15 @@
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
+import { getStoredAccounts } from '@/lib/auth-api';
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const handleProtectedNav = (path: string) => {
+    const isLoggedIn = getStoredAccounts().length > 0;
+    navigate(isLoggedIn ? path : '/login');
+  };
+
   return (
     <footer className="bg-black text-white py-16">
       <div className="max-w-7xl mx-auto px-4">
@@ -43,8 +50,8 @@ const Footer = () => {
             <ul className="space-y-2 text-gray-400">
               <li><Link to="/register" className="hover:text-white">Open Account</Link></li>
               <li><Link to="/login" className="hover:text-white">Login</Link></li>
-              <li><Link to="/deposit" className="hover:text-white">Deposit</Link></li>
-              <li><Link to="/withdrawal" className="hover:text-white">Withdrawal</Link></li>
+              <li><button type="button" onClick={() => handleProtectedNav('/deposit')} className="hover:text-white text-left">Deposit</button></li>
+              <li><button type="button" onClick={() => handleProtectedNav('/cashier')} className="hover:text-white text-left">Withdrawal</button></li>
             </ul>
           </div>
 
