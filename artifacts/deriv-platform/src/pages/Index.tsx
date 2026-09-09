@@ -12,9 +12,9 @@ const Index = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-red-500 rounded flex items-center justify-center">
-              <span className="text-white font-bold text-sm">D</span>
+              <span className="text-white font-bold text-sm">NB</span>
             </div>
-            <span className="text-xl font-bold text-white">Deriv</span>
+            <span className="text-xl font-bold text-white">NOVBINARY</span>
           </div>
           
           <nav className="hidden md:flex items-center space-x-8">
@@ -70,7 +70,7 @@ const Index = () => {
       <section className="py-20 px-4 bg-[#0a0a0a]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Why choose Deriv</h2>
+            <h2 className="text-4xl font-bold mb-4">Why choose NOVBINARY</h2>
             <p className="text-xl text-gray-300">Trade with confidence on our award-winning platforms</p>
           </div>
           

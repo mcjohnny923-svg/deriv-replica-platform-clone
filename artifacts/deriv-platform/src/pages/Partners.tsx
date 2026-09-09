@@ -30,7 +30,7 @@ const Partners = () => {
 
   const shareOnWhatsApp = () => {
     const message = encodeURIComponent(
-      `Join me on Deriv and start trading! Sign up here: ${referralLink}`,
+      `Join me on NOVBINARY and start trading! Sign up here: ${referralLink}`,
     );
     window.open(`https://wa.me/?text=${message}`, '_blank');
   };

@@ -109,7 +109,7 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
             <div className="text-center">
               <div className="text-xs text-gray-400">Trading with</div>
               <div className="text-sm font-medium text-white">Demo Account</div>
-              <div className="text-xs text-gray-400 mt-1">Server: Deriv-Demo</div>
+              <div className="text-xs text-gray-400 mt-1">Server: NOVBINARY-Demo</div>
             </div>
           </div>
         )}

@@ -87,9 +87,9 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
 
         <Link to="/" className="flex items-center space-x-2">
           <div className="w-7 h-7 bg-red-500 rounded flex items-center justify-center">
-            <span className="text-white font-bold text-xs">D</span>
+            <span className="text-white font-bold text-xs">NB</span>
           </div>
-          <span className="text-lg font-bold text-white hidden sm:inline">Deriv</span>
+          <span className="text-lg font-bold text-white hidden sm:inline">NOVBINARY</span>
         </Link>
 
         <nav className="hidden md:flex items-center space-x-1">
