@@ -37,7 +37,7 @@ const AdminBalanceModal = ({
   const isValid = accountId !== '' && amount !== '' && Number.isFinite(amountNum) && amountNum !== 0;
 
   const handleSubmit = async () => {
-    if (!isValid || accountId === '') return;
+    if (!isValid) return;
     setSubmitting(true);
     try {
       await adjustUserBalance(adminKey, userId, {

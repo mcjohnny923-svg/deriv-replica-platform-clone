@@ -302,9 +302,9 @@ const Automate = () => {
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden pb-16 md:pb-0">
           {/* Scrollable content */}
           <div className="flex-1 min-h-0 overflow-y-auto pb-4">
-            <div className="max-w-lg md:max-w-5xl mx-auto md:mx-0 p-4 space-y-3 md:space-y-0 md:grid md:grid-cols-2 md:gap-3 md:items-start">
+            <div className="max-w-lg md:max-w-5xl mx-auto md:mx-0 p-4 space-y-3 md:space-y-0 md:grid md:grid-cols-3 md:gap-3 md:items-start">
               {isRunning && (
-                <div className="md:col-span-2 bg-[#151717] border border-[#323738] rounded-lg p-3 flex justify-between items-center">
+                <div className="md:col-span-3 bg-[#151717] border border-[#323738] rounded-lg p-3 flex justify-between items-center">
                   <div>
                     <div className="text-xs text-gray-400">Running P/L ({tradesRun} trades)</div>
                     <div className={`text-lg font-bold ${runningPL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
@@ -318,123 +318,17 @@ const Automate = () => {
                 </div>
               )}
 
-              <div className="bg-[#151717] border border-[#323738] rounded-lg divide-y divide-[#323738]">
-                <div className="p-3 grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1.5">Volatility</label>
-                    <Select value={selectedAsset} onValueChange={setSelectedAsset} disabled={isRunning}>
-                      <SelectTrigger className="bg-[#323738] border-[#414647] text-white h-9">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#323738] border-[#414647] max-h-72">
-                        {VOLATILITY_ASSETS.map((asset) => (
-                          <SelectItem key={asset} value={asset} className="text-white hover:bg-[#414647]">
-                            {asset}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1.5">Trade type</label>
-                    <Select value={tradeType} onValueChange={setTradeType} disabled={isRunning}>
-                      <SelectTrigger className="bg-[#323738] border-[#414647] text-white h-9">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#323738] border-[#414647]">
-                        {TRADE_TYPES.map((t) => (
-                          <SelectItem key={t.value} value={t.value} className="text-white hover:bg-[#414647]">
-                            {t.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="p-3">
-                  <label className="block text-xs text-gray-300 mb-1.5">Direction</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {choices.map((choice, idx) => (
-                      <button
-                        key={choice}
-                        disabled={isRunning}
-                        onClick={() => setChoiceIndex(idx)}
-                        className={`py-1.5 rounded border text-sm font-medium capitalize disabled:opacity-50 ${
-                          choiceIndex === idx
-                            ? 'bg-red-600 border-red-500 text-white'
-                            : 'bg-[#323738] border-[#414647] text-gray-300'
-                        }`}
-                      >
-                        {choice}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {digitSelector && (
-                  <div className="p-3">
-                    <label className="block text-xs text-gray-300 mb-1.5">Digit</label>
-                    <div className="grid grid-cols-5 gap-1.5">
-                      {DIGITS.map((d) => (
-                        <button
-                          key={d}
-                          disabled={isRunning}
-                          onClick={() => setSelectedDigit(d)}
-                          className={`py-1.5 rounded border text-sm font-medium disabled:opacity-50 ${
-                            selectedDigit === d
-                              ? 'bg-red-600 border-red-500 text-white'
-                              : 'bg-[#323738] border-[#414647] text-gray-300'
-                          }`}
-                        >
-                          {d}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="p-3 grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1.5">Duration (ticks)</label>
-                    <Input
-                      type="number"
-                      value={durationValue}
-                      onChange={(e) => setDurationValue(e.target.value)}
-                      disabled={isRunning}
-                      className="bg-[#323738] border-[#414647] text-white h-9"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-300 mb-1.5">Base stake (USD)</label>
-                    <Input
-                      type="number"
-                      value={baseStake}
-                      onChange={(e) => setBaseStake(e.target.value)}
-                      disabled={isRunning}
-                      className="bg-[#323738] border-[#414647] text-white h-9"
-                    />
-                  </div>
-                </div>
-
-                <div className="p-3 flex items-center justify-between">
-                  <span className="text-sm text-gray-300">Allow equals</span>
-                  <Switch checked={allowEquals} onCheckedChange={setAllowEquals} disabled={isRunning} />
-                </div>
-              </div>
-
-              <div className="md:col-span-2">
+              <div className="md:col-start-1 md:row-start-1 md:row-span-2">
                 <DigitStatsDisplay
                   selectedDigit={digitSelector ? selectedDigit : null}
                   flash={digitFlashEligible ? digitFlash : null}
                   digitHistory={priceFeed.digitHistory}
                   lastDigit={priceFeed.lastDigit}
+                  desktopTwoRow
                 />
               </div>
 
-              <div className="md:flex md:flex-col md:gap-3">
-              <div className="md:grid md:grid-cols-2 md:gap-3 space-y-3 md:space-y-0">
-              <div>
+              <div className="md:col-start-2 md:row-start-1">
                 <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1.5">Strategy parameters</div>
                 <div className="bg-[#151717] border border-[#323738] rounded-lg divide-y divide-[#323738]">
                   <div className="p-3">
@@ -498,7 +392,7 @@ const Automate = () => {
                 </div>
               </div>
 
-              <div>
+              <div className="md:col-start-3 md:row-start-1">
                 <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1.5">Risk management</div>
                 <div className="bg-[#151717] border border-[#323738] rounded-lg p-3">
                   <div className="grid grid-cols-2 gap-3">
@@ -526,9 +420,115 @@ const Automate = () => {
                   <div className="text-xs text-gray-500 mt-2">Stops automatically when cumulative profit/loss reaches either value.</div>
                 </div>
               </div>
+
+              <div className="md:col-start-2 md:col-span-2 md:row-start-2">
+                <div className="bg-[#151717] border border-[#323738] rounded-lg divide-y divide-[#323738]">
+                  <div className="p-3 grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-300 mb-1.5">Volatility</label>
+                      <Select value={selectedAsset} onValueChange={setSelectedAsset} disabled={isRunning}>
+                        <SelectTrigger className="bg-[#323738] border-[#414647] text-white h-9">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#323738] border-[#414647] max-h-72">
+                          {VOLATILITY_ASSETS.map((asset) => (
+                            <SelectItem key={asset} value={asset} className="text-white hover:bg-[#414647]">
+                              {asset}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-300 mb-1.5">Trade type</label>
+                      <Select value={tradeType} onValueChange={setTradeType} disabled={isRunning}>
+                        <SelectTrigger className="bg-[#323738] border-[#414647] text-white h-9">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#323738] border-[#414647]">
+                          {TRADE_TYPES.map((t) => (
+                            <SelectItem key={t.value} value={t.value} className="text-white hover:bg-[#414647]">
+                              {t.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="p-3">
+                    <label className="block text-xs text-gray-300 mb-1.5">Direction</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {choices.map((choice, idx) => (
+                        <button
+                          key={choice}
+                          disabled={isRunning}
+                          onClick={() => setChoiceIndex(idx)}
+                          className={`py-1.5 rounded border text-sm font-medium capitalize disabled:opacity-50 ${
+                            choiceIndex === idx
+                              ? 'bg-red-600 border-red-500 text-white'
+                              : 'bg-[#323738] border-[#414647] text-gray-300'
+                          }`}
+                        >
+                          {choice}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {digitSelector && (
+                    <div className="p-3">
+                      <label className="block text-xs text-gray-300 mb-1.5">Digit</label>
+                      <div className="grid grid-cols-5 gap-1.5">
+                        {DIGITS.map((d) => (
+                          <button
+                            key={d}
+                            disabled={isRunning}
+                            onClick={() => setSelectedDigit(d)}
+                            className={`py-1.5 rounded border text-sm font-medium disabled:opacity-50 ${
+                              selectedDigit === d
+                                ? 'bg-red-600 border-red-500 text-white'
+                                : 'bg-[#323738] border-[#414647] text-gray-300'
+                            }`}
+                          >
+                            {d}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="p-3 grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-300 mb-1.5">Duration (ticks)</label>
+                      <Input
+                        type="number"
+                        value={durationValue}
+                        onChange={(e) => setDurationValue(e.target.value)}
+                        disabled={isRunning}
+                        className="bg-[#323738] border-[#414647] text-white h-9"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-300 mb-1.5">Base stake (USD)</label>
+                      <Input
+                        type="number"
+                        value={baseStake}
+                        onChange={(e) => setBaseStake(e.target.value)}
+                        disabled={isRunning}
+                        className="bg-[#323738] border-[#414647] text-white h-9"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="p-3 flex items-center justify-between">
+                    <span className="text-sm text-gray-300">Allow equals</span>
+                    <Switch checked={allowEquals} onCheckedChange={setAllowEquals} disabled={isRunning} />
+                  </div>
+                </div>
               </div>
 
-              <div>
+              <div className="md:col-span-3">
                 <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1.5">Bot statistics</div>
                 <div className="bg-[#151717] border border-[#323738] rounded-lg p-3 space-y-3">
                   <div className="grid grid-cols-3 gap-3 text-center">
@@ -567,7 +567,6 @@ const Automate = () => {
                     Reset
                   </button>
                 </div>
-              </div>
               </div>
             </div>
           </div>

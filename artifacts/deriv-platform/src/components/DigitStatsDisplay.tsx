@@ -12,6 +12,7 @@ interface DigitStatsDisplayProps {
   digitHistory?: number[];
   lastDigit?: number;
   twoRowOnMobile?: boolean;
+  desktopTwoRow?: boolean;
 }
 
 const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -23,7 +24,7 @@ function randomDigit() {
   return Math.floor(Math.random() * 10);
 }
 
-const DigitStatsDisplay = ({ selectedDigit, flash, digitHistory, lastDigit, twoRowOnMobile }: DigitStatsDisplayProps) => {
+const DigitStatsDisplay = ({ selectedDigit, flash, digitHistory, lastDigit, twoRowOnMobile, desktopTwoRow }: DigitStatsDisplayProps) => {
   const isControlled = digitHistory !== undefined;
   const [internalHistory, setInternalHistory] = useState<number[]>(() =>
     Array.from({ length: HISTORY_LENGTH }, randomDigit),
@@ -79,7 +80,15 @@ const DigitStatsDisplay = ({ selectedDigit, flash, digitHistory, lastDigit, twoR
 
   return (
     <div className="bg-[#151717] border border-[#323738] rounded-lg px-2 py-3">
-      <div className={twoRowOnMobile ? "grid grid-cols-5 sm:grid-cols-10 gap-1" : "grid grid-cols-10 gap-1"}>
+      <div
+                className={
+                  twoRowOnMobile
+                    ? "grid grid-cols-5 sm:grid-cols-10 gap-1"
+                    : desktopTwoRow
+                      ? "grid grid-cols-10 md:grid-cols-5 gap-1"
+                      : "grid grid-cols-10 gap-1"
+                }
+              >
         {DIGITS.map((digit) => {
           const pct = percentages[digit];
           const isSelected = selectedDigit === digit;
