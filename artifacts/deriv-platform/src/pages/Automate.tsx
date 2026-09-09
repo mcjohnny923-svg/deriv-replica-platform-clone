@@ -302,7 +302,7 @@ const Automate = () => {
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden pb-16 md:pb-0">
           {/* Scrollable content */}
           <div className="flex-1 min-h-0 overflow-y-auto pb-4">
-            <div className="max-w-lg md:max-w-5xl mx-auto md:mx-0 p-4 space-y-3 md:space-y-0 md:grid md:grid-cols-3 md:gap-3 md:items-start">
+            <div className="max-w-lg md:max-w-5xl mx-auto md:mx-0 p-4 space-y-3 md:space-y-0 flex flex-col md:grid md:grid-cols-3 md:gap-3 md:items-start">
               {isRunning && (
                 <div className="md:col-span-3 bg-[#151717] border border-[#323738] rounded-lg p-3 flex justify-between items-center">
                   <div>
@@ -318,7 +318,7 @@ const Automate = () => {
                 </div>
               )}
 
-              <div className="md:col-start-1 md:row-start-2">
+              <div className="order-2 md:order-none md:col-start-1 md:row-start-2">
                 <DigitStatsDisplay
                   selectedDigit={digitSelector ? selectedDigit : null}
                   flash={digitFlashEligible ? digitFlash : null}
@@ -328,7 +328,7 @@ const Automate = () => {
                 />
               </div>
 
-              <div className="md:col-start-2 md:row-start-1">
+              <div className="order-3 md:order-none md:col-start-2 md:row-start-1">
                 <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1.5">Strategy parameters</div>
                 <div className="bg-[#151717] border border-[#323738] rounded-lg divide-y divide-[#323738]">
                   <div className="p-3">
@@ -392,7 +392,7 @@ const Automate = () => {
                 </div>
               </div>
 
-              <div className="md:col-start-3 md:row-start-1">
+              <div className="order-4 md:order-none md:col-start-3 md:row-start-1">
                 <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1.5">Risk management</div>
                 <div className="bg-[#151717] border border-[#323738] rounded-lg p-3">
                   <div className="grid grid-cols-2 gap-3">
@@ -421,7 +421,7 @@ const Automate = () => {
                 </div>
               </div>
 
-              <div className="md:col-start-1 md:row-start-1">
+              <div className="order-1 md:order-none md:col-start-1 md:row-start-1">
                 <div className="bg-[#151717] border border-[#323738] rounded-lg divide-y divide-[#323738]">
                   <div className="p-3 grid grid-cols-2 gap-3">
                     <div>
@@ -528,7 +528,7 @@ const Automate = () => {
                 </div>
               </div>
 
-              <div className="md:col-start-2 md:col-span-2 md:row-start-2">
+              <div className="order-5 md:order-none md:col-start-2 md:col-span-2 md:row-start-2">
                 <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1.5">Bot statistics</div>
                 <div className="bg-[#151717] border border-[#323738] rounded-lg p-3 space-y-3">
                   <div className="grid grid-cols-3 gap-3 text-center">
