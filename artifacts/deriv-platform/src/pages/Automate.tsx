@@ -318,7 +318,7 @@ const Automate = () => {
                 </div>
               )}
 
-              <div className="md:col-start-1 md:row-start-1 md:row-span-2">
+              <div className="md:col-start-1 md:row-start-2">
                 <DigitStatsDisplay
                   selectedDigit={digitSelector ? selectedDigit : null}
                   flash={digitFlashEligible ? digitFlash : null}
@@ -421,7 +421,7 @@ const Automate = () => {
                 </div>
               </div>
 
-              <div className="md:col-start-2 md:col-span-2 md:row-start-2">
+              <div className="md:col-start-1 md:row-start-1">
                 <div className="bg-[#151717] border border-[#323738] rounded-lg divide-y divide-[#323738]">
                   <div className="p-3 grid grid-cols-2 gap-3">
                     <div>
@@ -528,7 +528,7 @@ const Automate = () => {
                 </div>
               </div>
 
-              <div className="md:col-span-3">
+              <div className="md:col-start-2 md:col-span-2 md:row-start-2">
                 <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1.5">Bot statistics</div>
                 <div className="bg-[#151717] border border-[#323738] rounded-lg p-3 space-y-3">
                   <div className="grid grid-cols-3 gap-3 text-center">
