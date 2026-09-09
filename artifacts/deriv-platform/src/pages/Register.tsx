@@ -74,9 +74,9 @@ const Register = () => {
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center space-x-2 mb-8">
             <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold">T</span>
+              <span className="text-white font-bold text-xs">NB</span>
             </div>
-            <span className="text-2xl font-bold text-white">TradePro</span>
+            <span className="text-2xl font-bold text-white">NovBinary</span>
           </Link>
           <h1 className="text-3xl font-bold text-white">Create your account</h1>
           <p className="mt-2 text-gray-400">

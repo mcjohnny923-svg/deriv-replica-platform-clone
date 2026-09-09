@@ -18,9 +18,9 @@ const Footer = () => {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">T</span>
+                <span className="text-white font-bold text-[10px]">NB</span>
               </div>
-              <span className="text-xl font-bold">TradePro</span>
+              <span className="text-xl font-bold">NovBinary</span>
             </div>
             <p className="text-gray-400 mb-6">
               Professional trading platform for forex, indices, and synthetic markets.
@@ -69,7 +69,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            © 2024 TradePro. All rights reserved.
+            © 2024 NovBinary. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="#" className="text-gray-400 hover:text-white text-sm">Privacy Policy</a>

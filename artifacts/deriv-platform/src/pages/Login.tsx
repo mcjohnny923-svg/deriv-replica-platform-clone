@@ -38,9 +38,9 @@ const Login = () => {
         <div className="text-center">
           <Link to="/" className="inline-flex items-center space-x-2 mb-8">
             <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold">T</span>
+              <span className="text-white font-bold text-xs">NB</span>
             </div>
-            <span className="text-2xl font-bold text-white">TradePro</span>
+            <span className="text-2xl font-bold text-white">NovBinary</span>
           </Link>
           <h2 className="text-3xl font-bold text-white">Welcome back</h2>
           <p className="mt-2 text-gray-400">Sign in to your trading account</p>
