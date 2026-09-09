@@ -9,7 +9,7 @@ import DerivHeader from '@/components/DerivHeader';
 import DerivSidebar from '@/components/DerivSidebar';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import {
-  getStoredAccount,
+  getRealAccount,
   updateStoredAccountBalance,
   getStoredUser,
   updateStoredUserPhone,
@@ -80,11 +80,11 @@ const Deposit = () => {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [balanceRefreshKey, setBalanceRefreshKey] = useState(0);
-  const [account, setAccount] = useState<AuthAccount | null>(getStoredAccount());
+  const [account, setAccount] = useState<AuthAccount | null>(getRealAccount());
 
   useEffect(() => {
     refreshAccounts()
-      .then(() => setAccount(getStoredAccount()))
+      .then(() => setAccount(getRealAccount()))
       .catch(() => {});
   }, []);
   const [storedPhone, setStoredPhone] = useState(getStoredUser()?.phoneNumber ?? null);

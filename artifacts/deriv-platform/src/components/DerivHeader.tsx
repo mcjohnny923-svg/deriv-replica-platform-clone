@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ChevronDown, Check, HelpCircle, Menu, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -13,6 +13,7 @@ interface DerivHeaderProps {
 }
 
 const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivHeaderProps) => {
+  const navigate = useNavigate();
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const [topUpOpen, setTopUpOpen] = useState(false);
   const [accounts, setAccounts] = useState<AuthAccount[]>(getStoredAccounts());
@@ -185,7 +186,7 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
 
         {/* Deposit button - opens the Top Up Funds modal */}
         <Button
-          onClick={() => setTopUpOpen(true)}
+          onClick={() => (isLoggedIn ? setTopUpOpen(true) : navigate('/login'))}
           className="bg-red-500 hover:bg-red-600 text-white h-9 px-4 rounded-full font-semibold text-sm"
         >
           Deposit

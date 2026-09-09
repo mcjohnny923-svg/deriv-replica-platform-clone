@@ -196,3 +196,8 @@ export async function resetDemoBalance(accountId: number): Promise<{ newBalance:
   }
   return data;
 }
+
+export function getRealAccount(): AuthAccount | null {
+  const accounts = getStoredAccounts();
+  return accounts.find((a) => a.type === 'real') ?? null;
+}
