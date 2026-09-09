@@ -36,6 +36,7 @@ export function saveAuth(data: AuthResponse) {
   if (!localStorage.getItem(ACTIVE_TYPE_KEY)) {
     localStorage.setItem(ACTIVE_TYPE_KEY, "demo");
   }
+  window.dispatchEvent(new Event("auth-changed"));
 }
 
 export function getToken(): string | null {
@@ -58,6 +59,7 @@ export function getActiveAccountType(): "demo" | "real" {
 
 export function setActiveAccountType(type: "demo" | "real") {
   localStorage.setItem(ACTIVE_TYPE_KEY, type);
+  window.dispatchEvent(new Event("auth-changed"));
 }
 
 export function getStoredAccount(): AuthAccount | null {
@@ -92,6 +94,7 @@ export function clearAuth() {
   localStorage.removeItem(USER_KEY);
   localStorage.removeItem(ACCOUNTS_KEY);
   localStorage.removeItem(ACTIVE_TYPE_KEY);
+  window.dispatchEvent(new Event("auth-changed"));
 }
 
 function authHeaders(): HeadersInit {

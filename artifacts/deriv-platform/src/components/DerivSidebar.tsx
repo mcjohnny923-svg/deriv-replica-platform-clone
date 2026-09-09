@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   BarChart3,
@@ -12,6 +13,7 @@ import {
   Bot,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { getActiveAccountType, getToken } from '@/lib/auth-api';
 
 interface DerivSidebarProps {
   isOpen: boolean;
@@ -20,6 +22,23 @@ interface DerivSidebarProps {
 
 const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
   const location = useLocation();
+  const [activeType, setActiveType] = useState<'demo' | 'real'>(getActiveAccountType());
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(getToken() !== null);
+
+  useEffect(() => {
+    const refresh = () => {
+      setActiveType(getActiveAccountType());
+      setIsLoggedIn(getToken() !== null);
+    };
+    window.addEventListener('auth-changed', refresh);
+    window.addEventListener('storage', refresh);
+    window.addEventListener('focus', refresh);
+    return () => {
+      window.removeEventListener('auth-changed', refresh);
+      window.removeEventListener('storage', refresh);
+      window.removeEventListener('focus', refresh);
+    };
+  }, []);
 
   const menuItems = [
     { icon: BarChart3, label: 'Trade', path: '/dashboard' },
@@ -46,7 +65,7 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
 
       {/* Sidebar */}
       <div className={`
-        fixed md:relative top-0 left-0 h-full bg-[#151717] border-r border-[#323738] z-50 transition-transform duration-300
+        fixed md:relative top-0 left-0 h-full bg-[#151717] border-r border-[#323738] z-50 transition-transform duration-300 flex flex-col
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         ${isOpen ? 'w-64' : 'w-16'}
       `}>
@@ -63,7 +82,7 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
         </div>
 
         {/* Navigation items */}
-        <nav className="p-4">
+        <nav className="p-4 flex-1 overflow-y-auto">
           <ul className="space-y-2">
             {menuItems.map((item) => (
               <li key={item.path}>
@@ -104,12 +123,14 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
         </nav>
 
         {/* Bottom section - Account info */}
-        {isOpen && (
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-[#323738]">
+        {isOpen && isLoggedIn && (
+          <div className="shrink-0 p-4 border-t border-[#323738]">
             <div className="text-center">
               <div className="text-xs text-gray-400">Trading with</div>
-              <div className="text-sm font-medium text-white">Demo Account</div>
-              <div className="text-xs text-gray-400 mt-1">Server: NOVBINARY-Demo</div>
+              <div className="text-sm font-medium text-white capitalize">{activeType} Account</div>
+              <div className="text-xs text-gray-400 mt-1">
+                Server: NOVBINARY-{activeType === 'real' ? 'Real' : 'Demo'}
+              </div>
             </div>
           </div>
         )}
