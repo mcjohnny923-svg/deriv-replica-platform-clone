@@ -130,7 +130,7 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
           >
             <div className="text-left leading-tight">
               <div className={`text-[10px] font-semibold capitalize ${typeColorClass}`}>{activeType}</div>
-              <div className="text-xs font-bold text-white whitespace-nowrap">
+              <div className="text-sm font-extrabold text-white whitespace-nowrap tracking-tight">
                 {displayCurrency} {displayBalance}
               </div>
             </div>
