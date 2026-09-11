@@ -79,7 +79,7 @@ const DigitStatsDisplay = ({ selectedDigit, flash, digitHistory, lastDigit, twoR
   };
 
   return (
-    <div className="bg-[#151717] border border-[#323738] rounded-lg px-2 py-3">
+    <div className="bg-white dark:bg-[#151717] border border-gray-200 dark:border-[#323738] rounded-lg px-2 py-3">
       <div
                 className={
                   twoRowOnMobile

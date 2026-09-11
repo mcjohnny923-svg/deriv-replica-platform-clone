@@ -69,21 +69,21 @@ const AssetPriceBar = ({ selectedAsset, onAssetChange, price, priceChange: contr
   const percentChange = ((priceChange / currentPrice) * 100).toFixed(2);
 
   return (
-    <div className="flex items-center gap-2 px-3 sm:px-4 py-3 bg-[#0e0e0e] border-b border-[#232728]">
+    <div className="flex items-center gap-2 px-3 sm:px-4 py-3 bg-gray-50 dark:bg-[#0e0e0e] border-b border-gray-200 dark:border-[#232728]">
       <div className="relative shrink-0">
         <button
           onClick={() => setIsAssetDropdownOpen(!isAssetDropdownOpen)}
-          className="flex items-center space-x-1.5 px-2.5 py-1.5 bg-[#323738] rounded hover:bg-[#414647] transition-colors max-w-[150px] sm:max-w-none"
+          className="flex items-center space-x-1.5 px-2.5 py-1.5 bg-gray-100 dark:bg-[#323738] rounded hover:bg-gray-200 dark:hover:bg-[#414647] transition-colors max-w-[150px] sm:max-w-none"
         >
           <span className="font-medium text-white text-xs sm:text-sm truncate">{selectedAsset}</span>
           <ChevronDown className="h-3.5 w-3.5 text-gray-400 shrink-0" />
         </button>
 
         {isAssetDropdownOpen && (
-          <div className="absolute top-full left-0 mt-1 w-72 max-h-96 overflow-y-auto bg-[#323738] border border-[#414647] rounded-lg shadow-lg z-50">
+          <div className="absolute top-full left-0 mt-1 w-72 max-h-96 overflow-y-auto bg-gray-100 dark:bg-[#323738] border border-gray-300 dark:border-[#414647] rounded-lg shadow-lg z-50">
             {assetGroups.map((group) => (
               <div key={group.label}>
-                <div className="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-400 sticky top-0 bg-[#323738]">
+                <div className="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-400 sticky top-0 bg-gray-100 dark:bg-[#323738]">
                   {group.label}
                 </div>
                 {group.assets.map((asset) => (
@@ -93,8 +93,8 @@ const AssetPriceBar = ({ selectedAsset, onAssetChange, price, priceChange: contr
                       onAssetChange(asset);
                       setIsAssetDropdownOpen(false);
                     }}
-                    className={`flex items-center justify-between w-full text-left px-4 py-2.5 hover:bg-[#414647] text-white transition-colors ${
-                      asset === selectedAsset ? 'bg-[#414647]/60' : ''
+                    className={`flex items-center justify-between w-full text-left px-4 py-2.5 hover:bg-gray-200 dark:hover:bg-[#414647] text-white transition-colors ${
+                      asset === selectedAsset ? 'bg-gray-200 dark:bg-[#414647]/60' : ''
                     }`}
                   >
                     <span>{asset}</span>

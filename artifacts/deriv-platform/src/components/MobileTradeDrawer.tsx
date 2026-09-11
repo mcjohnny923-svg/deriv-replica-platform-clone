@@ -103,7 +103,7 @@ const MobileTradeDrawer = ({
   };
 
   return (
-    <div className="fixed bottom-16 md:bottom-0 left-0 right-0 z-30 bg-[#151717] border-t border-[#323738] md:hidden">
+    <div className="fixed bottom-16 md:bottom-0 left-0 right-0 z-30 bg-white dark:bg-[#151717] border-t border-gray-200 dark:border-[#323738] md:hidden">
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
@@ -116,7 +116,7 @@ const MobileTradeDrawer = ({
 
       {expanded && (
         <div className="pb-4">
-          <div className="px-4 py-3 border-t border-[#323738] flex items-center justify-center gap-2">
+          <div className="px-4 py-3 border-t border-gray-200 dark:border-[#323738] flex items-center justify-center gap-2">
             <TrendingUp className="h-4 w-4 text-red-500" />
             <span className="text-white text-base font-semibold">{currentLabel}</span>
           </div>
@@ -130,8 +130,8 @@ const MobileTradeDrawer = ({
                   onClick={() => onDigitChange(digit)}
                   className={`py-2 rounded text-sm font-medium border transition-colors ${
                     selectedDigit === digit
-                      ? 'bg-[#323738] border-white text-white'
-                      : 'bg-[#0e0e0e] border-[#323738] text-gray-300'
+                      ? 'bg-gray-100 dark:bg-[#323738] border-white text-white'
+                      : 'bg-gray-50 dark:bg-[#0e0e0e] border-gray-200 dark:border-[#323738] text-gray-300'
                   }`}
                 >
                   {digit}
@@ -140,7 +140,7 @@ const MobileTradeDrawer = ({
             </div>
           )}
 
-          <div className="flex items-center gap-3 px-4 py-3 border-t border-[#323738]">
+          <div className="flex items-center gap-3 px-4 py-3 border-t border-gray-200 dark:border-[#323738]">
             <div className="flex-1">
               <label className="block text-[11px] text-gray-400 mb-1">Duration</label>
               <div className="flex gap-1">
@@ -149,16 +149,16 @@ const MobileTradeDrawer = ({
                   value={duration}
                   onChange={(e) => onDurationChange(e.target.value)}
                   min="1"
-                  className="bg-[#0e0e0e] border-[#323738] text-white h-9 text-sm"
+                  className="bg-gray-50 dark:bg-[#0e0e0e] border-gray-200 dark:border-[#323738] text-white h-9 text-sm"
                 />
                 <Select value={durationType} onValueChange={onDurationTypeChange}>
-                  <SelectTrigger className="w-24 bg-[#0e0e0e] border-[#323738] text-white h-9 text-sm">
+                  <SelectTrigger className="w-24 bg-gray-50 dark:bg-[#0e0e0e] border-gray-200 dark:border-[#323738] text-white h-9 text-sm">
                     <SelectValue>{durationUnitLabel}</SelectValue>
                   </SelectTrigger>
-                  <SelectContent className="bg-[#323738] border-[#414647]">
-                    <SelectItem value="t" className="text-white hover:bg-[#414647]">Ticks</SelectItem>
-                    <SelectItem value="s" className="text-white hover:bg-[#414647]">Seconds</SelectItem>
-                    <SelectItem value="m" className="text-white hover:bg-[#414647]">Minutes</SelectItem>
+                  <SelectContent className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647]">
+                    <SelectItem value="t" className="text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Ticks</SelectItem>
+                    <SelectItem value="s" className="text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Seconds</SelectItem>
+                    <SelectItem value="m" className="text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Minutes</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -175,14 +175,14 @@ const MobileTradeDrawer = ({
                   onChange={(e) => onStakeChange(e.target.value)}
                   min="1"
                   step="0.01"
-                  className="bg-[#0e0e0e] border-[#323738] text-white h-9 text-sm pl-10"
+                  className="bg-gray-50 dark:bg-[#0e0e0e] border-gray-200 dark:border-[#323738] text-white h-9 text-sm pl-10"
                 />
               </div>
             </div>
           </div>
 
           {!digitContract && (
-            <div className="flex items-center space-x-3 px-4 py-3 border-t border-[#323738]">
+            <div className="flex items-center space-x-3 px-4 py-3 border-t border-gray-200 dark:border-[#323738]">
               <Checkbox
                 id="equals-mobile"
                 checked={equalsChecked}

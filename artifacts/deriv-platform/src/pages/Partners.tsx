@@ -36,7 +36,7 @@ const Partners = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0e0e0e] text-white flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0e0e0e] text-white flex flex-col">
       <DerivHeader onMenuClick={() => setIsSidebarOpen(true)} />
       <div className="flex flex-1 overflow-hidden">
         <DerivSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
@@ -50,7 +50,7 @@ const Partners = () => {
             {summary && (
               <>
                 {/* Earnings card */}
-                <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
+                <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
                   <div className="text-xs text-gray-400">Total earnings</div>
                   <div className="text-2xl font-bold text-white">USD {summary.totalEarnings}</div>
                   <div className="text-xs text-gray-500 mt-1">
@@ -59,12 +59,12 @@ const Partners = () => {
                 </div>
 
                 {/* Referral link/code */}
-                <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
+                <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
                   <h2 className="text-sm font-semibold text-gray-300 mb-3">Your referral link</h2>
 
                   <div className="mb-3">
                     <div className="text-xs text-gray-400 mb-1">Referral link</div>
-                    <div className="flex items-center gap-2 bg-[#323738] rounded-lg p-2.5">
+                    <div className="flex items-center gap-2 bg-gray-100 dark:bg-[#323738] rounded-lg p-2.5">
                       <span className="text-white text-sm flex-1 truncate">{referralLink}</span>
                       <button onClick={() => copyToClipboard(referralLink, 'Referral link')}>
                         <Copy className="h-4 w-4 text-gray-400 hover:text-white shrink-0" />
@@ -74,7 +74,7 @@ const Partners = () => {
 
                   <div className="mb-4">
                     <div className="text-xs text-gray-400 mb-1">Referral code</div>
-                    <div className="flex items-center gap-2 bg-[#323738] rounded-lg p-2.5">
+                    <div className="flex items-center gap-2 bg-gray-100 dark:bg-[#323738] rounded-lg p-2.5">
                       <span className="text-white text-sm font-mono flex-1">{summary.referralCode}</span>
                       <button onClick={() => copyToClipboard(summary.referralCode, 'Referral code')}>
                         <Copy className="h-4 w-4 text-gray-400 hover:text-white shrink-0" />
@@ -97,7 +97,7 @@ const Partners = () => {
                     <Button
                       onClick={() => copyToClipboard(referralLink, 'Referral link')}
                       variant="outline"
-                      className="flex-1 border-[#414647] text-gray-300 hover:bg-[#323738]"
+                      className="flex-1 border-gray-300 dark:border-[#414647] text-gray-300 hover:bg-gray-100 dark:hover:bg-[#323738]"
                     >
                       <Share2 className="h-4 w-4 mr-2" />
                       More options
@@ -106,14 +106,14 @@ const Partners = () => {
                 </div>
 
                 {/* Reports */}
-                <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
+                <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
                   <h3 className="text-sm font-semibold text-gray-300 mb-3">Reports</h3>
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-[#323738] rounded-lg p-3">
+                    <div className="bg-gray-100 dark:bg-[#323738] rounded-lg p-3">
                       <div className="text-xs text-gray-400">Signups</div>
                       <div className="text-xl font-bold text-white">{summary.signupsCount}</div>
                     </div>
-                    <div className="bg-[#323738] rounded-lg p-3">
+                    <div className="bg-gray-100 dark:bg-[#323738] rounded-lg p-3">
                       <div className="text-xs text-gray-400">Trades commissioned</div>
                       <div className="text-xl font-bold text-white">{summary.tradesCommissioned}</div>
                     </div>

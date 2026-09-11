@@ -30,7 +30,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0e0e0e] text-white flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0e0e0e] text-white flex flex-col">
       <DerivHeader onMenuClick={() => setIsSidebarOpen(true)} balanceRefreshKey={balanceRefreshKey} />
 
       <div className="flex flex-1 overflow-hidden">
@@ -62,7 +62,7 @@ const Dashboard = () => {
               <DerivBottomPanel refreshKey={balanceRefreshKey} />
             </div>
 
-            <div className="hidden md:block w-80 border-l border-[#323738]">
+            <div className="hidden md:block w-80 border-l border-gray-200 dark:border-[#323738]">
               <DerivTradePanel
                 selectedAsset={selectedAsset}
                 tradeType={tradeType}

@@ -65,17 +65,17 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
 
       {/* Sidebar */}
       <div className={`
-        fixed md:relative top-0 left-0 h-full bg-[#151717] border-r border-[#323738] z-50 transition-transform duration-300 flex flex-col
+        fixed md:relative top-0 left-0 h-full bg-white dark:bg-[#151717] border-r border-gray-200 dark:border-[#323738] z-50 transition-transform duration-300 flex flex-col
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         ${isOpen ? 'w-64' : 'w-16'}
       `}>
         {/* Toggle button */}
-        <div className="p-4 border-b border-[#323738]">
+        <div className="p-4 border-b border-gray-200 dark:border-[#323738]">
           <Button
             variant="ghost"
             size="icon"
             onClick={onToggle}
-            className="text-gray-300 hover:text-white hover:bg-[#323738]"
+            className="text-gray-300 hover:text-white hover:bg-gray-100 dark:hover:bg-[#323738]"
           >
             {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
@@ -91,7 +91,7 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
                   className={`flex items-center space-x-3 px-3 py-3 rounded-lg transition-colors group ${
                     isActive(item.path)
                       ? 'bg-red-500 text-white'
-                      : 'text-gray-300 hover:bg-[#323738] hover:text-white'
+                      : 'text-gray-300 hover:bg-gray-100 dark:hover:bg-[#323738] hover:text-white'
                   }`}
                 >
                   <item.icon className="h-5 w-5 flex-shrink-0" />
@@ -101,7 +101,7 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
             ))}
           </ul>
 
-          <div className="my-4 border-t border-[#323738]" />
+          <div className="my-4 border-t border-gray-200 dark:border-[#323738]" />
 
           <ul className="space-y-2">
             {accountItems.map((item) => (
@@ -111,7 +111,7 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
                   className={`flex items-center space-x-3 px-3 py-3 rounded-lg transition-colors group ${
                     isActive(item.path)
                       ? 'bg-red-500 text-white'
-                      : 'text-gray-300 hover:bg-[#323738] hover:text-white'
+                      : 'text-gray-300 hover:bg-gray-100 dark:hover:bg-[#323738] hover:text-white'
                   }`}
                 >
                   <item.icon className="h-5 w-5 flex-shrink-0" />
@@ -124,7 +124,7 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
 
         {/* Bottom section - Account info */}
         {isOpen && isLoggedIn && (
-          <div className="shrink-0 p-4 border-t border-[#323738]">
+          <div className="shrink-0 p-4 border-t border-gray-200 dark:border-[#323738]">
             <div className="text-center">
               <div className="text-xs text-gray-400">Trading with</div>
               <div className="text-sm font-medium text-white capitalize">{activeType} Account</div>

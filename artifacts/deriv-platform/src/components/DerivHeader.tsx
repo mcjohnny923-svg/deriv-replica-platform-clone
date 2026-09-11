@@ -75,14 +75,14 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
   };
 
   return (
-    <header className="bg-[#151717] border-b border-[#323738] h-14 px-3 flex items-center justify-between">
+    <header className="bg-white dark:bg-[#151717] border-b border-gray-200 dark:border-[#323738] h-14 px-3 flex items-center justify-between">
       {/* Left section - Menu, logo and navigation */}
       <div className="flex items-center space-x-3">
         <Button
           variant="ghost"
           size="icon"
           onClick={onMenuClick}
-          className="text-gray-300 hover:text-white hover:bg-[#323738] md:hidden"
+          className="text-gray-300 hover:text-white hover:bg-gray-100 dark:hover:bg-[#323738] md:hidden"
         >
           <Menu className="h-5 w-5" />
         </Button>
@@ -95,13 +95,13 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
         </Link>
 
         <nav className="hidden md:flex items-center space-x-1">
-          <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-[#323738]">
+          <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-gray-100 dark:hover:bg-[#323738]">
             Trade
           </Button>
-          <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-[#323738]">
+          <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-gray-100 dark:hover:bg-[#323738]">
             Markets
           </Button>
-          <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-[#323738]">
+          <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-gray-100 dark:hover:bg-[#323738]">
             Trading tools
           </Button>
         </nav>
@@ -110,7 +110,7 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
       {/* Right section - Account and controls */}
       <div className="flex items-center space-x-2">
         {/* Help */}
-        <Button variant="ghost" size="icon" className="hidden sm:inline-flex text-gray-300 hover:text-white hover:bg-[#323738] h-8 w-8">
+        <Button variant="ghost" size="icon" className="hidden sm:inline-flex text-gray-300 hover:text-white hover:bg-gray-100 dark:hover:bg-[#323738] h-8 w-8">
           <HelpCircle className="h-4 w-4" />
         </Button>
 
@@ -126,7 +126,7 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
         <div className="relative">
           <button
             onClick={() => setAccountDropdownOpen(!accountDropdownOpen)}
-            className="flex items-center space-x-1.5 px-2.5 py-1.5 bg-[#323738] rounded hover:bg-[#414647] transition-colors"
+            className="flex items-center space-x-1.5 px-2.5 py-1.5 bg-gray-100 dark:bg-[#323738] rounded hover:bg-gray-200 dark:hover:bg-[#414647] transition-colors"
           >
             <div className="text-left leading-tight">
               <div className={`text-[10px] font-semibold capitalize ${typeColorClass}`}>{activeType}</div>
@@ -138,7 +138,7 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
           </button>
 
           {accountDropdownOpen && (
-            <div className="absolute right-0 top-full mt-1 w-64 bg-[#323738] border border-[#414647] rounded-lg shadow-lg z-50 overflow-hidden">
+            <div className="absolute right-0 top-full mt-1 w-64 bg-gray-100 dark:bg-[#323738] border border-gray-300 dark:border-[#414647] rounded-lg shadow-lg z-50 overflow-hidden">
               {(['demo', 'real'] as const).map((type) => {
                 const acc = accounts.find((a) => a.type === type);
                 const balance = acc
@@ -155,7 +155,7 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
                     tabIndex={0}
                     onClick={() => handleSwitch(type)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSwitch(type)}
-                    className="flex items-center justify-between w-full px-4 py-3 hover:bg-[#414647] transition-colors cursor-pointer"
+                    className="flex items-center justify-between w-full px-4 py-3 hover:bg-gray-200 dark:hover:bg-[#414647] transition-colors cursor-pointer"
                   >
                     <div className="text-left">
                       <div className={`text-sm font-semibold capitalize ${colorClass}`}>{type}</div>
@@ -169,7 +169,7 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
                           type="button"
                           onClick={(e) => handleResetDemo(e, acc.id)}
                           title="Reset demo balance to USD 10,000.00"
-                          className="p-1.5 rounded hover:bg-[#525858] text-gray-400 hover:text-white transition-colors"
+                          className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-[#525858] text-gray-400 hover:text-white transition-colors"
                         >
                           <RotateCcw className="h-3.5 w-3.5" />
                         </button>

@@ -250,24 +250,24 @@ const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
   }, [isTickMode, selectedTimeframe]);
 
   return (
-    <div className="flex-1 bg-[#0e0e0e] p-3 sm:p-4 flex flex-col">
+    <div className="flex-1 bg-gray-50 dark:bg-[#0e0e0e] p-3 sm:p-4 flex flex-col">
       {/* Asset selector and price info */}
       <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
         <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
           <div className="relative shrink-0">
             <button
               onClick={() => setIsAssetDropdownOpen(!isAssetDropdownOpen)}
-              className="flex items-center space-x-1.5 px-2.5 py-1.5 bg-[#323738] rounded hover:bg-[#414647] transition-colors max-w-[150px] sm:max-w-none"
+              className="flex items-center space-x-1.5 px-2.5 py-1.5 bg-gray-100 dark:bg-[#323738] rounded hover:bg-gray-200 dark:hover:bg-[#414647] transition-colors max-w-[150px] sm:max-w-none"
             >
               <span className="font-medium text-white text-xs sm:text-sm truncate">{selectedAsset}</span>
               <ChevronDown className="h-3.5 w-3.5 text-gray-400 shrink-0" />
             </button>
 
             {isAssetDropdownOpen && (
-              <div className="absolute top-full left-0 mt-1 w-72 max-h-96 overflow-y-auto bg-[#323738] border border-[#414647] rounded-lg shadow-lg z-50">
+              <div className="absolute top-full left-0 mt-1 w-72 max-h-96 overflow-y-auto bg-gray-100 dark:bg-[#323738] border border-gray-300 dark:border-[#414647] rounded-lg shadow-lg z-50">
                 {assetGroups.map((group) => (
                   <div key={group.label}>
-                    <div className="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-400 sticky top-0 bg-[#323738]">
+                    <div className="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-400 sticky top-0 bg-gray-100 dark:bg-[#323738]">
                       {group.label}
                     </div>
                     {group.assets.map((asset) => (
@@ -277,8 +277,8 @@ const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
                           onAssetChange(asset);
                           setIsAssetDropdownOpen(false);
                         }}
-                        className={`flex items-center justify-between w-full text-left px-4 py-2.5 hover:bg-[#414647] text-white transition-colors ${
-                          asset === selectedAsset ? 'bg-[#414647]/60' : ''
+                        className={`flex items-center justify-between w-full text-left px-4 py-2.5 hover:bg-gray-200 dark:hover:bg-[#414647] text-white transition-colors ${
+                          asset === selectedAsset ? 'bg-gray-200 dark:bg-[#414647]/60' : ''
                         }`}
                       >
                         <span>{asset}</span>
@@ -320,7 +320,7 @@ const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
           </button>
 
           {isTimeframeDropdownOpen && (
-            <div className="absolute top-full right-0 mt-1 w-24 bg-[#323738] border border-[#414647] rounded-lg shadow-lg z-50 overflow-hidden">
+            <div className="absolute top-full right-0 mt-1 w-24 bg-gray-100 dark:bg-[#323738] border border-gray-300 dark:border-[#414647] rounded-lg shadow-lg z-50 overflow-hidden">
               {TIMEFRAMES.map((tf) => (
                 <button
                   key={tf}
@@ -331,7 +331,7 @@ const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
                   className={`block w-full text-left px-3 py-2 text-sm transition-colors ${
                     selectedTimeframe === tf
                       ? 'bg-red-500 text-white'
-                      : 'text-gray-300 hover:bg-[#414647] hover:text-white'
+                      : 'text-gray-300 hover:bg-gray-200 dark:hover:bg-[#414647] hover:text-white'
                   }`}
                 >
                   {tf}
@@ -343,7 +343,7 @@ const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
       </div>
 
       {/* Chart, zoom/pan scoped to this element only via lightweight-charts */}
-      <div className="flex-1 min-h-[320px] bg-[#151717] rounded-lg overflow-hidden">
+      <div className="flex-1 min-h-[320px] bg-white dark:bg-[#151717] rounded-lg overflow-hidden">
         <div ref={chartContainerRef} className="w-full h-full" />
       </div>
     </div>

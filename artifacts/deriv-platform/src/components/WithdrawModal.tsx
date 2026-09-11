@@ -59,7 +59,7 @@ const WithdrawModal = ({ open, onOpenChange, accountId }: WithdrawModalProps) =>
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-[#151717] border-[#323738] text-white sm:max-w-md p-0 overflow-hidden">
+      <DialogContent className="bg-white dark:bg-[#151717] border-gray-200 dark:border-[#323738] text-white sm:max-w-md p-0 overflow-hidden">
         {succeeded ? (
           <div className="p-8 text-center">
             <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-4">
@@ -79,7 +79,7 @@ const WithdrawModal = ({ open, onOpenChange, accountId }: WithdrawModalProps) =>
           </div>
         ) : (
           <>
-            <DialogHeader className="px-6 pt-6 pb-4 border-b border-[#323738] space-y-1">
+            <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-200 dark:border-[#323738] space-y-1">
               <DialogTitle className="text-xl font-bold text-white">Withdraw Funds</DialogTitle>
               <DialogDescription className="text-gray-400">Minimum withdrawal is $5.00</DialogDescription>
             </DialogHeader>
@@ -98,7 +98,7 @@ const WithdrawModal = ({ open, onOpenChange, accountId }: WithdrawModalProps) =>
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="5.00"
-                  className="w-full bg-[#0e0e0e] border border-[#323738] rounded-lg px-4 py-3 text-white text-lg focus:outline-none focus:border-gray-500"
+                  className="w-full bg-gray-50 dark:bg-[#0e0e0e] border border-gray-200 dark:border-[#323738] rounded-lg px-4 py-3 text-white text-lg focus:outline-none focus:border-gray-500"
                 />
                 <div className="text-sm text-gray-400 min-h-[1.25rem]">
                   {kesEquivalent !== null

@@ -38,12 +38,12 @@ const Positions = () => {
   const trades = tab === 'open' ? openTrades : closedTrades;
 
   return (
-    <div className="min-h-screen bg-[#0e0e0e] text-white flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0e0e0e] text-white flex flex-col">
       <DerivHeader onMenuClick={() => setIsSidebarOpen(true)} />
       <div className="flex flex-1 overflow-hidden">
         <DerivSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
         <div className="flex-1 flex flex-col pb-16 md:pb-0">
-          <div className="flex border-b border-[#323738]">
+          <div className="flex border-b border-gray-200 dark:border-[#323738]">
             <button
               onClick={() => setTab('open')}
               className={`px-4 py-3 text-sm font-medium border-b-2 ${
@@ -76,7 +76,7 @@ const Positions = () => {
                   : null;
 
               return (
-                <div key={trade.id} className="bg-[#151717] border border-[#323738] rounded-lg p-4">
+                <div key={trade.id} className="bg-white dark:bg-[#151717] border border-gray-200 dark:border-[#323738] rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <div className="text-white font-medium">{trade.market?.displayName ?? '—'}</div>

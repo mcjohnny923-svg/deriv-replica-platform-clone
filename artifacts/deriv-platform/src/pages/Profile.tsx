@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { User, Shield, Bell } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { User, Shield, Bell, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,6 +19,7 @@ import {
 } from '@/lib/auth-api';
 
 const Profile = () => {
+  const { theme, setTheme } = useTheme();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const storedUser = getStoredUser();
   const [account, setAccount] = useState<AuthAccount | null>(getStoredAccount());
@@ -84,7 +86,7 @@ const Profile = () => {
     : '—';
 
   return (
-    <div className="min-h-screen bg-[#0e0e0e] text-white flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0e0e0e] text-white flex flex-col">
       <DerivHeader onMenuClick={() => setIsSidebarOpen(true)} />
       <div className="flex flex-1 overflow-hidden">
         <DerivSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
@@ -94,7 +96,7 @@ const Profile = () => {
             <h1 className="text-2xl font-bold">Profile Settings</h1>
 
             {/* Account Summary */}
-            <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
+            <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
               <h3 className="text-sm font-semibold text-gray-300 mb-3">Account Summary</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -116,8 +118,26 @@ const Profile = () => {
               </div>
             </div>
 
+            {/* Appearance */}
+            <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
+              <h2 className="text-sm font-semibold text-gray-300 mb-4 flex items-center">
+                {theme === 'dark' ? <Moon className="h-4 w-4 mr-2" /> : <Sun className="h-4 w-4 mr-2" />}
+                Appearance
+              </h2>
+              <div className="flex justify-between items-center p-3 bg-gray-100 dark:bg-[#323738] rounded-lg">
+                <div>
+                  <div className="text-sm font-medium text-white">Dark mode</div>
+                  <div className="text-xs text-gray-400">Switch between light and dark theme</div>
+                </div>
+                <Switch
+                  checked={theme === 'dark'}
+                  onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+                />
+              </div>
+            </div>
+
             {/* Personal Information */}
-            <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
+            <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
               <h2 className="text-sm font-semibold text-gray-300 mb-4 flex items-center">
                 <User className="h-4 w-4 mr-2" />
                 Personal Information
@@ -129,7 +149,7 @@ const Profile = () => {
                   <Input
                     value={profile.firstName}
                     onChange={(e) => handleProfileUpdate('firstName', e.target.value)}
-                    className="mt-1 bg-[#323738] border-[#414647] text-white"
+                    className="mt-1 bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white"
                   />
                 </div>
                 <div>
@@ -137,7 +157,7 @@ const Profile = () => {
                   <Input
                     value={profile.lastName}
                     onChange={(e) => handleProfileUpdate('lastName', e.target.value)}
-                    className="mt-1 bg-[#323738] border-[#414647] text-white"
+                    className="mt-1 bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white"
                   />
                 </div>
               </div>
@@ -148,7 +168,7 @@ const Profile = () => {
                   <Input
                     value={profile.email}
                     disabled
-                    className="mt-1 bg-[#323738] border-[#414647] text-gray-400"
+                    className="mt-1 bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-400"
                   />
                 </div>
                 <div>
@@ -157,7 +177,7 @@ const Profile = () => {
                     value={profile.phone}
                     onChange={(e) => handleProfileUpdate('phone', e.target.value)}
                     placeholder="+1 (555) 123-4567"
-                    className="mt-1 bg-[#323738] border-[#414647] text-white"
+                    className="mt-1 bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white"
                   />
                 </div>
                 <div>
@@ -166,7 +186,7 @@ const Profile = () => {
                     value={profile.country}
                     onChange={(e) => handleProfileUpdate('country', e.target.value)}
                     placeholder="Not set"
-                    className="mt-1 bg-[#323738] border-[#414647] text-white"
+                    className="mt-1 bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white"
                   />
                 </div>
               </div>
@@ -181,34 +201,34 @@ const Profile = () => {
             </div>
 
             {/* Security */}
-            <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
+            <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
               <h2 className="text-sm font-semibold text-gray-300 mb-4 flex items-center">
                 <Shield className="h-4 w-4 mr-2" />
                 Security
               </h2>
               <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-[#323738] rounded-lg">
+                <div className="flex justify-between items-center p-3 bg-gray-100 dark:bg-[#323738] rounded-lg">
                   <div>
                     <div className="text-sm font-medium text-white">Two-Factor Authentication</div>
                     <div className="text-xs text-gray-400">Add an extra layer of security</div>
                   </div>
                   <Switch />
                 </div>
-                <div className="flex justify-between items-center p-3 bg-[#323738] rounded-lg">
+                <div className="flex justify-between items-center p-3 bg-gray-100 dark:bg-[#323738] rounded-lg">
                   <div>
                     <div className="text-sm font-medium text-white">Email Verification</div>
                     <div className="text-xs text-gray-400">Verify trades via email</div>
                   </div>
                   <Switch defaultChecked />
                 </div>
-                <Button variant="outline" className="w-full border-[#414647] text-gray-300 hover:bg-[#323738]">
+                <Button variant="outline" className="w-full border-gray-300 dark:border-[#414647] text-gray-300 hover:bg-gray-100 dark:hover:bg-[#323738]">
                   Change Password
                 </Button>
               </div>
             </div>
 
             {/* Notifications */}
-            <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
+            <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
               <h3 className="text-sm font-semibold text-gray-300 mb-4 flex items-center">
                 <Bell className="h-4 w-4 mr-2" />
                 Notifications

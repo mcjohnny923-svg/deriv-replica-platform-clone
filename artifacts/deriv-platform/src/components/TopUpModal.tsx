@@ -25,8 +25,8 @@ const TopUpModal = ({ open, onOpenChange }: TopUpModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-[#151717] border-[#323738] text-white sm:max-w-md p-0 overflow-hidden">
-        <DialogHeader className="px-6 pt-6 pb-4 border-b border-[#323738] space-y-1">
+      <DialogContent className="bg-white dark:bg-[#151717] border-gray-200 dark:border-[#323738] text-white sm:max-w-md p-0 overflow-hidden">
+        <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-200 dark:border-[#323738] space-y-1">
           <DialogTitle className="text-xl font-bold text-white">Top Up Funds</DialogTitle>
           <DialogDescription className="text-gray-400">Choose payment method</DialogDescription>
         </DialogHeader>
@@ -35,9 +35,9 @@ const TopUpModal = ({ open, onOpenChange }: TopUpModalProps) => {
           <button
             type="button"
             onClick={() => goToDeposit('mpesa')}
-            className="w-full flex items-center gap-4 p-4 rounded-xl border border-[#323738] hover:bg-[#1c1f1f] transition-colors"
+            className="w-full flex items-center gap-4 p-4 rounded-xl border border-gray-200 dark:border-[#323738] hover:bg-gray-50 dark:hover:bg-[#1c1f1f] transition-colors"
           >
-            <div className="w-11 h-11 rounded-lg bg-[#232728] flex items-center justify-center shrink-0">
+            <div className="w-11 h-11 rounded-lg bg-gray-100 dark:bg-[#232728] flex items-center justify-center shrink-0">
               <Smartphone className="h-5 w-5 text-white" />
             </div>
             <div className="flex-1 text-left">
@@ -50,9 +50,9 @@ const TopUpModal = ({ open, onOpenChange }: TopUpModalProps) => {
           <button
             type="button"
             onClick={() => goToDeposit('paystack')}
-            className="w-full flex items-center gap-4 p-4 rounded-xl border border-[#323738] hover:bg-[#1c1f1f] transition-colors"
+            className="w-full flex items-center gap-4 p-4 rounded-xl border border-gray-200 dark:border-[#323738] hover:bg-gray-50 dark:hover:bg-[#1c1f1f] transition-colors"
           >
-            <div className="w-11 h-11 rounded-lg bg-[#232728] flex items-center justify-center shrink-0">
+            <div className="w-11 h-11 rounded-lg bg-gray-100 dark:bg-[#232728] flex items-center justify-center shrink-0">
               <Zap className="h-5 w-5 text-white" />
             </div>
             <div className="flex-1 text-left">
@@ -65,9 +65,9 @@ const TopUpModal = ({ open, onOpenChange }: TopUpModalProps) => {
           <button
             type="button"
             onClick={() => toast('Card payments are temporarily unavailable — please try again later.')}
-            className="w-full flex items-center gap-4 p-4 rounded-xl border border-[#323738] hover:bg-[#1c1f1f] transition-colors"
+            className="w-full flex items-center gap-4 p-4 rounded-xl border border-gray-200 dark:border-[#323738] hover:bg-gray-50 dark:hover:bg-[#1c1f1f] transition-colors"
           >
-            <div className="w-11 h-11 rounded-lg bg-[#232728] flex items-center justify-center shrink-0">
+            <div className="w-11 h-11 rounded-lg bg-gray-100 dark:bg-[#232728] flex items-center justify-center shrink-0">
               <CreditCard className="h-5 w-5 text-white" />
             </div>
             <div className="flex-1 text-left">

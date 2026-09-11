@@ -17,7 +17,7 @@ const MobileBottomNav = ({ onMenuClick }: MobileBottomNavProps) => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#151717] border-t border-[#323738] flex items-stretch md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-[#151717] border-t border-gray-200 dark:border-[#323738] flex items-stretch md:hidden">
       {items.map((item) => (
         <Link
           key={item.path}

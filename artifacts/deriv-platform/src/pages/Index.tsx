@@ -16,7 +16,7 @@ const Index = () => {
         <DerivSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
       </div>
       {/* Header */}
-      <header className="bg-[#151717] border-b border-[#323738] px-4 py-4">
+      <header className="bg-white dark:bg-[#151717] border-b border-gray-200 dark:border-[#323738] px-4 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-red-500 rounded flex items-center justify-center">
@@ -75,7 +75,7 @@ const Index = () => {
       </section>
 
       {/* Features */}
-      <section className="py-20 px-4 bg-[#0a0a0a]">
+      <section className="py-20 px-4 bg-gray-50 dark:bg-[#0a0a0a]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Why choose NOVBINARY</h2>

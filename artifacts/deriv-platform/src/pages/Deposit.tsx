@@ -221,7 +221,7 @@ const Deposit = () => {
   const showForm = (isCard || storedPhone) && flowState === 'form';
 
   return (
-    <div className="min-h-screen bg-[#0e0e0e] text-white flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0e0e0e] text-white flex flex-col">
       <DerivHeader onMenuClick={() => setIsSidebarOpen(true)} balanceRefreshKey={balanceRefreshKey} />
       <div className="flex flex-1 overflow-hidden">
         <DerivSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
@@ -230,14 +230,14 @@ const Deposit = () => {
           <div className="max-w-2xl mx-auto p-4 space-y-4">
             <h1 className="text-2xl font-bold">Deposit Funds</h1>
 
-            <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
+            <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
               <div className="text-xs text-gray-400">Current balance</div>
               <div className="text-lg font-bold text-white">{balance}</div>
               <div className="text-xs text-gray-400 capitalize mt-0.5">{account?.type ?? '—'} account</div>
             </div>
 
             {showPhoneGate && (
-              <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
+              <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
                 <h2 className="text-sm font-semibold text-gray-300 mb-3 flex items-center">
                   <Smartphone className="h-4 w-4 mr-2" />
                   Link your M-Pesa number
@@ -250,7 +250,7 @@ const Deposit = () => {
                   value={phoneInput}
                   onChange={(e) => setPhoneInput(e.target.value)}
                   placeholder="2547XXXXXXXX"
-                  className="bg-[#323738] border-[#414647] text-white mb-3"
+                  className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white mb-3"
                 />
                 <Button
                   onClick={handleSavePhone}
@@ -263,7 +263,7 @@ const Deposit = () => {
             )}
 
             {showForm && (
-              <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
+              <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
                 <h2 className="text-sm font-semibold text-gray-300 mb-4 flex items-center">
                   <Smartphone className="h-4 w-4 mr-2" />
                   {PROVIDER_LABELS[provider]}
@@ -276,7 +276,7 @@ const Deposit = () => {
                     type="number"
                     value={amountUsd}
                     onChange={(e) => setAmountUsd(e.target.value)}
-                    className="bg-[#323738] border-[#414647] text-white text-lg"
+                    className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white text-lg"
                     placeholder="10"
                   />
                   <div className="text-xs text-gray-500 mt-1">
@@ -288,7 +288,7 @@ const Deposit = () => {
                         key={preset}
                         variant="ghost"
                         onClick={() => setAmountUsd(preset)}
-                        className="bg-[#323738] hover:bg-[#414647] text-gray-300 text-sm"
+                        className="bg-gray-100 dark:bg-[#323738] hover:bg-gray-200 dark:hover:bg-[#414647] text-gray-300 text-sm"
                       >
                         ${preset}
                       </Button>
@@ -315,7 +315,7 @@ const Deposit = () => {
             )}
 
             {flowState === 'waiting' && (
-              <div className="bg-[#151717] rounded-lg p-8 border border-[#323738] text-center">
+              <div className="bg-white dark:bg-[#151717] rounded-lg p-8 border border-gray-200 dark:border-[#323738] text-center">
                 <Loader2 className="h-10 w-10 text-red-500 animate-spin mx-auto mb-4" />
                 <h3 className="text-white font-semibold mb-2">
                   {isCard ? 'Confirming your payment' : 'Check your phone'}
@@ -330,7 +330,7 @@ const Deposit = () => {
             )}
 
             {flowState === 'success' && (
-              <div className="bg-[#151717] rounded-lg p-8 border border-[#323738] text-center">
+              <div className="bg-white dark:bg-[#151717] rounded-lg p-8 border border-gray-200 dark:border-[#323738] text-center">
                 <CheckCircle2 className="h-10 w-10 text-green-500 mx-auto mb-4" />
                 <h3 className="text-white font-semibold mb-2">Deposit successful</h3>
                 <p className="text-gray-400 text-sm mb-4">{resultMessage}</p>
@@ -341,7 +341,7 @@ const Deposit = () => {
             )}
 
             {flowState === 'failed' && (
-              <div className="bg-[#151717] rounded-lg p-8 border border-[#323738] text-center">
+              <div className="bg-white dark:bg-[#151717] rounded-lg p-8 border border-gray-200 dark:border-[#323738] text-center">
                 <XCircle className="h-10 w-10 text-red-500 mx-auto mb-4" />
                 <h3 className="text-white font-semibold mb-2">Deposit not completed</h3>
                 <p className="text-gray-400 text-sm mb-4">{resultMessage}</p>
@@ -351,7 +351,7 @@ const Deposit = () => {
               </div>
             )}
 
-            <div className="bg-[#151717] rounded-lg p-4 border border-[#323738]">
+            <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
               <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center">
                 <Shield className="h-4 w-4 mr-2" />
                 Security & Safety

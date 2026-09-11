@@ -115,9 +115,9 @@ const DerivBottomPanel = ({ refreshKey }: DerivBottomPanelProps) => {
   };
 
   return (
-    <div className="h-48 bg-[#151717] border-t border-[#323738] overflow-y-auto">
+    <div className="h-48 bg-white dark:bg-[#151717] border-t border-gray-200 dark:border-[#323738] overflow-y-auto">
       {/* Tab headers */}
-      <div className="flex border-b border-[#323738]">
+      <div className="flex border-b border-gray-200 dark:border-[#323738]">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -130,7 +130,7 @@ const DerivBottomPanel = ({ refreshKey }: DerivBottomPanelProps) => {
           >
             {tab.label}
             {tab.count !== undefined && (
-              <span className="ml-2 px-2 py-1 text-xs bg-[#323738] rounded-full">
+              <span className="ml-2 px-2 py-1 text-xs bg-gray-100 dark:bg-[#323738] rounded-full">
                 {tab.count}
               </span>
             )}
@@ -146,7 +146,7 @@ const DerivBottomPanel = ({ refreshKey }: DerivBottomPanelProps) => {
             </div>
           ) : (
             <div className="space-y-2">
-              <div className="grid grid-cols-5 gap-4 text-xs text-gray-400 uppercase tracking-wider border-b border-[#323738] pb-2">
+              <div className="grid grid-cols-5 gap-4 text-xs text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-[#323738] pb-2">
                 <div>Asset</div>
                 <div>Type</div>
                 <div>Direction</div>
@@ -154,7 +154,7 @@ const DerivBottomPanel = ({ refreshKey }: DerivBottomPanelProps) => {
                 <div>Settles in</div>
               </div>
               {openTrades.map((trade) => (
-                <div key={trade.id} className="grid grid-cols-5 gap-4 text-sm py-2 border-b border-[#323738]/50">
+                <div key={trade.id} className="grid grid-cols-5 gap-4 text-sm py-2 border-b border-gray-200 dark:border-[#323738]/50">
                   <div className="text-white">{trade.market?.displayName ?? '—'}</div>
                   <div className="text-gray-300">{trade.tradeType.replace('_', '/')}</div>
                   <div className="text-white">{formatDirection(trade)}</div>
@@ -177,7 +177,7 @@ const DerivBottomPanel = ({ refreshKey }: DerivBottomPanelProps) => {
             </div>
           ) : (
             <div className="space-y-2">
-              <div className="grid grid-cols-6 gap-4 text-xs text-gray-400 uppercase tracking-wider border-b border-[#323738] pb-2">
+              <div className="grid grid-cols-6 gap-4 text-xs text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-[#323738] pb-2">
                 <div>Asset</div>
                 <div>Type</div>
                 <div>Direction</div>
@@ -186,7 +186,7 @@ const DerivBottomPanel = ({ refreshKey }: DerivBottomPanelProps) => {
                 <div>Result</div>
               </div>
               {closedTrades.map((trade) => (
-                <div key={trade.id} className="grid grid-cols-6 gap-4 text-sm py-2 border-b border-[#323738]/50">
+                <div key={trade.id} className="grid grid-cols-6 gap-4 text-sm py-2 border-b border-gray-200 dark:border-[#323738]/50">
                   <div className="text-white">{trade.market?.displayName ?? '—'}</div>
                   <div className="text-gray-300">{trade.tradeType.replace('_', '/')}</div>
                   <div className="text-white">{formatDirection(trade)}</div>

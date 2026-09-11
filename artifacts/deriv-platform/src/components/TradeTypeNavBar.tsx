@@ -8,7 +8,7 @@ interface TradeTypeNavBarProps {
 const TradeTypeNavBar = ({ tradeType, onTradeTypeChange }: TradeTypeNavBarProps) => {
   return (
     <div
-      className="flex gap-2 overflow-x-auto px-3 py-2 bg-[#151717] border-b border-[#323738] [&::-webkit-scrollbar]:hidden"
+      className="flex gap-2 overflow-x-auto px-3 py-2 bg-white dark:bg-[#151717] border-b border-gray-200 dark:border-[#323738] [&::-webkit-scrollbar]:hidden"
       style={{
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
@@ -25,7 +25,7 @@ const TradeTypeNavBar = ({ tradeType, onTradeTypeChange }: TradeTypeNavBarProps)
           className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
             tradeType === type.value
               ? 'bg-red-600 border-red-500 text-white'
-              : 'bg-[#0e0e0e] border-[#323738] text-gray-300 hover:bg-[#323738]'
+              : 'bg-gray-50 dark:bg-[#0e0e0e] border-gray-200 dark:border-[#323738] text-gray-300 hover:bg-gray-100 dark:hover:bg-[#323738]'
           }`}
         >
           {type.label}
