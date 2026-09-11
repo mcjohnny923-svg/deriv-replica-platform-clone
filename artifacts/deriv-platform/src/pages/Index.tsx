@@ -12,7 +12,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-black text-white pb-16 md:pb-0">
-      <DerivSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
+      <div className="md:hidden">
+        <DerivSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
+      </div>
       {/* Header */}
       <header className="bg-[#151717] border-b border-[#323738] px-4 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
