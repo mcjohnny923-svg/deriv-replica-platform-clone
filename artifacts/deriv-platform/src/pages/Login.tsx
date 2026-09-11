@@ -38,12 +38,12 @@ const Login = () => {
         <div className="text-center">
           <Link to="/" className="inline-flex items-center space-x-2 mb-8">
             <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-xs">NB</span>
+              <span className="text-gray-900 dark:text-white font-bold text-xs">NB</span>
             </div>
-            <span className="text-2xl font-bold text-white">NovBinary</span>
+            <span className="text-2xl font-bold text-gray-900 dark:text-white">NovBinary</span>
           </Link>
-          <h2 className="text-3xl font-bold text-white">Welcome back</h2>
-          <p className="mt-2 text-gray-400">Sign in to your trading account</p>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome back</h2>
+          <p className="mt-2 text-gray-400 dark:text-gray-500 dark:text-gray-400">Sign in to your trading account</p>
         </div>
 
         {/* Login Form */}
@@ -55,34 +55,34 @@ const Login = () => {
               </div>
             )}
             <div>
-              <Label htmlFor="email" className="text-gray-300">Email address</Label>
+              <Label htmlFor="email" className="text-gray-600 dark:text-gray-300">Email address</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 bg-gray-700 border-gray-600 text-white"
+                className="mt-1 bg-gray-700 border-gray-600 text-gray-900 dark:text-white"
                 placeholder="Enter your email"
                 required
               />
             </div>
 
             <div>
-              <Label htmlFor="password" className="text-gray-300">Password</Label>
+              <Label htmlFor="password" className="text-gray-600 dark:text-gray-300">Password</Label>
               <div className="relative mt-1">
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white pr-10"
+                  className="bg-gray-700 border-gray-600 text-gray-900 dark:text-white pr-10"
                   placeholder="Enter your password"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-white"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -96,7 +96,7 @@ const Login = () => {
                   checked={rememberMe}
                   onCheckedChange={(checked) => setRememberMe(!!checked)}
                 />
-                <Label htmlFor="remember" className="text-sm text-gray-300">
+                <Label htmlFor="remember" className="text-sm text-gray-600 dark:text-gray-300">
                   Remember me
                 </Label>
               </div>
@@ -115,7 +115,7 @@ const Login = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-gray-400">
+            <p className="text-gray-400 dark:text-gray-500 dark:text-gray-400">
               Don't have an account?{' '}
               <Link to="/register" className="text-red-500 hover:text-red-400 font-medium">
                 Sign up
@@ -126,9 +126,9 @@ const Login = () => {
 
         {/* Demo Account */}
         <div className="text-center">
-          <p className="text-gray-400 mb-4">Want to try our platform first?</p>
+          <p className="text-gray-400 dark:text-gray-500 dark:text-gray-400 mb-4">Want to try our platform first?</p>
           <Link to="/dashboard">
-            <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700">
+            <Button variant="outline" className="border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-700">
               Try Demo Account
             </Button>
           </Link>

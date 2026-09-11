@@ -146,12 +146,12 @@ const DigitStatsDisplay = ({ selectedDigit, flash, digitHistory, lastDigit, twoR
                 <div className="absolute inset-0 flex flex-col items-center justify-center leading-none">
                   <span
                     className={`text-[10px] font-semibold ${
-                      isSelected ? 'text-[#7c5cff]' : 'text-white'
+                      isSelected ? 'text-[#7c5cff]' : 'text-gray-900 dark:text-white'
                     }`}
                   >
                     {digit}
                   </span>
-                  <span className="text-[6px] text-gray-400 mt-0.5">
+                  <span className="text-[6px] text-gray-400 dark:text-gray-500 dark:text-gray-400 mt-0.5">
                     {pct.toFixed(1)}%
                   </span>
                 </div>

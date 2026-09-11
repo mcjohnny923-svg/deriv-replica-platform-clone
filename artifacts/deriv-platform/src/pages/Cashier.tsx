@@ -28,7 +28,7 @@ const Cashier = () => {
       })}`
     : '—';
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0e0e0e] text-white flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0e0e0e] text-gray-900 dark:text-white flex flex-col">
       <DerivHeader onMenuClick={() => setIsSidebarOpen(true)} />
       <div className="flex flex-1 overflow-hidden">
         <DerivSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
@@ -36,9 +36,9 @@ const Cashier = () => {
           <div className="max-w-2xl mx-auto p-4 space-y-4">
             <h1 className="text-2xl font-bold">Cashier</h1>
             <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
-              <div className="text-xs text-gray-400">Current balance</div>
-              <div className="text-lg font-bold text-white">{balance}</div>
-              <div className="text-xs text-gray-400 capitalize mt-0.5">{account?.type ?? '—'} account</div>
+              <div className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400">Current balance</div>
+              <div className="text-lg font-bold text-gray-900 dark:text-white">{balance}</div>
+              <div className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400 capitalize mt-0.5">{account?.type ?? '—'} account</div>
             </div>
             <div className="space-y-3">
               <button
@@ -50,10 +50,10 @@ const Cashier = () => {
                   <ArrowDownCircle className="h-5 w-5 text-green-500" />
                 </div>
                 <div className="flex-1 text-left">
-                  <div className="text-white font-semibold">Deposit</div>
-                  <div className="text-gray-400 text-sm">Add funds via M-Pesa, Payment agent, or card</div>
+                  <div className="text-gray-900 dark:text-white font-semibold">Deposit</div>
+                  <div className="text-gray-400 dark:text-gray-500 dark:text-gray-400 text-sm">Add funds via M-Pesa, Payment agent, or card</div>
                 </div>
-                <ChevronRight className="h-5 w-5 text-gray-500" />
+                <ChevronRight className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               </button>
               <button
                 type="button"
@@ -64,10 +64,10 @@ const Cashier = () => {
                   <ArrowUpCircle className="h-5 w-5 text-red-500" />
                 </div>
                 <div className="flex-1 text-left">
-                  <div className="text-white font-semibold">Withdraw</div>
-                  <div className="text-gray-400 text-sm">Minimum $5</div>
+                  <div className="text-gray-900 dark:text-white font-semibold">Withdraw</div>
+                  <div className="text-gray-400 dark:text-gray-500 dark:text-gray-400 text-sm">Minimum $5</div>
                 </div>
-                <ChevronRight className="h-5 w-5 text-gray-500" />
+                <ChevronRight className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               </button>
             </div>
           </div>

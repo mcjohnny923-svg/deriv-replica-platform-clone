@@ -59,14 +59,14 @@ const WithdrawModal = ({ open, onOpenChange, accountId }: WithdrawModalProps) =>
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white dark:bg-[#151717] border-gray-200 dark:border-[#323738] text-white sm:max-w-md p-0 overflow-hidden">
+      <DialogContent className="bg-white dark:bg-[#151717] border-gray-200 dark:border-[#323738] text-gray-900 dark:text-white sm:max-w-md p-0 overflow-hidden">
         {succeeded ? (
           <div className="p-8 text-center">
             <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 className="h-9 w-9 text-green-500" />
             </div>
-            <h3 className="text-white font-semibold text-lg mb-2">Withdrawal successful!</h3>
-            <p className="text-gray-400 text-sm">
+            <h3 className="text-gray-900 dark:text-white font-semibold text-lg mb-2">Withdrawal successful!</h3>
+            <p className="text-gray-400 dark:text-gray-500 dark:text-gray-400 text-sm">
               Your withdrawal request of ${submittedAmount} has been submitted.
             </p>
             <button
@@ -80,13 +80,13 @@ const WithdrawModal = ({ open, onOpenChange, accountId }: WithdrawModalProps) =>
         ) : (
           <>
             <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-200 dark:border-[#323738] space-y-1">
-              <DialogTitle className="text-xl font-bold text-white">Withdraw Funds</DialogTitle>
-              <DialogDescription className="text-gray-400">Minimum withdrawal is $5.00</DialogDescription>
+              <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">Withdraw Funds</DialogTitle>
+              <DialogDescription className="text-gray-400 dark:text-gray-500 dark:text-gray-400">Minimum withdrawal is $5.00</DialogDescription>
             </DialogHeader>
 
             <div className="p-6 space-y-4">
               <div className="space-y-2">
-                <label htmlFor="withdraw-amount" className="text-sm text-gray-400">
+                <label htmlFor="withdraw-amount" className="text-sm text-gray-400 dark:text-gray-500 dark:text-gray-400">
                   Amount (USD)
                 </label>
                 <input
@@ -98,9 +98,9 @@ const WithdrawModal = ({ open, onOpenChange, accountId }: WithdrawModalProps) =>
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="5.00"
-                  className="w-full bg-gray-50 dark:bg-[#0e0e0e] border border-gray-200 dark:border-[#323738] rounded-lg px-4 py-3 text-white text-lg focus:outline-none focus:border-gray-500"
+                  className="w-full bg-gray-50 dark:bg-[#0e0e0e] border border-gray-200 dark:border-[#323738] rounded-lg px-4 py-3 text-gray-900 dark:text-white text-lg focus:outline-none focus:border-gray-500"
                 />
-                <div className="text-sm text-gray-400 min-h-[1.25rem]">
+                <div className="text-sm text-gray-400 dark:text-gray-500 dark:text-gray-400 min-h-[1.25rem]">
                   {kesEquivalent !== null
                     ? `≈ KES ${kesEquivalent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                     : amount && !isValidAmount

@@ -23,7 +23,7 @@ const MobileBottomNav = ({ onMenuClick }: MobileBottomNavProps) => {
           key={item.path}
           to={item.path}
           className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 ${
-            isActive(item.path) ? 'text-red-500' : 'text-gray-400'
+            isActive(item.path) ? 'text-red-500' : 'text-gray-400 dark:text-gray-500 dark:text-gray-400'
           }`}
         >
           <item.icon className="h-5 w-5" />
@@ -32,7 +32,7 @@ const MobileBottomNav = ({ onMenuClick }: MobileBottomNavProps) => {
       ))}
       <button
         onClick={onMenuClick}
-        className="flex-1 flex flex-col items-center justify-center gap-1 py-2 text-gray-400"
+        className="flex-1 flex flex-col items-center justify-center gap-1 py-2 text-gray-400 dark:text-gray-500 dark:text-gray-400"
       >
         <Menu className="h-5 w-5" />
         <span className="text-[11px]">Menu</span>

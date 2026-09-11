@@ -20,21 +20,21 @@ const Index = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-red-500 rounded flex items-center justify-center">
-              <span className="text-white font-bold text-sm">NB</span>
+              <span className="text-gray-900 dark:text-white font-bold text-sm">NB</span>
             </div>
-            <span className="text-xl font-bold text-white">NOVBINARY</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">NOVBINARY</span>
           </div>
           
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">Trade</a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">Markets</a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">About us</a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">Help centre</a>
+            <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white transition-colors">Trade</a>
+            <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white transition-colors">Markets</a>
+            <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white transition-colors">About us</a>
+            <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white transition-colors">Help centre</a>
           </nav>
 
           <div className="flex items-center space-x-4">
             <Link to="/login">
-              <Button variant="ghost" className="text-gray-300 hover:text-white">
+              <Button variant="ghost" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white">
                 Log in
               </Button>
             </Link>
@@ -54,7 +54,7 @@ const Index = () => {
             Trading<br />
             <span className="text-red-500">reimagined</span>
           </h1>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
             Trade forex, synthetics, and cryptocurrencies with our award-winning platforms. 
             Start with a demo account and $10,000 virtual money.
           </p>
@@ -66,7 +66,7 @@ const Index = () => {
               </Button>
             </Link>
             <Link to="/dashboard">
-              <Button size="lg" variant="outline" className="border-gray-600 text-white hover:bg-gray-800 px-8 py-4 text-lg">
+              <Button size="lg" variant="outline" className="border-gray-600 text-gray-900 dark:text-white hover:bg-gray-800 px-8 py-4 text-lg">
                 Try the demo
               </Button>
             </Link>
@@ -79,7 +79,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Why choose NOVBINARY</h2>
-            <p className="text-xl text-gray-300">Trade with confidence on our award-winning platforms</p>
+            <p className="text-xl text-gray-600 dark:text-gray-300">Trade with confidence on our award-winning platforms</p>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -88,7 +88,7 @@ const Index = () => {
                 <BarChart3 className="h-8 w-8 text-red-500" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Advanced charting</h3>
-              <p className="text-gray-400">Comprehensive tools and indicators for technical analysis</p>
+              <p className="text-gray-400 dark:text-gray-500 dark:text-gray-400">Comprehensive tools and indicators for technical analysis</p>
             </div>
             
             <div className="text-center p-6">
@@ -96,7 +96,7 @@ const Index = () => {
                 <Shield className="h-8 w-8 text-red-500" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Regulated & secure</h3>
-              <p className="text-gray-400">Licensed and regulated by top-tier financial authorities</p>
+              <p className="text-gray-400 dark:text-gray-500 dark:text-gray-400">Licensed and regulated by top-tier financial authorities</p>
             </div>
             
             <div className="text-center p-6">
@@ -104,7 +104,7 @@ const Index = () => {
                 <Zap className="h-8 w-8 text-red-500" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Fast execution</h3>
-              <p className="text-gray-400">Lightning-fast trade execution with competitive spreads</p>
+              <p className="text-gray-400 dark:text-gray-500 dark:text-gray-400">Lightning-fast trade execution with competitive spreads</p>
             </div>
             
             <div className="text-center p-6">
@@ -112,7 +112,7 @@ const Index = () => {
                 <Globe className="h-8 w-8 text-red-500" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Global markets</h3>
-              <p className="text-gray-400">Access to forex, stocks, indices, and synthetic markets</p>
+              <p className="text-gray-400 dark:text-gray-500 dark:text-gray-400">Access to forex, stocks, indices, and synthetic markets</p>
             </div>
           </div>
         </div>
@@ -122,7 +122,7 @@ const Index = () => {
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-6">Start trading today</h2>
-          <p className="text-xl text-gray-300 mb-8">
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
             Join millions of traders worldwide. Create your free demo account in minutes.
           </p>
           <Link to="/register">

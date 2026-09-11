@@ -74,12 +74,12 @@ const Register = () => {
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center space-x-2 mb-8">
             <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-xs">NB</span>
+              <span className="text-gray-900 dark:text-white font-bold text-xs">NB</span>
             </div>
-            <span className="text-2xl font-bold text-white">NovBinary</span>
+            <span className="text-2xl font-bold text-gray-900 dark:text-white">NovBinary</span>
           </Link>
-          <h1 className="text-3xl font-bold text-white">Create your account</h1>
-          <p className="mt-2 text-gray-400">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Create your account</h1>
+          <p className="mt-2 text-gray-400 dark:text-gray-500 dark:text-gray-400">
             You'll get both a Demo account (USD 10,000 virtual balance) and a Real account, ready to switch between anytime.
           </p>
           {referralCode && (
@@ -100,23 +100,23 @@ const Register = () => {
             {/* Personal Information */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="firstName" className="text-gray-300">First Name</Label>
+                <Label htmlFor="firstName" className="text-gray-600 dark:text-gray-300">First Name</Label>
                 <Input
                   id="firstName"
                   value={formData.firstName}
                   onChange={(e) => handleInputChange('firstName', e.target.value)}
-                  className="mt-1 bg-gray-700 border-gray-600 text-white"
+                  className="mt-1 bg-gray-700 border-gray-600 text-gray-900 dark:text-white"
                   placeholder="John"
                   required
                 />
               </div>
               <div>
-                <Label htmlFor="lastName" className="text-gray-300">Last Name</Label>
+                <Label htmlFor="lastName" className="text-gray-600 dark:text-gray-300">Last Name</Label>
                 <Input
                   id="lastName"
                   value={formData.lastName}
                   onChange={(e) => handleInputChange('lastName', e.target.value)}
-                  className="mt-1 bg-gray-700 border-gray-600 text-white"
+                  className="mt-1 bg-gray-700 border-gray-600 text-gray-900 dark:text-white"
                   placeholder="Doe"
                   required
                 />
@@ -124,27 +124,27 @@ const Register = () => {
             </div>
 
             <div>
-              <Label htmlFor="email" className="text-gray-300">Email Address</Label>
+              <Label htmlFor="email" className="text-gray-600 dark:text-gray-300">Email Address</Label>
               <Input
                 id="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className="mt-1 bg-gray-700 border-gray-600 text-white"
+                className="mt-1 bg-gray-700 border-gray-600 text-gray-900 dark:text-white"
                 placeholder="john@example.com"
                 required
               />
             </div>
 
             <div>
-              <Label htmlFor="country" className="text-gray-300">Country</Label>
+              <Label htmlFor="country" className="text-gray-600 dark:text-gray-300">Country</Label>
               <Select value={formData.country} onValueChange={(value) => handleInputChange('country', value)}>
-                <SelectTrigger className="mt-1 bg-gray-700 border-gray-600 text-white">
+                <SelectTrigger className="mt-1 bg-gray-700 border-gray-600 text-gray-900 dark:text-white">
                   <SelectValue placeholder="Select your country" />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-700 border-gray-600 max-h-72">
                   {COUNTRIES.map((c) => (
-                    <SelectItem key={c.code} value={c.code} className="text-white hover:bg-gray-600">
+                    <SelectItem key={c.code} value={c.code} className="text-gray-900 dark:text-white hover:bg-gray-600">
                       {c.name}
                     </SelectItem>
                   ))}
@@ -153,37 +153,37 @@ const Register = () => {
             </div>
 
             <div>
-              <Label htmlFor="phone" className="text-gray-300">M-Pesa Phone Number</Label>
+              <Label htmlFor="phone" className="text-gray-600 dark:text-gray-300">M-Pesa Phone Number</Label>
               <Input
                 id="phone"
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
-                className="mt-1 bg-gray-700 border-gray-600 text-white"
+                className="mt-1 bg-gray-700 border-gray-600 text-gray-900 dark:text-white"
                 placeholder="254712345678"
                 required
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                 Format: 254 followed by 9 digits, no + or spaces. Used for M-Pesa deposits.
               </p>
             </div>
 
             <div>
-              <Label htmlFor="password" className="text-gray-300">Password</Label>
+              <Label htmlFor="password" className="text-gray-600 dark:text-gray-300">Password</Label>
               <div className="relative mt-1">
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white pr-10"
+                  className="bg-gray-700 border-gray-600 text-gray-900 dark:text-white pr-10"
                   placeholder="Create a strong password"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-white"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -191,21 +191,21 @@ const Register = () => {
             </div>
 
             <div>
-              <Label htmlFor="confirmPassword" className="text-gray-300">Confirm Password</Label>
+              <Label htmlFor="confirmPassword" className="text-gray-600 dark:text-gray-300">Confirm Password</Label>
               <div className="relative mt-1">
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={formData.confirmPassword}
                   onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white pr-10"
+                  className="bg-gray-700 border-gray-600 text-gray-900 dark:text-white pr-10"
                   placeholder="Confirm your password"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-white"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white"
                 >
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -219,7 +219,7 @@ const Register = () => {
                 onCheckedChange={(checked) => setAgreedToTerms(!!checked)}
                 className="mt-1"
               />
-              <Label htmlFor="terms" className="text-sm text-gray-300 leading-relaxed">
+              <Label htmlFor="terms" className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                 I agree to the{' '}
                 <a href="#" className="text-red-500 hover:text-red-400">Terms of Service</a>{' '}
                 and{' '}
@@ -237,7 +237,7 @@ const Register = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-gray-400">
+            <p className="text-gray-400 dark:text-gray-500 dark:text-gray-400">
               Already have an account?{' '}
               <Link to="/login" className="text-red-500 hover:text-red-400 font-medium">
                 Sign in

@@ -38,7 +38,7 @@ const Positions = () => {
   const trades = tab === 'open' ? openTrades : closedTrades;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0e0e0e] text-white flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0e0e0e] text-gray-900 dark:text-white flex flex-col">
       <DerivHeader onMenuClick={() => setIsSidebarOpen(true)} />
       <div className="flex flex-1 overflow-hidden">
         <DerivSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
@@ -47,7 +47,7 @@ const Positions = () => {
             <button
               onClick={() => setTab('open')}
               className={`px-4 py-3 text-sm font-medium border-b-2 ${
-                tab === 'open' ? 'text-red-500 border-red-500' : 'text-gray-400 border-transparent'
+                tab === 'open' ? 'text-red-500 border-red-500' : 'text-gray-400 dark:text-gray-500 dark:text-gray-400 border-transparent'
               }`}
             >
               Open ({openTrades.length})
@@ -55,7 +55,7 @@ const Positions = () => {
             <button
               onClick={() => setTab('closed')}
               className={`px-4 py-3 text-sm font-medium border-b-2 ${
-                tab === 'closed' ? 'text-red-500 border-red-500' : 'text-gray-400 border-transparent'
+                tab === 'closed' ? 'text-red-500 border-red-500' : 'text-gray-400 dark:text-gray-500 dark:text-gray-400 border-transparent'
               }`}
             >
               Closed ({closedTrades.length})
@@ -64,7 +64,7 @@ const Positions = () => {
 
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {trades.length === 0 && (
-              <div className="text-center text-gray-400 text-sm py-12">No trades yet</div>
+              <div className="text-center text-gray-400 dark:text-gray-500 dark:text-gray-400 text-sm py-12">No trades yet</div>
             )}
             {trades.map((trade) => {
               const direction = trade.direction.charAt(0).toUpperCase() + trade.direction.slice(1);
@@ -79,8 +79,8 @@ const Positions = () => {
                 <div key={trade.id} className="bg-white dark:bg-[#151717] border border-gray-200 dark:border-[#323738] rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <div className="text-white font-medium">{trade.market?.displayName ?? '—'}</div>
-                      <div className="text-gray-400 text-xs">{trade.tradeType.replace('_', '/')} — {direction}</div>
+                      <div className="text-gray-900 dark:text-white font-medium">{trade.market?.displayName ?? '—'}</div>
+                      <div className="text-gray-400 dark:text-gray-500 dark:text-gray-400 text-xs">{trade.tradeType.replace('_', '/')} — {direction}</div>
                     </div>
                     {trade.status === 'open' ? (
                       <span className="text-yellow-400 text-xs">{secondsLeft(trade.settlesAt)}s left</span>
@@ -94,7 +94,7 @@ const Positions = () => {
                       </span>
                     )}
                   </div>
-                  <div className="text-gray-400 text-xs">Stake USD {Number(trade.stake).toFixed(2)}</div>
+                  <div className="text-gray-400 dark:text-gray-500 dark:text-gray-400 text-xs">Stake USD {Number(trade.stake).toFixed(2)}</div>
                 </div>
               );
             })}

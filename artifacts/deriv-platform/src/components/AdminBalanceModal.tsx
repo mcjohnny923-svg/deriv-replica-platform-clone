@@ -59,19 +59,19 @@ const AdminBalanceModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white dark:bg-[#151717] border-gray-200 dark:border-[#323738] text-white sm:max-w-md p-0 overflow-hidden">
+      <DialogContent className="bg-white dark:bg-[#151717] border-gray-200 dark:border-[#323738] text-gray-900 dark:text-white sm:max-w-md p-0 overflow-hidden">
         <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-200 dark:border-[#323738] space-y-1">
-          <DialogTitle className="text-xl font-bold text-white">Adjust Balance</DialogTitle>
-          <DialogDescription className="text-gray-400">{userEmail}</DialogDescription>
+          <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">Adjust Balance</DialogTitle>
+          <DialogDescription className="text-gray-400 dark:text-gray-500 dark:text-gray-400">{userEmail}</DialogDescription>
         </DialogHeader>
 
         <div className="p-6 space-y-4">
           <div className="space-y-2">
-            <label className="text-sm text-gray-400">Account</label>
+            <label className="text-sm text-gray-400 dark:text-gray-500 dark:text-gray-400">Account</label>
             <select
               value={accountId}
               onChange={(e) => setAccountId(Number(e.target.value))}
-              className="w-full bg-gray-50 dark:bg-[#0e0e0e] border border-gray-200 dark:border-[#323738] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-gray-500"
+              className="w-full bg-gray-50 dark:bg-[#0e0e0e] border border-gray-200 dark:border-[#323738] rounded-lg px-4 py-3 text-gray-900 dark:text-white focus:outline-none focus:border-gray-500"
             >
               {accounts.map((a) => (
                 <option key={a.id} value={a.id}>
@@ -82,25 +82,25 @@ const AdminBalanceModal = ({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm text-gray-400">Amount (positive credits, negative debits)</label>
+            <label className="text-sm text-gray-400 dark:text-gray-500 dark:text-gray-400">Amount (positive credits, negative debits)</label>
             <input
               type="number"
               step="0.01"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="e.g. 50 or -20"
-              className="w-full bg-gray-50 dark:bg-[#0e0e0e] border border-gray-200 dark:border-[#323738] rounded-lg px-4 py-3 text-white text-lg focus:outline-none focus:border-gray-500"
+              className="w-full bg-gray-50 dark:bg-[#0e0e0e] border border-gray-200 dark:border-[#323738] rounded-lg px-4 py-3 text-gray-900 dark:text-white text-lg focus:outline-none focus:border-gray-500"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm text-gray-400">Note (optional)</label>
+            <label className="text-sm text-gray-400 dark:text-gray-500 dark:text-gray-400">Note (optional)</label>
             <input
               type="text"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="e.g. Bank transfer top-up"
-              className="w-full bg-gray-50 dark:bg-[#0e0e0e] border border-gray-200 dark:border-[#323738] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-gray-500"
+              className="w-full bg-gray-50 dark:bg-[#0e0e0e] border border-gray-200 dark:border-[#323738] rounded-lg px-4 py-3 text-gray-900 dark:text-white focus:outline-none focus:border-gray-500"
             />
           </div>
 

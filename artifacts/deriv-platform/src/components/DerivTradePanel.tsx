@@ -101,23 +101,23 @@ const DerivTradePanel = ({
     <div className="h-full bg-white dark:bg-[#151717] border-l border-gray-200 dark:border-[#323738]">
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-[#323738]">
-        <h3 className="text-lg font-semibold text-white">Trade</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Trade</h3>
       </div>
 
       <div className="p-4 space-y-4">
         {/* Trade Type + Asset */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
               Trade type
             </label>
             <Select value={tradeType} onValueChange={onTradeTypeChange}>
-              <SelectTrigger className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white">
+              <SelectTrigger className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-900 dark:text-white">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647]">
                 {TRADE_TYPES.map((type) => (
-                  <SelectItem key={type.value} value={type.value} className="text-white hover:bg-gray-200 dark:hover:bg-[#414647]">
+                  <SelectItem key={type.value} value={type.value} className="text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-[#414647]">
                     {type.label}
                   </SelectItem>
                 ))}
@@ -126,11 +126,11 @@ const DerivTradePanel = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
               Asset
             </label>
             <div className="p-3 bg-gray-100 dark:bg-[#323738] rounded border border-gray-300 dark:border-[#414647] h-10 flex items-center">
-              <div className="text-white font-medium text-sm truncate">{selectedAsset}</div>
+              <div className="text-gray-900 dark:text-white font-medium text-sm truncate">{selectedAsset}</div>
             </div>
           </div>
         </div>
@@ -138,7 +138,7 @@ const DerivTradePanel = ({
         {/* Digit selector, only for Matches/Differs and Over/Under */}
         {digitSelector && (
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
               {tradeType === 'matches_differs' ? 'Digit to match' : 'Digit barrier'}
             </label>
             <div className="grid grid-cols-5 gap-2">
@@ -150,7 +150,7 @@ const DerivTradePanel = ({
                   className={`py-2 rounded text-sm font-medium border transition-colors ${
                     selectedDigit === digit
                       ? 'bg-red-600 border-red-500 text-white'
-                      : 'bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-300 hover:bg-gray-200 dark:hover:bg-[#414647]'
+                      : 'bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#414647]'
                   }`}
                 >
                   {digit}
@@ -163,18 +163,18 @@ const DerivTradePanel = ({
         {/* Stake + Duration */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
               Stake
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 dark:text-gray-400 text-sm">
                 USD
               </span>
               <Input
                 type="number"
                 value={stake}
                 onChange={(e) => onStakeChange(e.target.value)}
-                className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white pl-12"
+                className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-900 dark:text-white pl-12"
                 min="1"
                 step="0.01"
               />
@@ -186,7 +186,7 @@ const DerivTradePanel = ({
                   variant="ghost"
                   size="sm"
                   onClick={() => onStakeChange(amount)}
-                  className="text-xs bg-gray-100 dark:bg-[#323738] text-gray-300 hover:text-white hover:bg-gray-200 dark:hover:bg-[#414647] border border-gray-300 dark:border-[#414647] px-2"
+                  className="text-xs bg-gray-100 dark:bg-[#323738] text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-[#414647] border border-gray-300 dark:border-[#414647] px-2"
                 >
                   {amount}
                 </Button>
@@ -195,7 +195,7 @@ const DerivTradePanel = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
               Duration
             </label>
             <div className="flex flex-col gap-2">
@@ -203,17 +203,17 @@ const DerivTradePanel = ({
                 type="number"
                 value={duration}
                 onChange={(e) => onDurationChange(e.target.value)}
-                className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white"
+                className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-900 dark:text-white"
                 min="1"
               />
               <Select value={durationType} onValueChange={onDurationTypeChange}>
-                <SelectTrigger className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white">
+                <SelectTrigger className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-900 dark:text-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647]">
-                  <SelectItem value="t" className="text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Ticks</SelectItem>
-                  <SelectItem value="s" className="text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Seconds</SelectItem>
-                  <SelectItem value="m" className="text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Minutes</SelectItem>
+                  <SelectItem value="t" className="text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Ticks</SelectItem>
+                  <SelectItem value="s" className="text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Seconds</SelectItem>
+                  <SelectItem value="m" className="text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Minutes</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -223,11 +223,11 @@ const DerivTradePanel = ({
         {/* Payout info */}
         <div className="p-3 bg-gray-100 dark:bg-[#323738] rounded border border-gray-300 dark:border-[#414647]">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-gray-300">Payout</span>
-            <span className="text-sm font-medium text-white">USD {payout}</span>
+            <span className="text-sm text-gray-600 dark:text-gray-300">Payout</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-white">USD {payout}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-300">Profit</span>
+            <span className="text-sm text-gray-600 dark:text-gray-300">Profit</span>
             <span className="text-sm font-medium text-green-400">
               USD {(parseFloat(payout) - parseFloat(stake || '0')).toFixed(2)}
             </span>

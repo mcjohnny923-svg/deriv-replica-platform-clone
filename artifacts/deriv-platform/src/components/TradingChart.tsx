@@ -53,9 +53,9 @@ const TradingChart = ({ market }: TradingChartProps) => {
       {/* Chart Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-xl font-semibold text-white">{market}</h3>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{market}</h3>
           <div className="flex items-center space-x-4 mt-2">
-            <span className="text-2xl font-bold text-white">{currentPrice}</span>
+            <span className="text-2xl font-bold text-gray-900 dark:text-white">{currentPrice}</span>
             <span className={`text-sm px-2 py-1 rounded ${
               priceChange >= 0 ? 'text-green-400 bg-green-400/10' : 'text-red-400 bg-red-400/10'
             }`}>
@@ -65,11 +65,11 @@ const TradingChart = ({ market }: TradingChartProps) => {
         </div>
         
         <div className="flex space-x-2">
-          <button className="px-3 py-1 bg-gray-700 text-white rounded text-sm hover:bg-gray-600">1M</button>
-          <button className="px-3 py-1 bg-gray-700 text-white rounded text-sm hover:bg-gray-600">5M</button>
+          <button className="px-3 py-1 bg-gray-700 text-gray-900 dark:text-white rounded text-sm hover:bg-gray-600">1M</button>
+          <button className="px-3 py-1 bg-gray-700 text-gray-900 dark:text-white rounded text-sm hover:bg-gray-600">5M</button>
           <button className="px-3 py-1 bg-red-600 text-white rounded text-sm">15M</button>
-          <button className="px-3 py-1 bg-gray-700 text-white rounded text-sm hover:bg-gray-600">1H</button>
-          <button className="px-3 py-1 bg-gray-700 text-white rounded text-sm hover:bg-gray-600">1D</button>
+          <button className="px-3 py-1 bg-gray-700 text-gray-900 dark:text-white rounded text-sm hover:bg-gray-600">1H</button>
+          <button className="px-3 py-1 bg-gray-700 text-gray-900 dark:text-white rounded text-sm hover:bg-gray-600">1D</button>
         </div>
       </div>
 

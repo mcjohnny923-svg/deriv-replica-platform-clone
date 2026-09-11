@@ -25,18 +25,18 @@ const TradePanel = ({ selectedMarket, tradeType, onTradeTypeChange }: TradePanel
 
   return (
     <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 h-fit">
-      <h3 className="text-lg font-semibold text-white mb-6">Trade</h3>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Trade</h3>
 
       {/* Trade Type Selection */}
       <div className="space-y-4 mb-6">
-        <Label className="text-gray-300">Trade Type</Label>
+        <Label className="text-gray-600 dark:text-gray-300">Trade Type</Label>
         <Select value={tradeType} onValueChange={onTradeTypeChange}>
-          <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+          <SelectTrigger className="bg-gray-700 border-gray-600 text-gray-900 dark:text-white">
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-gray-700 border-gray-600">
             {tradeTypes.map((type) => (
-              <SelectItem key={type} value={type} className="text-white hover:bg-gray-600">
+              <SelectItem key={type} value={type} className="text-gray-900 dark:text-white hover:bg-gray-600">
                 {type}
               </SelectItem>
             ))}
@@ -46,23 +46,23 @@ const TradePanel = ({ selectedMarket, tradeType, onTradeTypeChange }: TradePanel
 
       {/* Market Display */}
       <div className="mb-6">
-        <Label className="text-gray-300">Market</Label>
+        <Label className="text-gray-600 dark:text-gray-300">Market</Label>
         <div className="mt-2 p-3 bg-gray-700 rounded-lg">
-          <div className="text-white font-medium">{selectedMarket}</div>
-          <div className="text-gray-400 text-sm">Current: 1.0850</div>
+          <div className="text-gray-900 dark:text-white font-medium">{selectedMarket}</div>
+          <div className="text-gray-400 dark:text-gray-500 dark:text-gray-400 text-sm">Current: 1.0850</div>
         </div>
       </div>
 
       {/* Stake */}
       <div className="space-y-2 mb-6">
-        <Label className="text-gray-300">Stake</Label>
+        <Label className="text-gray-600 dark:text-gray-300">Stake</Label>
         <div className="relative">
-          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">$</span>
+          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 dark:text-gray-400">$</span>
           <Input
             type="number"
             value={stake}
             onChange={(e) => setStake(e.target.value)}
-            className="bg-gray-700 border-gray-600 text-white pl-8"
+            className="bg-gray-700 border-gray-600 text-gray-900 dark:text-white pl-8"
           />
         </div>
         <div className="flex space-x-2">
@@ -72,7 +72,7 @@ const TradePanel = ({ selectedMarket, tradeType, onTradeTypeChange }: TradePanel
               variant="ghost"
               size="sm"
               onClick={() => setStake(amount)}
-              className="text-gray-400 hover:text-white bg-gray-700 hover:bg-gray-600"
+              className="text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white bg-gray-700 hover:bg-gray-600"
             >
               ${amount}
             </Button>
@@ -82,17 +82,17 @@ const TradePanel = ({ selectedMarket, tradeType, onTradeTypeChange }: TradePanel
 
       {/* Duration */}
       <div className="space-y-2 mb-6">
-        <Label className="text-gray-300">Duration</Label>
+        <Label className="text-gray-600 dark:text-gray-300">Duration</Label>
         <Select value={duration} onValueChange={setDuration}>
-          <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+          <SelectTrigger className="bg-gray-700 border-gray-600 text-gray-900 dark:text-white">
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-gray-700 border-gray-600">
-            <SelectItem value="1" className="text-white hover:bg-gray-600">1 minute</SelectItem>
-            <SelectItem value="5" className="text-white hover:bg-gray-600">5 minutes</SelectItem>
-            <SelectItem value="15" className="text-white hover:bg-gray-600">15 minutes</SelectItem>
-            <SelectItem value="30" className="text-white hover:bg-gray-600">30 minutes</SelectItem>
-            <SelectItem value="60" className="text-white hover:bg-gray-600">1 hour</SelectItem>
+            <SelectItem value="1" className="text-gray-900 dark:text-white hover:bg-gray-600">1 minute</SelectItem>
+            <SelectItem value="5" className="text-gray-900 dark:text-white hover:bg-gray-600">5 minutes</SelectItem>
+            <SelectItem value="15" className="text-gray-900 dark:text-white hover:bg-gray-600">15 minutes</SelectItem>
+            <SelectItem value="30" className="text-gray-900 dark:text-white hover:bg-gray-600">30 minutes</SelectItem>
+            <SelectItem value="60" className="text-gray-900 dark:text-white hover:bg-gray-600">1 hour</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -100,10 +100,10 @@ const TradePanel = ({ selectedMarket, tradeType, onTradeTypeChange }: TradePanel
       {/* Payout */}
       <div className="space-y-2 mb-6">
         <div className="flex justify-between">
-          <Label className="text-gray-300">Potential Payout</Label>
+          <Label className="text-gray-600 dark:text-gray-300">Potential Payout</Label>
           <span className="text-green-400 font-medium">${payout}</span>
         </div>
-        <div className="text-xs text-gray-400">
+        <div className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400">
           Potential Profit: ${(parseFloat(payout) - parseFloat(stake)).toFixed(2)}
         </div>
       </div>

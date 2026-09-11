@@ -54,7 +54,7 @@ const DerivBottomPanel = ({ refreshKey }: DerivBottomPanelProps) => {
                   <div className={`font-bold text-sm ${won ? 'text-green-600' : 'text-red-600'}`}>
                     {won ? 'Profit' : 'Loss'}: {sign}{Math.abs(amount).toFixed(2)} USD
                   </div>
-                  <div className="text-gray-500 text-xs">{formatContractLabel(settled)}</div>
+                  <div className="text-gray-400 dark:text-gray-500 text-xs">{formatContractLabel(settled)}</div>
                 </div>
               </div>
             ), { duration: 4000 });
@@ -125,7 +125,7 @@ const DerivBottomPanel = ({ refreshKey }: DerivBottomPanelProps) => {
             className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === tab.id
                 ? 'text-red-500 border-red-500'
-                : 'text-gray-400 border-transparent hover:text-white'
+                : 'text-gray-400 dark:text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-900 dark:text-white'
             }`}
           >
             {tab.label}
@@ -142,11 +142,11 @@ const DerivBottomPanel = ({ refreshKey }: DerivBottomPanelProps) => {
         {activeTab === 'open_positions' && (
           openTrades.length === 0 ? (
             <div className="text-center py-8">
-              <div className="text-gray-400 text-sm">No open positions</div>
+              <div className="text-gray-400 dark:text-gray-500 dark:text-gray-400 text-sm">No open positions</div>
             </div>
           ) : (
             <div className="space-y-2">
-              <div className="grid grid-cols-5 gap-4 text-xs text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-[#323738] pb-2">
+              <div className="grid grid-cols-5 gap-4 text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-[#323738] pb-2">
                 <div>Asset</div>
                 <div>Type</div>
                 <div>Direction</div>
@@ -155,10 +155,10 @@ const DerivBottomPanel = ({ refreshKey }: DerivBottomPanelProps) => {
               </div>
               {openTrades.map((trade) => (
                 <div key={trade.id} className="grid grid-cols-5 gap-4 text-sm py-2 border-b border-gray-200 dark:border-[#323738]/50">
-                  <div className="text-white">{trade.market?.displayName ?? '—'}</div>
-                  <div className="text-gray-300">{trade.tradeType.replace('_', '/')}</div>
-                  <div className="text-white">{formatDirection(trade)}</div>
-                  <div className="text-white">USD {Number(trade.stake).toFixed(2)}</div>
+                  <div className="text-gray-900 dark:text-white">{trade.market?.displayName ?? '—'}</div>
+                  <div className="text-gray-600 dark:text-gray-300">{trade.tradeType.replace('_', '/')}</div>
+                  <div className="text-gray-900 dark:text-white">{formatDirection(trade)}</div>
+                  <div className="text-gray-900 dark:text-white">USD {Number(trade.stake).toFixed(2)}</div>
                   <div className="text-yellow-400">{secondsLeft(trade.settlesAt)}s</div>
                 </div>
               ))}
@@ -167,17 +167,17 @@ const DerivBottomPanel = ({ refreshKey }: DerivBottomPanelProps) => {
         )}
         {activeTab === 'portfolio' && (
           <div className="text-center py-8">
-            <div className="text-gray-400 text-sm">Portfolio summary coming soon</div>
+            <div className="text-gray-400 dark:text-gray-500 dark:text-gray-400 text-sm">Portfolio summary coming soon</div>
           </div>
         )}
         {activeTab === 'statement' && (
           closedTrades.length === 0 ? (
             <div className="text-center py-8">
-              <div className="text-gray-400 text-sm">No transactions</div>
+              <div className="text-gray-400 dark:text-gray-500 dark:text-gray-400 text-sm">No transactions</div>
             </div>
           ) : (
             <div className="space-y-2">
-              <div className="grid grid-cols-6 gap-4 text-xs text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-[#323738] pb-2">
+              <div className="grid grid-cols-6 gap-4 text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-[#323738] pb-2">
                 <div>Asset</div>
                 <div>Type</div>
                 <div>Direction</div>
@@ -187,11 +187,11 @@ const DerivBottomPanel = ({ refreshKey }: DerivBottomPanelProps) => {
               </div>
               {closedTrades.map((trade) => (
                 <div key={trade.id} className="grid grid-cols-6 gap-4 text-sm py-2 border-b border-gray-200 dark:border-[#323738]/50">
-                  <div className="text-white">{trade.market?.displayName ?? '—'}</div>
-                  <div className="text-gray-300">{trade.tradeType.replace('_', '/')}</div>
-                  <div className="text-white">{formatDirection(trade)}</div>
-                  <div className="text-white">USD {Number(trade.stake).toFixed(2)}</div>
-                  <div className="text-white">USD {Number(trade.payout ?? 0).toFixed(2)}</div>
+                  <div className="text-gray-900 dark:text-white">{trade.market?.displayName ?? '—'}</div>
+                  <div className="text-gray-600 dark:text-gray-300">{trade.tradeType.replace('_', '/')}</div>
+                  <div className="text-gray-900 dark:text-white">{formatDirection(trade)}</div>
+                  <div className="text-gray-900 dark:text-white">USD {Number(trade.stake).toFixed(2)}</div>
+                  <div className="text-gray-900 dark:text-white">USD {Number(trade.payout ?? 0).toFixed(2)}</div>
                   <div className={trade.status === 'won' ? 'text-green-400' : 'text-red-400'}>
                     {trade.status === 'won' ? 'Won' : 'Lost'}
                   </div>

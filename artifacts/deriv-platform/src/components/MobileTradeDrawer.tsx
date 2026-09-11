@@ -110,7 +110,7 @@ const MobileTradeDrawer = ({
         className="w-full flex justify-center py-2"
       >
         <ChevronDown
-          className={`h-5 w-5 text-gray-400 transition-transform ${expanded ? '' : 'rotate-180'}`}
+          className={`h-5 w-5 text-gray-400 dark:text-gray-500 dark:text-gray-400 transition-transform ${expanded ? '' : 'rotate-180'}`}
         />
       </button>
 
@@ -118,7 +118,7 @@ const MobileTradeDrawer = ({
         <div className="pb-4">
           <div className="px-4 py-3 border-t border-gray-200 dark:border-[#323738] flex items-center justify-center gap-2">
             <TrendingUp className="h-4 w-4 text-red-500" />
-            <span className="text-white text-base font-semibold">{currentLabel}</span>
+            <span className="text-gray-900 dark:text-white text-base font-semibold">{currentLabel}</span>
           </div>
 
           {digitSelector && (
@@ -130,8 +130,8 @@ const MobileTradeDrawer = ({
                   onClick={() => onDigitChange(digit)}
                   className={`py-2 rounded text-sm font-medium border transition-colors ${
                     selectedDigit === digit
-                      ? 'bg-gray-100 dark:bg-[#323738] border-white text-white'
-                      : 'bg-gray-50 dark:bg-[#0e0e0e] border-gray-200 dark:border-[#323738] text-gray-300'
+                      ? 'bg-gray-100 dark:bg-[#323738] border-white text-gray-900 dark:text-white'
+                      : 'bg-gray-50 dark:bg-[#0e0e0e] border-gray-200 dark:border-[#323738] text-gray-600 dark:text-gray-300'
                   }`}
                 >
                   {digit}
@@ -142,31 +142,31 @@ const MobileTradeDrawer = ({
 
           <div className="flex items-center gap-3 px-4 py-3 border-t border-gray-200 dark:border-[#323738]">
             <div className="flex-1">
-              <label className="block text-[11px] text-gray-400 mb-1">Duration</label>
+              <label className="block text-[11px] text-gray-400 dark:text-gray-500 dark:text-gray-400 mb-1">Duration</label>
               <div className="flex gap-1">
                 <Input
                   type="number"
                   value={duration}
                   onChange={(e) => onDurationChange(e.target.value)}
                   min="1"
-                  className="bg-gray-50 dark:bg-[#0e0e0e] border-gray-200 dark:border-[#323738] text-white h-9 text-sm"
+                  className="bg-gray-50 dark:bg-[#0e0e0e] border-gray-200 dark:border-[#323738] text-gray-900 dark:text-white h-9 text-sm"
                 />
                 <Select value={durationType} onValueChange={onDurationTypeChange}>
-                  <SelectTrigger className="w-24 bg-gray-50 dark:bg-[#0e0e0e] border-gray-200 dark:border-[#323738] text-white h-9 text-sm">
+                  <SelectTrigger className="w-24 bg-gray-50 dark:bg-[#0e0e0e] border-gray-200 dark:border-[#323738] text-gray-900 dark:text-white h-9 text-sm">
                     <SelectValue>{durationUnitLabel}</SelectValue>
                   </SelectTrigger>
                   <SelectContent className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647]">
-                    <SelectItem value="t" className="text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Ticks</SelectItem>
-                    <SelectItem value="s" className="text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Seconds</SelectItem>
-                    <SelectItem value="m" className="text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Minutes</SelectItem>
+                    <SelectItem value="t" className="text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Ticks</SelectItem>
+                    <SelectItem value="s" className="text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Seconds</SelectItem>
+                    <SelectItem value="m" className="text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Minutes</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <div className="flex-1">
-              <label className="block text-[11px] text-gray-400 mb-1 text-right">Stake</label>
+              <label className="block text-[11px] text-gray-400 dark:text-gray-500 dark:text-gray-400 mb-1 text-right">Stake</label>
               <div className="relative">
-                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 dark:text-gray-400 text-xs">
                   USD
                 </span>
                 <Input
@@ -175,7 +175,7 @@ const MobileTradeDrawer = ({
                   onChange={(e) => onStakeChange(e.target.value)}
                   min="1"
                   step="0.01"
-                  className="bg-gray-50 dark:bg-[#0e0e0e] border-gray-200 dark:border-[#323738] text-white h-9 text-sm pl-10"
+                  className="bg-gray-50 dark:bg-[#0e0e0e] border-gray-200 dark:border-[#323738] text-gray-900 dark:text-white h-9 text-sm pl-10"
                 />
               </div>
             </div>
@@ -189,10 +189,10 @@ const MobileTradeDrawer = ({
                 onCheckedChange={(checked) => setEqualsChecked(!!checked)}
                 className="border-red-500 data-[state=checked]:bg-red-500"
               />
-              <label htmlFor="equals-mobile" className="text-white text-sm font-medium">
+              <label htmlFor="equals-mobile" className="text-gray-900 dark:text-white text-sm font-medium">
                 Equals
               </label>
-              <span className="text-gray-400 text-xs">
+              <span className="text-gray-400 dark:text-gray-500 dark:text-gray-400 text-xs">
                 Win payout if exit spot is also equal to entry spot.
               </span>
             </div>

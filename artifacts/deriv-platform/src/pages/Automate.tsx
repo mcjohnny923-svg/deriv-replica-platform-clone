@@ -294,7 +294,7 @@ const Automate = () => {
   };
 
   return (
-    <div className="h-[100dvh] bg-gray-50 dark:bg-[#0e0e0e] text-white flex flex-col overflow-hidden">
+    <div className="h-[100dvh] bg-gray-50 dark:bg-[#0e0e0e] text-gray-900 dark:text-white flex flex-col overflow-hidden">
       <DerivHeader onMenuClick={() => setIsSidebarOpen(true)} balanceRefreshKey={balanceRefreshKey} />
       <div className="flex flex-1 min-h-0 overflow-hidden">
         <DerivSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
@@ -306,14 +306,14 @@ const Automate = () => {
               {isRunning && (
                 <div className="md:col-span-3 bg-white dark:bg-[#151717] border border-gray-200 dark:border-[#323738] rounded-lg p-3 flex justify-between items-center">
                   <div>
-                    <div className="text-xs text-gray-400">Running P/L ({tradesRun} trades)</div>
+                    <div className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400">Running P/L ({tradesRun} trades)</div>
                     <div className={`text-lg font-bold ${runningPL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                       {runningPL >= 0 ? '+' : ''}{runningPL.toFixed(2)} USD
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs text-gray-400">Current stake</div>
-                    <div className="text-white font-medium">USD {currentStake}</div>
+                    <div className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400">Current stake</div>
+                    <div className="text-gray-900 dark:text-white font-medium">USD {currentStake}</div>
                   </div>
                 </div>
               )}
@@ -329,18 +329,18 @@ const Automate = () => {
               </div>
 
               <div className="order-3 md:order-none md:col-start-2 md:row-start-1">
-                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1.5">Strategy parameters</div>
+                <div className="text-xs font-semibold text-gray-400 dark:text-gray-500 dark:text-gray-400 uppercase tracking-wide px-1 mb-1.5">Strategy parameters</div>
                 <div className="bg-white dark:bg-[#151717] border border-gray-200 dark:border-[#323738] rounded-lg divide-y divide-[#323738]">
                   <div className="p-3">
-                    <label className="block text-xs text-gray-300 mb-1.5">Strategy</label>
+                    <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1.5">Strategy</label>
                     <Select value={strategy} onValueChange={(v) => setStrategy(v as Strategy)} disabled={isRunning}>
-                      <SelectTrigger className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white h-9">
+                      <SelectTrigger className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-900 dark:text-white h-9">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647]">
-                        <SelectItem value="martingale" className="text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Martingale</SelectItem>
-                        <SelectItem value="dalembert" className="text-white hover:bg-gray-200 dark:hover:bg-[#414647]">D'Alembert</SelectItem>
-                        <SelectItem value="oscars_grind" className="text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Oscar's Grind</SelectItem>
+                        <SelectItem value="martingale" className="text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Martingale</SelectItem>
+                        <SelectItem value="dalembert" className="text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-[#414647]">D'Alembert</SelectItem>
+                        <SelectItem value="oscars_grind" className="text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-[#414647]">Oscar's Grind</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -348,43 +348,43 @@ const Automate = () => {
                   {strategy === 'martingale' ? (
                     <div className="p-3 grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs text-gray-300 mb-1.5">Stake ×multiplier</label>
+                        <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1.5">Stake ×multiplier</label>
                         <Input
                           type="number"
                           value={stakeMultiplier}
                           onChange={(e) => setStakeMultiplier(e.target.value)}
                           disabled={isRunning}
-                          className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white h-9"
+                          className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-900 dark:text-white h-9"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-gray-300 mb-1.5">Max stake (USD)</label>
+                        <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1.5">Max stake (USD)</label>
                         <Input
                           type="number"
                           value={maxStake}
                           onChange={(e) => setMaxStake(e.target.value)}
                           disabled={isRunning}
                           placeholder="No limit"
-                          className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white h-9"
+                          className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-900 dark:text-white h-9"
                         />
                       </div>
                     </div>
                   ) : (
                     <>
-                      <div className="p-3 text-xs text-gray-400">
+                      <div className="p-3 text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400">
                         {strategy === 'dalembert'
                           ? 'Increases stake by the base stake amount after a loss, decreases by the same amount after a win (never below base stake).'
                           : "Keeps stake flat after a loss, increases by the base stake amount after a win."}
                       </div>
                       <div className="p-3">
-                        <label className="block text-xs text-gray-300 mb-1.5">Max stake (USD)</label>
+                        <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1.5">Max stake (USD)</label>
                         <Input
                           type="number"
                           value={maxStake}
                           onChange={(e) => setMaxStake(e.target.value)}
                           disabled={isRunning}
                           placeholder="No limit"
-                          className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white h-9"
+                          className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-900 dark:text-white h-9"
                         />
                       </div>
                     </>
@@ -393,31 +393,31 @@ const Automate = () => {
               </div>
 
               <div className="order-4 md:order-none md:col-start-3 md:row-start-1">
-                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1.5">Risk management</div>
+                <div className="text-xs font-semibold text-gray-400 dark:text-gray-500 dark:text-gray-400 uppercase tracking-wide px-1 mb-1.5">Risk management</div>
                 <div className="bg-white dark:bg-[#151717] border border-gray-200 dark:border-[#323738] rounded-lg p-3">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs text-gray-300 mb-1.5">Profit target (USD)</label>
+                      <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1.5">Profit target (USD)</label>
                       <Input
                         type="number"
                         value={profitThreshold}
                         onChange={(e) => setProfitThreshold(e.target.value)}
                         disabled={isRunning}
-                        className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white h-9"
+                        className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-900 dark:text-white h-9"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-300 mb-1.5">Loss limit (USD)</label>
+                      <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1.5">Loss limit (USD)</label>
                       <Input
                         type="number"
                         value={lossThreshold}
                         onChange={(e) => setLossThreshold(e.target.value)}
                         disabled={isRunning}
-                        className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white h-9"
+                        className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-900 dark:text-white h-9"
                       />
                     </div>
                   </div>
-                  <div className="text-xs text-gray-500 mt-2">Stops automatically when cumulative profit/loss reaches either value.</div>
+                  <div className="text-xs text-gray-400 dark:text-gray-500 mt-2">Stops automatically when cumulative profit/loss reaches either value.</div>
                 </div>
               </div>
 
@@ -425,14 +425,14 @@ const Automate = () => {
                 <div className="bg-white dark:bg-[#151717] border border-gray-200 dark:border-[#323738] rounded-lg divide-y divide-[#323738]">
                   <div className="p-3 grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs text-gray-300 mb-1.5">Volatility</label>
+                      <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1.5">Volatility</label>
                       <Select value={selectedAsset} onValueChange={setSelectedAsset} disabled={isRunning}>
-                        <SelectTrigger className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white h-9">
+                        <SelectTrigger className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-900 dark:text-white h-9">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] max-h-72">
                           {VOLATILITY_ASSETS.map((asset) => (
-                            <SelectItem key={asset} value={asset} className="text-white hover:bg-gray-200 dark:hover:bg-[#414647]">
+                            <SelectItem key={asset} value={asset} className="text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-[#414647]">
                               {asset}
                             </SelectItem>
                           ))}
@@ -440,14 +440,14 @@ const Automate = () => {
                       </Select>
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-300 mb-1.5">Trade type</label>
+                      <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1.5">Trade type</label>
                       <Select value={tradeType} onValueChange={setTradeType} disabled={isRunning}>
-                        <SelectTrigger className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white h-9">
+                        <SelectTrigger className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-900 dark:text-white h-9">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647]">
                           {TRADE_TYPES.map((t) => (
-                            <SelectItem key={t.value} value={t.value} className="text-white hover:bg-gray-200 dark:hover:bg-[#414647]">
+                            <SelectItem key={t.value} value={t.value} className="text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-[#414647]">
                               {t.label}
                             </SelectItem>
                           ))}
@@ -457,7 +457,7 @@ const Automate = () => {
                   </div>
 
                   <div className="p-3">
-                    <label className="block text-xs text-gray-300 mb-1.5">Direction</label>
+                    <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1.5">Direction</label>
                     <div className="grid grid-cols-2 gap-2">
                       {choices.map((choice, idx) => (
                         <button
@@ -467,7 +467,7 @@ const Automate = () => {
                           className={`py-1.5 rounded border text-sm font-medium capitalize disabled:opacity-50 ${
                             choiceIndex === idx
                               ? 'bg-red-600 border-red-500 text-white'
-                              : 'bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-300'
+                              : 'bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-600 dark:text-gray-300'
                           }`}
                         >
                           {choice}
@@ -478,7 +478,7 @@ const Automate = () => {
 
                   {digitSelector && (
                     <div className="p-3">
-                      <label className="block text-xs text-gray-300 mb-1.5">Digit</label>
+                      <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1.5">Digit</label>
                       <div className="grid grid-cols-5 gap-1.5">
                         {DIGITS.map((d) => (
                           <button
@@ -488,7 +488,7 @@ const Automate = () => {
                             className={`py-1.5 rounded border text-sm font-medium disabled:opacity-50 ${
                               selectedDigit === d
                                 ? 'bg-red-600 border-red-500 text-white'
-                                : 'bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-300'
+                                : 'bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-600 dark:text-gray-300'
                             }`}
                           >
                             {d}
@@ -500,60 +500,60 @@ const Automate = () => {
 
                   <div className="p-3 grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs text-gray-300 mb-1.5">Duration (ticks)</label>
+                      <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1.5">Duration (ticks)</label>
                       <Input
                         type="number"
                         value={durationValue}
                         onChange={(e) => setDurationValue(e.target.value)}
                         disabled={isRunning}
-                        className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white h-9"
+                        className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-900 dark:text-white h-9"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-300 mb-1.5">Base stake (USD)</label>
+                      <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1.5">Base stake (USD)</label>
                       <Input
                         type="number"
                         value={baseStake}
                         onChange={(e) => setBaseStake(e.target.value)}
                         disabled={isRunning}
-                        className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white h-9"
+                        className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-900 dark:text-white h-9"
                       />
                     </div>
                   </div>
 
                   <div className="p-3 flex items-center justify-between">
-                    <span className="text-sm text-gray-300">Allow equals</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">Allow equals</span>
                     <Switch checked={allowEquals} onCheckedChange={setAllowEquals} disabled={isRunning} />
                   </div>
                 </div>
               </div>
 
               <div className="order-5 md:order-none md:col-start-2 md:col-span-2 md:row-start-2">
-                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-1.5">Bot statistics</div>
+                <div className="text-xs font-semibold text-gray-400 dark:text-gray-500 dark:text-gray-400 uppercase tracking-wide px-1 mb-1.5">Bot statistics</div>
                 <div className="bg-white dark:bg-[#151717] border border-gray-200 dark:border-[#323738] rounded-lg p-3 space-y-3">
                   <div className="grid grid-cols-3 gap-3 text-center">
                     <div>
-                      <div className="text-[11px] text-gray-400">Total stake</div>
-                      <div className="text-sm font-semibold text-white">{totalStake.toFixed(2)} USD</div>
+                      <div className="text-[11px] text-gray-400 dark:text-gray-500 dark:text-gray-400">Total stake</div>
+                      <div className="text-sm font-semibold text-gray-900 dark:text-white">{totalStake.toFixed(2)} USD</div>
                     </div>
                     <div>
-                      <div className="text-[11px] text-gray-400">Total payout</div>
-                      <div className="text-sm font-semibold text-white">{totalPayout.toFixed(2)} USD</div>
+                      <div className="text-[11px] text-gray-400 dark:text-gray-500 dark:text-gray-400">Total payout</div>
+                      <div className="text-sm font-semibold text-gray-900 dark:text-white">{totalPayout.toFixed(2)} USD</div>
                     </div>
                     <div>
-                      <div className="text-[11px] text-gray-400">No. of runs</div>
-                      <div className="text-sm font-semibold text-white">{tradesRun}</div>
+                      <div className="text-[11px] text-gray-400 dark:text-gray-500 dark:text-gray-400">No. of runs</div>
+                      <div className="text-sm font-semibold text-gray-900 dark:text-white">{tradesRun}</div>
                     </div>
                     <div>
-                      <div className="text-[11px] text-gray-400">Contracts lost</div>
+                      <div className="text-[11px] text-gray-400 dark:text-gray-500 dark:text-gray-400">Contracts lost</div>
                       <div className="text-sm font-semibold text-red-400">{contractsLost}</div>
                     </div>
                     <div>
-                      <div className="text-[11px] text-gray-400">Contracts won</div>
+                      <div className="text-[11px] text-gray-400 dark:text-gray-500 dark:text-gray-400">Contracts won</div>
                       <div className="text-sm font-semibold text-green-400">{contractsWon}</div>
                     </div>
                     <div>
-                      <div className="text-[11px] text-gray-400">Total profit/loss</div>
+                      <div className="text-[11px] text-gray-400 dark:text-gray-500 dark:text-gray-400">Total profit/loss</div>
                       <div className={`text-sm font-semibold ${runningPL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                         {runningPL >= 0 ? '+' : ''}{runningPL.toFixed(2)} USD
                       </div>
@@ -562,7 +562,7 @@ const Automate = () => {
                   <button
                     type="button"
                     onClick={handleResetStats}
-                    className="w-full py-2 rounded-lg border border-gray-300 dark:border-[#414647] text-sm font-medium text-gray-300 hover:bg-gray-100 dark:hover:bg-[#232728] transition-colors"
+                    className="w-full py-2 rounded-lg border border-gray-300 dark:border-[#414647] text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#232728] transition-colors"
                   >
                     Reset
                   </button>

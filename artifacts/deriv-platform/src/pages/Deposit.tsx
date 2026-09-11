@@ -221,7 +221,7 @@ const Deposit = () => {
   const showForm = (isCard || storedPhone) && flowState === 'form';
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0e0e0e] text-white flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0e0e0e] text-gray-900 dark:text-white flex flex-col">
       <DerivHeader onMenuClick={() => setIsSidebarOpen(true)} balanceRefreshKey={balanceRefreshKey} />
       <div className="flex flex-1 overflow-hidden">
         <DerivSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
@@ -231,18 +231,18 @@ const Deposit = () => {
             <h1 className="text-2xl font-bold">Deposit Funds</h1>
 
             <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
-              <div className="text-xs text-gray-400">Current balance</div>
-              <div className="text-lg font-bold text-white">{balance}</div>
-              <div className="text-xs text-gray-400 capitalize mt-0.5">{account?.type ?? '—'} account</div>
+              <div className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400">Current balance</div>
+              <div className="text-lg font-bold text-gray-900 dark:text-white">{balance}</div>
+              <div className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400 capitalize mt-0.5">{account?.type ?? '—'} account</div>
             </div>
 
             {showPhoneGate && (
               <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
-                <h2 className="text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                <h2 className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-3 flex items-center">
                   <Smartphone className="h-4 w-4 mr-2" />
                   Link your M-Pesa number
                 </h2>
-                <p className="text-xs text-gray-500 mb-3">
+                <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">
                   This is set once and used for all future deposits — no need to type it every time.
                 </p>
                 <Input
@@ -250,7 +250,7 @@ const Deposit = () => {
                   value={phoneInput}
                   onChange={(e) => setPhoneInput(e.target.value)}
                   placeholder="2547XXXXXXXX"
-                  className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white mb-3"
+                  className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-900 dark:text-white mb-3"
                 />
                 <Button
                   onClick={handleSavePhone}
@@ -264,22 +264,22 @@ const Deposit = () => {
 
             {showForm && (
               <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
-                <h2 className="text-sm font-semibold text-gray-300 mb-4 flex items-center">
+                <h2 className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-4 flex items-center">
                   <Smartphone className="h-4 w-4 mr-2" />
                   {PROVIDER_LABELS[provider]}
                   {!isCard && storedPhone ? ` — ${maskPhone(storedPhone)}` : ''}
                 </h2>
 
                 <div className="mb-6">
-                  <Label className="text-gray-300 mb-2 block text-xs">Amount (USD)</Label>
+                  <Label className="text-gray-600 dark:text-gray-300 mb-2 block text-xs">Amount (USD)</Label>
                   <Input
                     type="number"
                     value={amountUsd}
                     onChange={(e) => setAmountUsd(e.target.value)}
-                    className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white text-lg"
+                    className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-900 dark:text-white text-lg"
                     placeholder="10"
                   />
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                     = {kesDisplay} KES will be charged (rate: {KES_PER_USD} KES/USD)
                   </div>
                   <div className="grid grid-cols-4 gap-2 mt-3">
@@ -288,7 +288,7 @@ const Deposit = () => {
                         key={preset}
                         variant="ghost"
                         onClick={() => setAmountUsd(preset)}
-                        className="bg-gray-100 dark:bg-[#323738] hover:bg-gray-200 dark:hover:bg-[#414647] text-gray-300 text-sm"
+                        className="bg-gray-100 dark:bg-[#323738] hover:bg-gray-200 dark:hover:bg-[#414647] text-gray-600 dark:text-gray-300 text-sm"
                       >
                         ${preset}
                       </Button>
@@ -307,7 +307,7 @@ const Deposit = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/deposit', { state: null, replace: true })}
-                  className="w-full text-center text-xs text-gray-500 hover:text-gray-300 mt-3"
+                  className="w-full text-center text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-300 mt-3"
                 >
                   Change payment method
                 </button>
@@ -317,23 +317,23 @@ const Deposit = () => {
             {flowState === 'waiting' && (
               <div className="bg-white dark:bg-[#151717] rounded-lg p-8 border border-gray-200 dark:border-[#323738] text-center">
                 <Loader2 className="h-10 w-10 text-red-500 animate-spin mx-auto mb-4" />
-                <h3 className="text-white font-semibold mb-2">
+                <h3 className="text-gray-900 dark:text-white font-semibold mb-2">
                   {isCard ? 'Confirming your payment' : 'Check your phone'}
                 </h3>
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-400 dark:text-gray-500 dark:text-gray-400 text-sm">
                   {isCard
                     ? `We're confirming your card payment of KES ${kesDisplay} — this usually takes a few seconds.`
                     : `Enter your M-Pesa PIN on the prompt sent to ${storedPhone ? maskPhone(storedPhone) : 'your phone'} to approve the payment of KES ${kesDisplay}.`}
                 </p>
-                <p className="text-gray-500 text-xs mt-4">This page updates automatically once confirmed.</p>
+                <p className="text-gray-400 dark:text-gray-500 text-xs mt-4">This page updates automatically once confirmed.</p>
               </div>
             )}
 
             {flowState === 'success' && (
               <div className="bg-white dark:bg-[#151717] rounded-lg p-8 border border-gray-200 dark:border-[#323738] text-center">
                 <CheckCircle2 className="h-10 w-10 text-green-500 mx-auto mb-4" />
-                <h3 className="text-white font-semibold mb-2">Deposit successful</h3>
-                <p className="text-gray-400 text-sm mb-4">{resultMessage}</p>
+                <h3 className="text-gray-900 dark:text-white font-semibold mb-2">Deposit successful</h3>
+                <p className="text-gray-400 dark:text-gray-500 dark:text-gray-400 text-sm mb-4">{resultMessage}</p>
                 <Button onClick={resetFlow} className="bg-red-600 hover:bg-red-700 text-white">
                   Make another deposit
                 </Button>
@@ -343,8 +343,8 @@ const Deposit = () => {
             {flowState === 'failed' && (
               <div className="bg-white dark:bg-[#151717] rounded-lg p-8 border border-gray-200 dark:border-[#323738] text-center">
                 <XCircle className="h-10 w-10 text-red-500 mx-auto mb-4" />
-                <h3 className="text-white font-semibold mb-2">Deposit not completed</h3>
-                <p className="text-gray-400 text-sm mb-4">{resultMessage}</p>
+                <h3 className="text-gray-900 dark:text-white font-semibold mb-2">Deposit not completed</h3>
+                <p className="text-gray-400 dark:text-gray-500 dark:text-gray-400 text-sm mb-4">{resultMessage}</p>
                 <Button onClick={resetFlow} className="bg-red-600 hover:bg-red-700 text-white">
                   Try again
                 </Button>
@@ -352,11 +352,11 @@ const Deposit = () => {
             )}
 
             <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
-              <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center">
+              <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-3 flex items-center">
                 <Shield className="h-4 w-4 mr-2" />
                 Security & Safety
               </h3>
-              <ul className="space-y-1.5 text-xs text-gray-400">
+              <ul className="space-y-1.5 text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400">
                 <li>• Payments processed via M-Pesa STK push or Payment agent card checkout</li>
                 <li>• Card details are entered directly on Payment agent's secure popup — we never see them</li>
                 <li>• Your M-Pesa number is linked once, only to your account</li>

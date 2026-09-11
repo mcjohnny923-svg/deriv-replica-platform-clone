@@ -14,23 +14,23 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-[10px]">NB</span>
+              <span className="text-gray-900 dark:text-white font-bold text-[10px]">NB</span>
             </div>
-            <span className="text-xl font-bold text-white">NovBinary</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">NovBinary</span>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-300 hover:text-white transition-colors">
+            <Link to="/" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white transition-colors">
               Home
             </Link>
-            <Link to="/dashboard" className="text-gray-300 hover:text-white transition-colors">
+            <Link to="/dashboard" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white transition-colors">
               Trade
             </Link>
-            <Link to="/markets" className="text-gray-300 hover:text-white transition-colors">
+            <Link to="/markets" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white transition-colors">
               Markets
             </Link>
-            <Link to="/about" className="text-gray-300 hover:text-white transition-colors">
+            <Link to="/about" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white transition-colors">
               About
             </Link>
           </nav>
@@ -38,7 +38,7 @@ const Header = () => {
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <Link to="/login">
-              <Button variant="ghost" className="text-gray-300 hover:text-white">
+              <Button variant="ghost" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white">
                 Login
               </Button>
             </Link>
@@ -51,7 +51,7 @@ const Header = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-gray-300 hover:text-white"
+            className="md:hidden text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -64,35 +64,35 @@ const Header = () => {
             <nav className="flex flex-col space-y-4">
               <Link 
                 to="/" 
-                className="text-gray-300 hover:text-white transition-colors"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Home
               </Link>
               <Link 
                 to="/dashboard" 
-                className="text-gray-300 hover:text-white transition-colors"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Trade
               </Link>
               <Link 
                 to="/markets" 
-                className="text-gray-300 hover:text-white transition-colors"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Markets
               </Link>
               <Link 
                 to="/about" 
-                className="text-gray-300 hover:text-white transition-colors"
+                className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 About
               </Link>
               <div className="flex flex-col space-y-2 pt-4 border-t border-gray-800">
                 <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="ghost" className="w-full text-gray-300 hover:text-white">
+                  <Button variant="ghost" className="w-full text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white">
                     Login
                   </Button>
                 </Link>

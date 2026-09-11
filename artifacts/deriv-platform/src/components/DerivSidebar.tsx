@@ -75,7 +75,7 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
             variant="ghost"
             size="icon"
             onClick={onToggle}
-            className="text-gray-300 hover:text-white hover:bg-gray-100 dark:hover:bg-[#323738]"
+            className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-[#323738]"
           >
             {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
@@ -91,7 +91,7 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
                   className={`flex items-center space-x-3 px-3 py-3 rounded-lg transition-colors group ${
                     isActive(item.path)
                       ? 'bg-red-500 text-white'
-                      : 'text-gray-300 hover:bg-gray-100 dark:hover:bg-[#323738] hover:text-white'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#323738] hover:text-gray-900 dark:text-white'
                   }`}
                 >
                   <item.icon className="h-5 w-5 flex-shrink-0" />
@@ -111,7 +111,7 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
                   className={`flex items-center space-x-3 px-3 py-3 rounded-lg transition-colors group ${
                     isActive(item.path)
                       ? 'bg-red-500 text-white'
-                      : 'text-gray-300 hover:bg-gray-100 dark:hover:bg-[#323738] hover:text-white'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#323738] hover:text-gray-900 dark:text-white'
                   }`}
                 >
                   <item.icon className="h-5 w-5 flex-shrink-0" />
@@ -126,9 +126,9 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
         {isOpen && isLoggedIn && (
           <div className="shrink-0 p-4 border-t border-gray-200 dark:border-[#323738]">
             <div className="text-center">
-              <div className="text-xs text-gray-400">Trading with</div>
-              <div className="text-sm font-medium text-white capitalize">{activeType} Account</div>
-              <div className="text-xs text-gray-400 mt-1">
+              <div className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400">Trading with</div>
+              <div className="text-sm font-medium text-gray-900 dark:text-white capitalize">{activeType} Account</div>
+              <div className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400 mt-1">
                 Server: NOVBINARY-{activeType === 'real' ? 'Real' : 'Demo'}
               </div>
             </div>

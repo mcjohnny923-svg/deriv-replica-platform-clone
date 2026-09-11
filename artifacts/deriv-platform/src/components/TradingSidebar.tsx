@@ -33,9 +33,9 @@ const TradingSidebar = () => {
       <div className="p-4 border-b border-gray-700">
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-[10px]">NB</span>
+            <span className="text-gray-900 dark:text-white font-bold text-[10px]">NB</span>
           </div>
-          <span className="text-xl font-bold text-white">NovBinary</span>
+          <span className="text-xl font-bold text-gray-900 dark:text-white">NovBinary</span>
         </div>
       </div>
 
@@ -43,10 +43,10 @@ const TradingSidebar = () => {
       <div className="p-4 border-b border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-sm font-medium text-white">Demo Account</div>
-            <div className="text-xs text-gray-400">Balance: $10,000</div>
+            <div className="text-sm font-medium text-gray-900 dark:text-white">Demo Account</div>
+            <div className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400">Balance: $10,000</div>
           </div>
-          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+          <Button variant="ghost" size="sm" className="text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white">
             Switch
           </Button>
         </div>
@@ -62,7 +62,7 @@ const TradingSidebar = () => {
                 className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                   isActive(item.path)
                     ? 'bg-red-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-700 hover:text-gray-900 dark:text-white'
                 }`}
               >
                 <item.icon className="h-5 w-5" />
@@ -77,12 +77,12 @@ const TradingSidebar = () => {
       <div className="p-4 border-t border-gray-700">
         {/* Dark Mode Toggle */}
         <div className="flex items-center justify-between mb-4">
-          <span className="text-sm text-gray-400">Dark Mode</span>
+          <span className="text-sm text-gray-400 dark:text-gray-500 dark:text-gray-400">Dark Mode</span>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsDarkMode(!isDarkMode)}
-            className="text-gray-400 hover:text-white"
+            className="text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white"
           >
             {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
@@ -91,18 +91,18 @@ const TradingSidebar = () => {
         {/* User Menu */}
         <div className="space-y-2">
           <Link to="/profile">
-            <Button variant="ghost" className="w-full justify-start text-gray-300 hover:text-white">
+            <Button variant="ghost" className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white">
               <User className="h-4 w-4 mr-2" />
               Profile
             </Button>
           </Link>
           <Link to="/settings">
-            <Button variant="ghost" className="w-full justify-start text-gray-300 hover:text-white">
+            <Button variant="ghost" className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white">
               <Settings className="h-4 w-4 mr-2" />
               Settings
             </Button>
           </Link>
-          <Button variant="ghost" className="w-full justify-start text-gray-300 hover:text-white">
+          <Button variant="ghost" className="w-full justify-start text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white">
             <LogOut className="h-4 w-4 mr-2" />
             Logout
           </Button>

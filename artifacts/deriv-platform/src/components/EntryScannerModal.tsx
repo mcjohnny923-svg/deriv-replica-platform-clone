@@ -206,7 +206,7 @@ const EntryScannerModal = ({ open, onOpenChange, markets, onLaunch }: EntryScann
             </div>
 
             <div className="space-y-1">
-              <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">
+              <label className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">
                 Number of ticks to scan
               </label>
               <Input
@@ -220,15 +220,15 @@ const EntryScannerModal = ({ open, onOpenChange, markets, onLaunch }: EntryScann
 
             <div className="grid grid-cols-3 gap-2">
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Best market</label>
+                <label className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Best market</label>
                 <Input readOnly value={best?.market ?? '—'} className="font-bold text-indigo-700 h-8 text-xs px-2" />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Strategy</label>
+                <label className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Strategy</label>
                 <Input readOnly value={best?.strategy.label ?? '—'} className="font-bold text-indigo-700 h-8 text-xs px-2" />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Entry digit</label>
+                <label className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Entry digit</label>
                 <Input readOnly value={best?.strategy.digit ?? '—'} className="font-bold text-indigo-700 h-8 text-xs px-2" />
               </div>
             </div>
@@ -244,7 +244,7 @@ const EntryScannerModal = ({ open, onOpenChange, markets, onLaunch }: EntryScann
               <div className="space-y-1">
                 <div className="flex justify-between text-xs font-semibold">
                   <span>{progress.label}</span>
-                  <span className="text-white font-mono">{livePrice !== null ? livePrice.toFixed(2) : ''}</span>
+                  <span className="text-gray-900 dark:text-white font-mono">{livePrice !== null ? livePrice.toFixed(2) : ''}</span>
                   <span className="text-indigo-700">{progress.index}/{progress.total}</span>
                 </div>
                 <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
@@ -296,44 +296,44 @@ const EntryScannerModal = ({ open, onOpenChange, markets, onLaunch }: EntryScann
             </DialogHeader>
 
             <div className="bg-indigo-50 rounded-md p-2.5 space-y-0.5">
-              <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Best market</div>
+              <div className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Best market</div>
               <div className="font-bold text-indigo-700 text-sm">{best?.market}</div>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <div className="bg-indigo-50 rounded-md p-2">
-                <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Strategy</div>
+                <div className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Strategy</div>
                 <div className="font-bold text-indigo-700 text-sm">{best?.strategy.label}</div>
               </div>
               <div className="bg-indigo-50 rounded-md p-2">
-                <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Entry digit</div>
+                <div className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Entry digit</div>
                 <div className="font-bold text-indigo-700 text-base">{best?.strategy.digit ?? '—'}</div>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Stake</label>
+                <label className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Stake</label>
                 <Input type="number" step="0.01" value={stake} onChange={(e) => setStake(e.target.value)} className="h-8 text-sm" />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Martingale</label>
+                <label className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Martingale</label>
                 <Input type="number" step="0.1" value={martingale} onChange={(e) => setMartingale(e.target.value)} className="h-8 text-sm" />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Number of wins</label>
+                <label className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Number of wins</label>
                 <Input type="number" value={numberOfWins} onChange={(e) => setNumberOfWins(e.target.value)} className="h-8 text-sm" />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">No. of digits to check</label>
+                <label className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">No. of digits to check</label>
                 <Input type="number" value={digitsToCheck} onChange={(e) => setDigitsToCheck(e.target.value)} className="h-8 text-sm" />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Expected profit</label>
+                <label className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Expected profit</label>
                 <Input type="number" value={expectedProfit} onChange={(e) => setExpectedProfit(e.target.value)} className="h-8 text-sm" />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Stop loss</label>
+                <label className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Stop loss</label>
                 <Input type="number" value={stopLoss} onChange={(e) => setStopLoss(e.target.value)} className="h-8 text-sm" />
               </div>
             </div>
@@ -346,7 +346,7 @@ const EntryScannerModal = ({ open, onOpenChange, markets, onLaunch }: EntryScann
             <div className="flex items-center justify-between gap-4">
               <div>
                 <div className="text-sm font-semibold">Auto-Start Trading</div>
-                <div className="text-[11px] text-gray-500">Bot runs immediately without further review</div>
+                <div className="text-[11px] text-gray-400 dark:text-gray-500">Bot runs immediately without further review</div>
               </div>
               <Switch checked={autoStart} onCheckedChange={setAutoStart} />
             </div>

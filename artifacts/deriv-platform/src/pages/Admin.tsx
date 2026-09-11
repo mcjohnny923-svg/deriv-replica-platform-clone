@@ -115,12 +115,12 @@ const Admin = () => {
 
   if (!users) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-[#0e0e0e] text-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-50 dark:bg-[#0e0e0e] text-gray-900 dark:text-white flex items-center justify-center p-4">
         <form
           onSubmit={handleUnlock}
           className="w-full max-w-sm bg-white dark:bg-[#151717] border border-gray-200 dark:border-[#323738] rounded-lg p-6 space-y-4"
         >
-          <div className="flex items-center gap-2 text-white font-semibold text-lg">
+          <div className="flex items-center gap-2 text-gray-900 dark:text-white font-semibold text-lg">
             <Lock className="h-5 w-5" />
             Admin Access
           </div>
@@ -129,7 +129,7 @@ const Admin = () => {
             value={keyInput}
             onChange={(e) => setKeyInput(e.target.value)}
             placeholder="Admin key"
-            className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-white"
+            className="bg-gray-100 dark:bg-[#323738] border-gray-300 dark:border-[#414647] text-gray-900 dark:text-white"
             autoFocus
           />
           {error && <div className="text-red-400 text-sm">{error}</div>}
@@ -146,7 +146,7 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0e0e0e] text-white p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0e0e0e] text-gray-900 dark:text-white p-4">
       <div className="max-w-6xl mx-auto space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -154,7 +154,7 @@ const Admin = () => {
               type="button"
               onClick={() => setTab('users')}
               className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                tab === 'users' ? 'bg-red-600 text-white' : 'bg-white dark:bg-[#151717] text-gray-400 hover:text-white'
+                tab === 'users' ? 'bg-red-600 text-white' : 'bg-white dark:bg-[#151717] text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-white'
               }`}
             >
               Users
@@ -163,7 +163,7 @@ const Admin = () => {
               type="button"
               onClick={() => setTab('partners')}
               className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                tab === 'partners' ? 'bg-red-600 text-white' : 'bg-white dark:bg-[#151717] text-gray-400 hover:text-white'
+                tab === 'partners' ? 'bg-red-600 text-white' : 'bg-white dark:bg-[#151717] text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:text-white'
               }`}
             >
               Partners
@@ -173,7 +173,7 @@ const Admin = () => {
             onClick={handleRefresh}
             disabled={loading}
             variant="ghost"
-            className="text-gray-300 hover:text-white hover:bg-gray-100 dark:hover:bg-[#323738]"
+            className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-[#323738]"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Refresh
@@ -186,7 +186,7 @@ const Admin = () => {
           <div className="bg-white dark:bg-[#151717] border border-gray-200 dark:border-[#323738] rounded-lg overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-[#323738] text-left text-gray-400">
+                <tr className="border-b border-gray-200 dark:border-[#323738] text-left text-gray-400 dark:text-gray-500 dark:text-gray-400">
                   <th className="p-3 font-medium">Email</th>
                   <th className="p-3 font-medium">Full name</th>
                   <th className="p-3 font-medium">Phone</th>
@@ -201,9 +201,9 @@ const Admin = () => {
               <tbody>
                 {users.map((u) => (
                   <tr key={u.id} className="border-b border-gray-200 dark:border-[#232728] last:border-0">
-                    <td className="p-3 text-white">{u.email}</td>
-                    <td className="p-3 text-gray-300">{u.fullName ?? '—'}</td>
-                    <td className="p-3 text-gray-300">{u.phoneNumber ?? '—'}</td>
+                    <td className="p-3 text-gray-900 dark:text-white">{u.email}</td>
+                    <td className="p-3 text-gray-600 dark:text-gray-300">{u.fullName ?? '—'}</td>
+                    <td className="p-3 text-gray-600 dark:text-gray-300">{u.phoneNumber ?? '—'}</td>
                     <td className="p-3 text-orange-400">{formatBalance(u.accounts, 'demo')}</td>
                     <td className="p-3 text-green-400">{formatBalance(u.accounts, 'real')}</td>
                     <td className="p-3">
@@ -220,19 +220,19 @@ const Admin = () => {
                         className={`px-3 py-1.5 rounded-md text-xs font-medium ${
                           u.autoWithdraw
                             ? 'bg-green-600/20 text-green-400 hover:bg-green-600/30'
-                            : 'bg-gray-100 dark:bg-[#232728] text-gray-400 hover:bg-gray-200 dark:hover:bg-[#2a2f2f]'
+                            : 'bg-gray-100 dark:bg-[#232728] text-gray-400 dark:text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#2a2f2f]'
                         }`}
                       >
                         {u.autoWithdraw ? 'On' : 'Off'}
                       </button>
                     </td>
-                    <td className="p-3 text-gray-500">{new Date(u.createdAt).toLocaleDateString()}</td>
+                    <td className="p-3 text-gray-400 dark:text-gray-500">{new Date(u.createdAt).toLocaleDateString()}</td>
                     <td className="p-3">
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() => setBalanceModalUser(u)}
-                          className="px-3 py-1.5 rounded-md bg-gray-100 dark:bg-[#232728] text-white text-xs font-medium hover:bg-gray-200 dark:hover:bg-[#2a2f2f]"
+                          className="px-3 py-1.5 rounded-md bg-gray-100 dark:bg-[#232728] text-gray-900 dark:text-white text-xs font-medium hover:bg-gray-200 dark:hover:bg-[#2a2f2f]"
                         >
                           Add balance
                         </button>
@@ -253,7 +253,7 @@ const Admin = () => {
                 ))}
                 {users.length === 0 && (
                   <tr>
-                    <td colSpan={9} className="p-6 text-center text-gray-500">
+                    <td colSpan={9} className="p-6 text-center text-gray-400 dark:text-gray-500">
                       No users yet.
                     </td>
                   </tr>
@@ -267,7 +267,7 @@ const Admin = () => {
           <div className="bg-white dark:bg-[#151717] border border-gray-200 dark:border-[#323738] rounded-lg overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-[#323738] text-left text-gray-400">
+                <tr className="border-b border-gray-200 dark:border-[#323738] text-left text-gray-400 dark:text-gray-500 dark:text-gray-400">
                   <th className="p-3 font-medium w-8"></th>
                   <th className="p-3 font-medium">Partner</th>
                   <th className="p-3 font-medium">Referral code</th>
@@ -282,19 +282,19 @@ const Admin = () => {
                       className="border-b border-gray-200 dark:border-[#232728] cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1c1f1f]"
                       onClick={() => setExpandedPartner(expandedPartner === p.id ? null : p.id)}
                     >
-                      <td className="p-3 text-gray-400">
+                      <td className="p-3 text-gray-400 dark:text-gray-500 dark:text-gray-400">
                         {expandedPartner === p.id ? (
                           <ChevronDown className="h-4 w-4" />
                         ) : (
                           <ChevronRight className="h-4 w-4" />
                         )}
                       </td>
-                      <td className="p-3 text-white">
+                      <td className="p-3 text-gray-900 dark:text-white">
                         {p.email}
-                        {p.fullName && <span className="text-gray-500"> · {p.fullName}</span>}
+                        {p.fullName && <span className="text-gray-400 dark:text-gray-500"> · {p.fullName}</span>}
                       </td>
-                      <td className="p-3 text-gray-300">{p.referralCode ?? '—'}</td>
-                      <td className="p-3 text-gray-300">{p.signupsCount}</td>
+                      <td className="p-3 text-gray-600 dark:text-gray-300">{p.referralCode ?? '—'}</td>
+                      <td className="p-3 text-gray-600 dark:text-gray-300">{p.signupsCount}</td>
                       <td className="p-3 text-green-400 font-semibold">${p.totalCommission}</td>
                     </tr>
                     {expandedPartner === p.id && (
@@ -303,7 +303,7 @@ const Admin = () => {
                         <td colSpan={4} className="p-3">
                           <table className="w-full text-xs">
                             <thead>
-                              <tr className="text-gray-500 text-left">
+                              <tr className="text-gray-400 dark:text-gray-500 text-left">
                                 <th className="pb-2 font-medium">Referred user</th>
                                 <th className="pb-2 font-medium">Joined</th>
                                 <th className="pb-2 font-medium">Total deposited</th>
@@ -311,7 +311,7 @@ const Admin = () => {
                             </thead>
                             <tbody>
                               {p.referredUsers.map((u) => (
-                                <tr key={u.id} className="text-gray-300">
+                                <tr key={u.id} className="text-gray-600 dark:text-gray-300">
                                   <td className="py-1">{u.email}</td>
                                   <td className="py-1">{new Date(u.createdAt).toLocaleDateString()}</td>
                                   <td className="py-1 text-green-400">${u.totalDeposited}</td>
@@ -326,7 +326,7 @@ const Admin = () => {
                 ))}
                 {partners !== null && partners.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="p-6 text-center text-gray-500">
+                    <td colSpan={5} className="p-6 text-center text-gray-400 dark:text-gray-500">
                       No partners with signups yet.
                     </td>
                   </tr>
