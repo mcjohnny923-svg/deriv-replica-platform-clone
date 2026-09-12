@@ -83,16 +83,7 @@ const Automate = () => {
   const [digitFlash, setDigitFlash] = useState<DigitFlashEvent | null>(null);
 
   const runningRef = useRef(false);
-
-  // Safety net: React Router navigation does not cancel an in-flight async
-  // function. If the bot loop is still running when this page unmounts
-  // (navigated away without clicking Stop, or any other edge case), force
-  // it to stop so it can never keep placing trades in the background.
-  useEffect(() => {
-    return () => {
-      runningRef.current = false;
-    };
-  }, []);
+  const runGenerationRef = useRef(0);
 
   const digitSelector = needsDigitSelector(tradeType);
   const digitFlashEligible = isDigitContract(tradeType);
@@ -128,7 +119,7 @@ const Automate = () => {
     return parseFloat(baseStake);
   };
 
-  const runLoop = useCallback(async () => {
+  const runLoop = useCallback(async (myGeneration: number) => {
     const account = getStoredAccount();
     if (!account) {
       toast.error('Please log in first.');
@@ -147,7 +138,7 @@ const Automate = () => {
     let lostCount = 0;
     setCurrentStake(stake.toFixed(2));
 
-    while (runningRef.current) {
+    while (runningRef.current && runGenerationRef.current === myGeneration) {
       const cap = parseFloat(maxStake);
       if (cap && stake > cap) {
         toast.error('Max stake reached, stopping.');
@@ -184,7 +175,7 @@ const Automate = () => {
       setTotalStake(stakeSum);
 
       const settled = await waitForSettlement(placed.trade.id, account.id);
-      if (!settled || !runningRef.current) break;
+      if (!settled || !runningRef.current || runGenerationRef.current !== myGeneration) break;
 
       const won = settled.status === 'won';
       const profit = won ? Number(settled.payout ?? 0) - Number(settled.stake) : -Number(settled.stake);
@@ -233,8 +224,13 @@ const Automate = () => {
       }
     }
 
-    runningRef.current = false;
-    setIsRunning(false);
+    // Only this loop's own generation is allowed to flip the running UI off -
+    // stops an old, already-superseded loop instance from clobbering a
+    // newer run that may have started since this one began.
+    if (runGenerationRef.current === myGeneration) {
+      runningRef.current = false;
+      setIsRunning(false);
+    }
   }, [
     baseStake, maxStake, selectedAsset, choiceIndex, choices, tradeType, digitSelector,
     selectedDigit, durationValue, durationUnit, waitForSettlement, profitThreshold, lossThreshold, strategy, stakeMultiplier, winsTarget,
@@ -242,6 +238,10 @@ const Automate = () => {
 
   const handleRun = () => {
     if (isRunning) {
+      // Bumping the generation immediately invalidates ANY currently-executing
+      // loop, even one from a previous Run click, so Stop always works no
+      // matter what state the loop's own closure/ref reads were left in.
+      runGenerationRef.current += 1;
       runningRef.current = false;
       setIsRunning(false);
       toast('Stopped by user.');
@@ -253,9 +253,10 @@ const Automate = () => {
     setTotalPayout(0);
     setContractsWon(0);
     setContractsLost(0);
+    const myGeneration = ++runGenerationRef.current;
     runningRef.current = true;
     setIsRunning(true);
-    runLoop();
+    runLoop(myGeneration);
   };
 
   const handleResetStats = () => {
