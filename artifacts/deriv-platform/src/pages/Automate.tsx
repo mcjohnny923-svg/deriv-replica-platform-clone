@@ -84,6 +84,16 @@ const Automate = () => {
 
   const runningRef = useRef(false);
 
+  // Safety net: React Router navigation does not cancel an in-flight async
+  // function. If the bot loop is still running when this page unmounts
+  // (navigated away without clicking Stop, or any other edge case), force
+  // it to stop so it can never keep placing trades in the background.
+  useEffect(() => {
+    return () => {
+      runningRef.current = false;
+    };
+  }, []);
+
   const digitSelector = needsDigitSelector(tradeType);
   const digitFlashEligible = isDigitContract(tradeType);
   const priceFeed = useDigitPriceFeed(selectedAsset);
