@@ -92,8 +92,8 @@ const Automate = () => {
   const bumpBalanceRefresh = () => setBalanceRefreshKey((k) => k + 1);
 
   const waitForSettlement = useCallback(async (tradeId: number, accountId: number): Promise<Trade | null> => {
-    for (let i = 0; i < 60; i++) {
-      await new Promise((r) => setTimeout(r, 1500));
+    for (let i = 0; i < 180; i++) {
+      await new Promise((r) => setTimeout(r, 500));
       const { closedTrades } = await getTradeHistory(accountId);
       const settled = closedTrades.find((t) => t.id === tradeId);
       if (settled) return settled;
