@@ -28,7 +28,7 @@ const Positions = () => {
     const interval = setInterval(() => {
       load();
       setNow(Date.now());
-    }, 2000);
+    }, 500);
     return () => clearInterval(interval);
   }, [load]);
 
