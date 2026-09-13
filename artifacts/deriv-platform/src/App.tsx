@@ -16,6 +16,7 @@ import Automate from "./pages/Automate";
 import Partners from "./pages/Partners";
 import NotFound from "./pages/NotFound";
 import { TradeSettingsProvider } from "./contexts/TradeSettingsContext";
+import { BotEngineProvider } from "./contexts/BotEngineContext";
 const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -24,6 +25,7 @@ const App = () => (
       <Sonner position="top-center" />
       <BrowserRouter>
         <TradeSettingsProvider>
+        <BotEngineProvider>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
@@ -45,6 +47,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </BotEngineProvider>
         </TradeSettingsProvider>
       </BrowserRouter>
     </TooltipProvider>
