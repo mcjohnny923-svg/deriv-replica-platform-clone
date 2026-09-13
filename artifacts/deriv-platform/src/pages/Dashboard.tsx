@@ -14,15 +14,18 @@ import { useDigitPriceFeed } from '@/hooks/useDigitPriceFeed';
 import { getTradeHistory, type Trade } from '@/lib/trades-api';
 import { getStoredAccount } from '@/lib/auth-api';
 import type { DigitFlashEvent } from '@/components/DigitStatsDisplay';
+import { useTradeSettings } from '@/contexts/TradeSettingsContext';
 
 const Dashboard = () => {
-  const [selectedAsset, setSelectedAsset] = useState('Volatility 75 Index');
+  const {
+    selectedAsset, setSelectedAsset,
+    tradeType, setTradeType,
+    selectedDigit, setSelectedDigit,
+    stake, setStake,
+    duration, setDuration,
+    durationType, setDurationType,
+  } = useTradeSettings();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [tradeType, setTradeType] = useState('rise_fall');
-  const [selectedDigit, setSelectedDigit] = useState(5);
-  const [stake, setStake] = useState('10');
-  const [duration, setDuration] = useState('1');
-  const [durationType, setDurationType] = useState('t');
   const [balanceRefreshKey, setBalanceRefreshKey] = useState(0);
   const [digitFlash, setDigitFlash] = useState<DigitFlashEvent | null>(null);
 

@@ -15,6 +15,7 @@ import Positions from "./pages/Positions";
 import Automate from "./pages/Automate";
 import Partners from "./pages/Partners";
 import NotFound from "./pages/NotFound";
+import { TradeSettingsProvider } from "./contexts/TradeSettingsContext";
 const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -22,6 +23,7 @@ const App = () => (
       <Toaster />
       <Sonner position="top-center" />
       <BrowserRouter>
+        <TradeSettingsProvider>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
@@ -43,6 +45,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </TradeSettingsProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
