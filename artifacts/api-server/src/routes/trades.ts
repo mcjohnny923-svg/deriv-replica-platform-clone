@@ -106,7 +106,26 @@ async function settleDueTrades(accountId: number) {
       } else {
         won = false;
       }
+    } else if (trade.tradeType === "rise_fall" || trade.tradeType === "higher_lower") {
+      // Higher/Lower is treated identically to Rise/Fall here - both are a
+      // plain entry-vs-exit comparison on the real live price, no separate
+      // barrier concept. Uses the same live price source as digit
+      // contracts so the chart the user watches is what decides the trade.
+      const live = getLivePrice(trade.market?.symbol ?? String(trade.marketId));
+      exitPrice = live.price;
+      const entryPriceNum = Number(trade.entryPrice);
+
+      if (trade.direction === "rise" || trade.direction === "higher") {
+        won = exitPrice > entryPriceNum;
+      } else if (trade.direction === "fall" || trade.direction === "lower") {
+        won = exitPrice < entryPriceNum;
+      } else {
+        won = false;
+      }
     } else {
+      // Touch/No Touch and In/Out are not yet on real-price logic - they
+      // need barrier-during-duration tracking, which is a separate,
+      // larger change. Left as a probability roll for now.
       const winProbability = getWinProbability(trade.tradeType);
       won = Math.random() < winProbability;
       const priceDrift = (Math.random() - 0.5) * 40;
@@ -189,7 +208,10 @@ router.post("/buy", async (req: AuthedRequest, res: Response) => {
   const durationSeconds = durationToSeconds(data.durationValue, data.durationUnit);
   const now = new Date();
   const settlesAt = new Date(now.getTime() + durationSeconds * 1000);
-  const entryPrice = 10000 + Math.random() * 5000;
+  // Real entry price from the same live feed used for settlement and for
+  // digit contracts, so Rise/Fall and Higher/Lower are decided by the
+  // actual price the user was watching, not an unrelated random number.
+  const entryPrice = getLivePrice(market.symbol).price;
 
   const newBalance = Number(account.balance) - data.stake;
   await db

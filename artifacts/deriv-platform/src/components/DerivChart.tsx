@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChevronDown, TrendingUp, TrendingDown } from 'lucide-react';
 import { getAssetBasePrice } from '@/lib/asset-base-prices';
+import { assetToMarketInfo } from '@/lib/trade-config';
+import { API_BASE_URL } from '@/lib/api-config';
 import {
   createChart,
   AreaSeries,
@@ -168,8 +170,10 @@ const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
         lastValueVisible: true,
       });
 
+      // Seed with a short run anchored on the real current live price so
+      // the chart doesn't show a fake history before the first real tick
+      // arrives. The live-updates effect below takes over immediately after.
       const seed = Array.from({ length: 100 }, (_, i) => {
-        basePrice += (Math.random() - 0.5) * 3;
         return { time: (now - (100 - i)) as UTCTimestamp, value: basePrice };
       });
       series.setData(seed);
@@ -184,16 +188,14 @@ const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
         wickDownColor: '#ff444f',
       });
 
+      // Flat seed anchored on the real current live price - candle shapes
+      // fill in as real ticks arrive via the live-updates effect below,
+      // rather than showing fabricated history.
       const intervalSec = TIMEFRAME_SECONDS[selectedTimeframe];
       const seed: { time: number; open: number; high: number; low: number; close: number }[] = [];
       let t = now - intervalSec * 100;
       for (let i = 0; i < 100; i++) {
-        const open = basePrice;
-        const close = open + (Math.random() - 0.5) * 40;
-        const high = Math.max(open, close) + Math.random() * 15;
-        const low = Math.min(open, close) - Math.random() * 15;
-        seed.push({ time: t, open, high, low, close });
-        basePrice = close;
+        seed.push({ time: t, open: basePrice, high: basePrice, low: basePrice, close: basePrice });
         t += intervalSec;
       }
       series.setData(seed as never);
@@ -205,11 +207,27 @@ const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
     chart.timeScale().fitContent();
   }, [isTickMode, selectedTimeframe, selectedAsset]);
 
-  // Live updates
+  // Live updates - polls the same server-side price feed used for trade
+  // settlement (getLivePrice), so the chart shows exactly what determines
+  // Rise/Fall, Higher/Lower, and digit-contract outcomes. Polling at 1s
+  // matches the backend's own per-second tick model.
   useEffect(() => {
-    const interval = setInterval(() => {
-      const change = (Math.random() - 0.5) * (isTickMode ? 3 : 8);
-      const newPrice = Math.max(0, priceRef.current + change);
+    let cancelled = false;
+    const { symbol } = assetToMarketInfo(selectedAsset);
+
+    const interval = setInterval(async () => {
+      let newPrice: number;
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/markets/tick?symbol=${encodeURIComponent(symbol)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        newPrice = data.price;
+      } catch {
+        return; // transient network issue - skip this tick, try again next interval
+      }
+      if (cancelled) return;
+
+      const change = newPrice - priceRef.current;
       priceRef.current = newPrice;
       setCurrentPrice(newPrice);
       setPriceChange(change);
@@ -246,8 +264,11 @@ const DerivChart = ({ selectedAsset, onAssetChange }: DerivChartProps) => {
       }
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [isTickMode, selectedTimeframe]);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [isTickMode, selectedTimeframe, selectedAsset]);
 
   return (
     <div className="flex-1 bg-gray-50 dark:bg-[#0e0e0e] p-3 sm:p-4 flex flex-col">
