@@ -83,7 +83,7 @@ const DigitStatsDisplay = ({ selectedDigit, flash, digitHistory, lastDigit, twoR
       <div
                 className={
                   twoRowOnMobile
-                    ? "grid grid-cols-5 sm:grid-cols-10 gap-1"
+                    ? "grid grid-cols-5 sm:grid-cols-10 gap-1 max-w-[260px] sm:max-w-none mx-auto sm:mx-0"
                     : desktopTwoRow
                       ? "grid grid-cols-10 md:grid-cols-5 gap-1"
                       : "grid grid-cols-10 gap-1"
@@ -151,7 +151,7 @@ const DigitStatsDisplay = ({ selectedDigit, flash, digitHistory, lastDigit, twoR
                   >
                     {digit}
                   </span>
-                  <span className="text-[6px] text-gray-400 dark:text-gray-500 dark:text-gray-400 mt-0.5">
+                  <span className="text-[8px] text-white mt-0.5">
                     {pct.toFixed(1)}%
                   </span>
                 </div>
