@@ -28,7 +28,7 @@ interface MobileTradeDrawerProps {
   onDurationChange: (duration: string) => void;
   durationType: string;
   onDurationTypeChange: (type: string) => void;
-  onTradePlaced?: (newBalance: string) => void;
+  onTradePlaced?: (newBalance: string, trade: import('@/lib/trades-api').Trade) => void;
 }
 
 const MobileTradeDrawer = ({
@@ -102,7 +102,7 @@ const MobileTradeDrawer = ({
       });
 
       updateStoredAccountBalance(result.newBalance);
-      onTradePlaced?.(result.newBalance);
+      onTradePlaced?.(result.newBalance, result.trade);
       toast.success(`Trade placed: ${direction} on ${selectedAsset}`, {
         description: `Stake USD ${stakeNum.toFixed(2)} — settles in ${duration} ${durationUnitLabel.toLowerCase()}`,
       });
