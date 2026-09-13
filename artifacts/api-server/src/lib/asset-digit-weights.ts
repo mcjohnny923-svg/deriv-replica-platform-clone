@@ -29,9 +29,15 @@ export function getDigitWeights(symbol: string): number[] {
   if (cached) return cached;
 
   const rand = mulberry32(hashString(symbol));
-  // Each digit gets a raw weight between 0.4 and 2.0 (up to 5x more likely
-  // than another digit for the same asset), then normalized to sum to 1.
-  const raw = Array.from({ length: 10 }, () => 0.4 + rand() * 1.6);
+  // Each digit gets a raw weight between 0.85 and 1.15 (a mild per-asset
+  // flavor, not a real edge), then normalized to sum to 1. This keeps each
+  // digit statistically close to a fair 10% - the kind of spread you'd
+  // naturally see from ~1000 genuinely fair ticks (typically ~6%-12%) -
+  // rather than a permanent, multiples-of-each-other bias. This matters
+  // because the payout formula (10 / (winningDigitCount + 0.2)) assumes
+  // each digit is close to fair odds; a wider bias here would make some
+  // digits secretly much better or worse bets than the payout reflects.
+  const raw = Array.from({ length: 10 }, () => 0.85 + rand() * 0.3);
   const sum = raw.reduce((a, b) => a + b, 0);
   const weights = raw.map((v) => v / sum);
 
