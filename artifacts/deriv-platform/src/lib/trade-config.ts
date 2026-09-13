@@ -25,8 +25,37 @@ const PAYOUT_MULTIPLIERS: Record<string, number> = {
   over_under: 1.9,
 };
 
-export function calculatePayout(tradeType: string, stake: string): string {
+// Number of digits (0-9) that count as a win for a given digit-contract
+// direction/target. Mirrors getWinningDigitCount in
+// artifacts/api-server/src/lib/trade-config.ts exactly - if you change the
+// odds here, change them there too, or the preview shown here will stop
+// matching what the backend actually pays out.
+export function getWinningDigitCount(direction: string, digit: number): number {
+  if (direction === 'over') return 9 - digit;
+  if (direction === 'under') return digit;
+  if (direction === 'matches') return 1;
+  if (direction === 'differs') return 9;
+  return 5;
+}
+
+// Returns null when the selection has no possible winning outcome
+// (e.g. Over 9, Under 0) - callers must disable that choice rather than
+// show a payout number for it.
+export function calculatePayout(
+  tradeType: string,
+  stake: string,
+  direction?: string,
+  digit?: number,
+): string | null {
   const stakeAmount = parseFloat(stake) || 0;
+
+  if (tradeType === 'over_under' || tradeType === 'matches_differs') {
+    const n = getWinningDigitCount(direction ?? '', digit ?? 0);
+    if (n <= 0 || n >= 10) return null;
+    const multiplier = 10 / (n + 0.2);
+    return (stakeAmount * multiplier).toFixed(2);
+  }
+
   const multiplier = PAYOUT_MULTIPLIERS[tradeType] ?? 1.75;
   return (stakeAmount * multiplier).toFixed(2);
 }

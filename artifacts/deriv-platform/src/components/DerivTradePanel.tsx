@@ -49,7 +49,19 @@ const DerivTradePanel = ({
 
   const digitContract = isDigitContract(tradeType);
   const digitSelector = needsDigitSelector(tradeType);
-  const payout = calculatePayout(tradeType, stake);
+
+  // For Matches/Differs and Over/Under, payout depends on the specific
+  // digit+direction chosen, so each button needs its own number rather
+  // than one shared value. null means that side has no valid winning
+  // outcome (e.g. Over 9, Under 0) and its button should be disabled.
+  const matchesPayout = calculatePayout(tradeType, stake, 'matches', selectedDigit);
+  const differsPayout = calculatePayout(tradeType, stake, 'differs', selectedDigit);
+  const overPayout = calculatePayout(tradeType, stake, 'over', selectedDigit);
+  const underPayout = calculatePayout(tradeType, stake, 'under', selectedDigit);
+
+  // Everything else (Rise/Fall, Even/Odd, Higher/Lower, Touch/No Touch,
+  // In/Out) still uses one flat multiplier shared by both buttons.
+  const payout = calculatePayout(tradeType, stake) ?? '0.00';
 
   const placeTrade = async (choice: string) => {
     const account = getStoredAccount();
@@ -220,19 +232,23 @@ const DerivTradePanel = ({
           </div>
         </div>
 
-        {/* Payout info */}
-        <div className="p-3 bg-gray-100 dark:bg-[#323738] rounded border border-gray-300 dark:border-[#414647]">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-gray-600 dark:text-gray-300">Payout</span>
-            <span className="text-sm font-medium text-gray-900 dark:text-white">USD {payout}</span>
+        {/* Payout info - shown here for flat-rate trade types only.
+            Matches/Differs and Over/Under show payout per-button instead,
+            since the two choices have different odds/multipliers. */}
+        {tradeType !== 'matches_differs' && tradeType !== 'over_under' && (
+          <div className="p-3 bg-gray-100 dark:bg-[#323738] rounded border border-gray-300 dark:border-[#414647]">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm text-gray-600 dark:text-gray-300">Payout</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">USD {payout}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600 dark:text-gray-300">Profit</span>
+              <span className="text-sm font-medium text-green-400">
+                USD {(parseFloat(payout) - parseFloat(stake || '0')).toFixed(2)}
+              </span>
+            </div>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600 dark:text-gray-300">Profit</span>
-            <span className="text-sm font-medium text-green-400">
-              USD {(parseFloat(payout) - parseFloat(stake || '0')).toFixed(2)}
-            </span>
-          </div>
-        </div>
+        )}
 
         {/* Purchase buttons */}
         <div className="grid grid-cols-2 gap-3">
@@ -240,17 +256,23 @@ const DerivTradePanel = ({
             <>
               <Button
                 onClick={() => placeTrade('matches')}
-                disabled={submittingChoice !== null}
-                className="w-full bg-green-500 hover:bg-green-600 text-white py-4 font-medium text-base disabled:opacity-50"
+                disabled={submittingChoice !== null || matchesPayout === null}
+                className="w-full bg-green-500 hover:bg-green-600 text-white py-4 font-medium text-base disabled:opacity-50 flex flex-col h-auto leading-tight"
               >
-                {submittingChoice === 'matches' ? 'Placing...' : 'Matches'}
+                <span>{submittingChoice === 'matches' ? 'Placing...' : 'Matches'}</span>
+                {matchesPayout !== null && (
+                  <span className="text-xs font-normal opacity-90">USD {matchesPayout}</span>
+                )}
               </Button>
               <Button
                 onClick={() => placeTrade('differs')}
-                disabled={submittingChoice !== null}
-                className="w-full bg-red-500 hover:bg-red-600 text-white py-4 font-medium text-base disabled:opacity-50"
+                disabled={submittingChoice !== null || differsPayout === null}
+                className="w-full bg-red-500 hover:bg-red-600 text-white py-4 font-medium text-base disabled:opacity-50 flex flex-col h-auto leading-tight"
               >
-                {submittingChoice === 'differs' ? 'Placing...' : 'Differs'}
+                <span>{submittingChoice === 'differs' ? 'Placing...' : 'Differs'}</span>
+                {differsPayout !== null && (
+                  <span className="text-xs font-normal opacity-90">USD {differsPayout}</span>
+                )}
               </Button>
             </>
           )}
@@ -278,17 +300,23 @@ const DerivTradePanel = ({
             <>
               <Button
                 onClick={() => placeTrade('over')}
-                disabled={submittingChoice !== null}
-                className="w-full bg-green-500 hover:bg-green-600 text-white py-4 font-medium text-base disabled:opacity-50"
+                disabled={submittingChoice !== null || overPayout === null}
+                className="w-full bg-green-500 hover:bg-green-600 text-white py-4 font-medium text-base disabled:opacity-50 flex flex-col h-auto leading-tight"
               >
-                {submittingChoice === 'over' ? 'Placing...' : 'Over'}
+                <span>{submittingChoice === 'over' ? 'Placing...' : 'Over'}</span>
+                {overPayout !== null && (
+                  <span className="text-xs font-normal opacity-90">USD {overPayout}</span>
+                )}
               </Button>
               <Button
                 onClick={() => placeTrade('under')}
-                disabled={submittingChoice !== null}
-                className="w-full bg-red-500 hover:bg-red-600 text-white py-4 font-medium text-base disabled:opacity-50"
+                disabled={submittingChoice !== null || underPayout === null}
+                className="w-full bg-red-500 hover:bg-red-600 text-white py-4 font-medium text-base disabled:opacity-50 flex flex-col h-auto leading-tight"
               >
-                {submittingChoice === 'under' ? 'Placing...' : 'Under'}
+                <span>{submittingChoice === 'under' ? 'Placing...' : 'Under'}</span>
+                {underPayout !== null && (
+                  <span className="text-xs font-normal opacity-90">USD {underPayout}</span>
+                )}
               </Button>
             </>
           )}

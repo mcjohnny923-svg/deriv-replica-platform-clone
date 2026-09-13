@@ -52,7 +52,18 @@ const MobileTradeDrawer = ({
   const currentLabel = TRADE_TYPES.find((t) => t.value === tradeType)?.label ?? 'Rise/Fall';
   const digitContract = isDigitContract(tradeType);
   const digitSelector = needsDigitSelector(tradeType);
-  const payout = calculatePayout(tradeType, stake);
+
+  // Matches/Differs and Over/Under have per-choice odds, so each button
+  // needs its own payout value rather than sharing one. null means that
+  // choice has no possible winning outcome (e.g. Over 9, Under 0) and its
+  // button must be disabled.
+  const matchesPayout = calculatePayout(tradeType, stake, 'matches', selectedDigit);
+  const differsPayout = calculatePayout(tradeType, stake, 'differs', selectedDigit);
+  const overPayout = calculatePayout(tradeType, stake, 'over', selectedDigit);
+  const underPayout = calculatePayout(tradeType, stake, 'under', selectedDigit);
+
+  // Rise/Fall and Even/Odd still share one flat multiplier per side.
+  const payout = calculatePayout(tradeType, stake) ?? '0.00';
 
   const durationUnitLabel = { t: 'Ticks', s: 'Seconds', m: 'Minutes' }[durationType] ?? 'Ticks';
 
@@ -203,19 +214,19 @@ const MobileTradeDrawer = ({
               <>
                 <button
                   onClick={() => placeTrade('matches')}
-                  disabled={submittingChoice !== null}
+                  disabled={submittingChoice !== null || matchesPayout === null}
                   className="bg-teal-700/40 border border-teal-500 rounded-lg py-4 text-teal-300 font-semibold disabled:opacity-50"
                 >
                   {submittingChoice === 'matches' ? 'Placing...' : 'Matches'}
-                  <div className="text-xs opacity-80">USD {payout}</div>
+                  {matchesPayout !== null && <div className="text-xs opacity-80">USD {matchesPayout}</div>}
                 </button>
                 <button
                   onClick={() => placeTrade('differs')}
-                  disabled={submittingChoice !== null}
+                  disabled={submittingChoice !== null || differsPayout === null}
                   className="bg-red-900/40 border border-red-500 rounded-lg py-4 text-red-300 font-semibold disabled:opacity-50"
                 >
                   {submittingChoice === 'differs' ? 'Placing...' : 'Differs'}
-                  <div className="text-xs opacity-80">USD {payout}</div>
+                  {differsPayout !== null && <div className="text-xs opacity-80">USD {differsPayout}</div>}
                 </button>
               </>
             )}
@@ -243,23 +254,23 @@ const MobileTradeDrawer = ({
               <>
                 <button
                   onClick={() => placeTrade('over')}
-                  disabled={submittingChoice !== null}
+                  disabled={submittingChoice !== null || overPayout === null}
                   className="bg-teal-700/40 border border-teal-500 rounded-lg py-4 text-teal-300 font-semibold disabled:opacity-50"
                 >
                   <div className="flex items-center justify-center gap-1">
                     <TrendingUp className="h-4 w-4" /> {submittingChoice === 'over' ? 'Placing...' : 'Over'}
                   </div>
-                  <div className="text-xs opacity-80">Payout {payout} USD</div>
+                  {overPayout !== null && <div className="text-xs opacity-80">Payout {overPayout} USD</div>}
                 </button>
                 <button
                   onClick={() => placeTrade('under')}
-                  disabled={submittingChoice !== null}
+                  disabled={submittingChoice !== null || underPayout === null}
                   className="bg-red-900/40 border border-red-500 rounded-lg py-4 text-red-300 font-semibold disabled:opacity-50"
                 >
                   <div className="flex items-center justify-center gap-1">
                     <TrendingDown className="h-4 w-4" /> {submittingChoice === 'under' ? 'Placing...' : 'Under'}
                   </div>
-                  <div className="text-xs opacity-80">Payout {payout} USD</div>
+                  {underPayout !== null && <div className="text-xs opacity-80">Payout {underPayout} USD</div>}
                 </button>
               </>
             )}

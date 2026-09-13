@@ -26,7 +26,37 @@ export function isDigitContract(tradeType: string): boolean {
   return DIGIT_TRADE_TYPES.includes(tradeType);
 }
 
-export function getPayoutMultiplier(tradeType: string): number {
+// Number of digits (0-9) that count as a win for a given digit-contract
+// direction/target. This must exactly mirror the win/loss check in
+// settleDueTrades() in trades.ts, or the displayed/paid multiplier will
+// stop matching the real win probability again.
+export function getWinningDigitCount(direction: string, digit: number): number {
+  if (direction === "over") return 9 - digit;   // e.g. Over 1 wins on 2-9 -> 8 digits
+  if (direction === "under") return digit;      // e.g. Under 8 wins on 0-7 -> 8 digits
+  if (direction === "matches") return 1;        // wins on exactly 1 digit
+  if (direction === "differs") return 9;        // wins on all but 1 digit
+  return 5; // even/odd - not used below, kept on flat table for now
+}
+
+export function getPayoutMultiplier(
+  tradeType: string,
+  direction?: string,
+  digit?: number,
+): number {
+  if (tradeType === "over_under" || tradeType === "matches_differs") {
+    const n = getWinningDigitCount(direction ?? "", digit ?? 0);
+    if (n <= 0 || n >= 10) {
+      // No possible winning outcome (e.g. Over 9, Under 0) - the frontend
+      // must not offer these as selectable options.
+      throw new Error(
+        `Invalid digit selection for ${tradeType}: direction=${direction} digit=${digit} has no valid payout`,
+      );
+    }
+    // Fair-odds multiplier scaled down slightly for house edge, derived
+    // from the actual number of winning digits out of 10 - NOT a flat
+    // per-trade-type rate. See trade-config discussion for derivation.
+    return 10 / (n + 0.2);
+  }
   return PAYOUT_MULTIPLIERS[tradeType] ?? 1.75;
 }
 

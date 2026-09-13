@@ -178,7 +178,14 @@ router.post("/buy", async (req: AuthedRequest, res: Response) => {
     data.marketCategory,
   );
 
-  const multiplier = getPayoutMultiplier(data.tradeType);
+  let multiplier: number;
+  try {
+    multiplier = getPayoutMultiplier(data.tradeType, data.direction, data.digit);
+  } catch (err) {
+    return res.status(400).json({
+      error: err instanceof Error ? err.message : "Invalid trade selection",
+    });
+  }
   const durationSeconds = durationToSeconds(data.durationValue, data.durationUnit);
   const now = new Date();
   const settlesAt = new Date(now.getTime() + durationSeconds * 1000);
