@@ -9,6 +9,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { initiateWithdraw, getExchangeRate } from '@/lib/payments-api';
+import { getActiveAccountType } from '@/lib/auth-api';
 
 interface WithdrawModalProps {
   open: boolean;
@@ -45,6 +46,10 @@ const WithdrawModal = ({ open, onOpenChange, accountId }: WithdrawModalProps) =>
 
   const handleSubmit = async () => {
     if (!accountId || !isValidAmount) return;
+    if (getActiveAccountType() === 'demo') {
+      toast.error('Please switch to your real account to withdraw.');
+      return;
+    }
     setSubmitting(true);
     try {
       await initiateWithdraw({ accountId, amountUsd: amountNum });
