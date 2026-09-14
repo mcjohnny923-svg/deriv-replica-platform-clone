@@ -12,7 +12,10 @@ import { COUNTRIES } from '@/lib/countries';
 const Register = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const referralCode = searchParams.get('ref') ?? undefined;
+
+  // Pre-filled from a ?ref=CODE link when present, but always editable so
+  // someone can type/paste a code even without following a referral link.
+  const [referralCode, setReferralCode] = useState(searchParams.get('ref') ?? '');
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -50,7 +53,7 @@ const Register = () => {
         email: formData.email,
         password: formData.password,
         fullName: fullName || undefined,
-        referralCode,
+        referralCode: referralCode.trim() || undefined,
         phoneNumber: formData.phone,
         country: formData.country || undefined,
       });
@@ -82,11 +85,6 @@ const Register = () => {
           <p className="mt-2 text-gray-400 dark:text-gray-500 dark:text-gray-400">
             You'll get both a Demo account (USD 10,000 virtual balance) and a Real account, ready to switch between anytime.
           </p>
-          {referralCode && (
-            <div className="mt-3 inline-block bg-green-500/10 border border-green-500 text-green-400 text-sm rounded-full px-4 py-1">
-              Referred by code: {referralCode}
-            </div>
-          )}
         </div>
 
         <div className="bg-gray-800 p-8 rounded-lg border border-gray-700">
@@ -150,6 +148,17 @@ const Register = () => {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="referralCode" className="text-gray-600 dark:text-gray-300">Referral Code (optional)</Label>
+              <Input
+                id="referralCode"
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value)}
+                className="mt-1 bg-gray-700 border-gray-600 text-gray-900 dark:text-white"
+                placeholder="Enter a referral code if you have one"
+              />
             </div>
 
             <div>
