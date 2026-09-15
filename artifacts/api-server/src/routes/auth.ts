@@ -5,6 +5,7 @@ import { db, usersTable, accountsTable } from "@workspace/db";
 import { hashPassword, comparePassword, signToken } from "../lib/auth";
 import { generateReferralCode } from "../lib/referral";
 import { authenticate, type AuthedRequest } from "../middlewares/authenticate";
+import { sendWelcomeEmail } from "../lib/email";
 
 const router: IRouter = Router();
 
@@ -87,6 +88,12 @@ router.post("/register", async (req, res) => {
     .returning();
 
   const token = signToken({ userId: user.id, email: user.email });
+
+  // Fire-and-forget: a welcome email failing (bad credentials, SMTP down,
+  // etc.) should never block or fail registration itself.
+  sendWelcomeEmail(user.email, user.fullName ?? undefined).catch((err) => {
+    console.error("Failed to send welcome email:", err);
+  });
 
   res.status(201).json({
     token,
