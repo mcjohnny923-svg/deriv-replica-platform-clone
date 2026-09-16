@@ -26,6 +26,55 @@ async function generateUniqueReferralCode(): Promise<string> {
   throw new Error("Failed to generate a unique referral code");
 }
 
+async function createVerifiedUser(input: {
+  email: string;
+  passwordHash: string;
+  fullName?: string;
+  referralCode?: string;
+  phoneNumber?: string;
+  country?: string;
+}) {
+  let referredByUserId: number | null = null;
+  if (input.referralCode) {
+    const referrer = await db.query.usersTable.findFirst({
+      where: eq(usersTable.referralCode, input.referralCode.toUpperCase()),
+    });
+    if (referrer) referredByUserId = referrer.id;
+  }
+
+  const ownReferralCode = await generateUniqueReferralCode();
+
+  const [user] = await db
+    .insert(usersTable)
+    .values({
+      email: input.email,
+      passwordHash: input.passwordHash,
+      fullName: input.fullName,
+      referralCode: ownReferralCode,
+      referredByUserId,
+      phoneNumber: input.phoneNumber,
+      country: input.country,
+    })
+    .returning();
+
+  const [demoAccount] = await db
+    .insert(accountsTable)
+    .values({ userId: user.id, type: "demo", currency: "USD", balance: "10000" })
+    .returning();
+  const [realAccount] = await db
+    .insert(accountsTable)
+    .values({ userId: user.id, type: "real", currency: "USD", balance: "0" })
+    .returning();
+
+  const token = signToken({ userId: user.id, email: user.email });
+
+  sendWelcomeEmail(user.email, user.fullName ?? undefined).catch((err) => {
+    console.error("Failed to send welcome email:", err);
+  });
+
+  return { user, demoAccount, realAccount, token };
+}
+
 const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
@@ -56,6 +105,32 @@ router.post("/register", async (req, res) => {
     if (phoneTaken) {
       return res.status(409).json({ error: "This phone number is already linked to another account" });
     }
+  }
+
+  if (process.env.SKIP_EMAIL_VERIFICATION === "true") {
+    const passwordHash = await hashPassword(password);
+    const { user, demoAccount, realAccount, token } = await createVerifiedUser({
+      email,
+      passwordHash,
+      fullName,
+      referralCode,
+      phoneNumber,
+      country,
+    });
+
+    return res.status(201).json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        createdAt: user.createdAt,
+        referralCode: user.referralCode,
+        phoneNumber: user.phoneNumber,
+        country: user.country,
+      },
+      accounts: [demoAccount, realAccount],
+    });
   }
 
   // Drop any stale pending registration for this email (expired, abandoned,
