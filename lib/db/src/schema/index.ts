@@ -47,6 +47,34 @@ export const insertUserSchema = createInsertSchema(usersTable).omit({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof usersTable.$inferSelect;
 
+// ---------- Pending registrations (email verify-before-create) ----------
+// Holds everything needed to create the real user+account rows, plus a
+// short-lived verification code. Nothing here becomes a real user until
+// the code is confirmed via /auth/register/confirm.
+export const pendingRegistrationsTable = pgTable("pending_registrations", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  fullName: text("full_name"),
+  referralCode: text("referral_code"),
+  phoneNumber: text("phone_number"),
+  country: text("country"),
+  verificationCode: text("verification_code").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertPendingRegistrationSchema = createInsertSchema(
+  pendingRegistrationsTable,
+).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertPendingRegistration = z.infer<
+  typeof insertPendingRegistrationSchema
+>;
+export type PendingRegistration = typeof pendingRegistrationsTable.$inferSelect;
+
 // ---------- Accounts (demo + real per user) ----------
 export const accountsTable = pgTable("accounts", {
   id: serial("id").primaryKey(),

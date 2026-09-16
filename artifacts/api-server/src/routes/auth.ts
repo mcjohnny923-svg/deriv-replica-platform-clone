@@ -1,13 +1,19 @@
 import { Router, type IRouter } from "express";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { db, usersTable, accountsTable } from "@workspace/db";
+import { db, usersTable, accountsTable, pendingRegistrationsTable } from "@workspace/db";
 import { hashPassword, comparePassword, signToken } from "../lib/auth";
 import { generateReferralCode } from "../lib/referral";
 import { authenticate, type AuthedRequest } from "../middlewares/authenticate";
-import { sendWelcomeEmail } from "../lib/email";
+import { sendWelcomeEmail, sendVerificationEmail } from "../lib/email";
 
 const router: IRouter = Router();
+
+const PENDING_REGISTRATION_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
+function generateVerificationCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
 
 async function generateUniqueReferralCode(): Promise<string> {
   for (let attempt = 0; attempt < 10; attempt++) {
@@ -52,29 +58,114 @@ router.post("/register", async (req, res) => {
     }
   }
 
+  // Drop any stale pending registration for this email (expired, abandoned,
+  // or a retry after a typo) so only one pending row per email ever exists.
+  await db
+    .delete(pendingRegistrationsTable)
+    .where(eq(pendingRegistrationsTable.email, email));
+
+  const passwordHash = await hashPassword(password);
+  const verificationCode = generateVerificationCode();
+  const expiresAt = new Date(Date.now() + PENDING_REGISTRATION_TTL_MS);
+
+  await db.insert(pendingRegistrationsTable).values({
+    email,
+    passwordHash,
+    fullName,
+    referralCode,
+    phoneNumber,
+    country,
+    verificationCode,
+    expiresAt,
+  });
+
+  try {
+    await sendVerificationEmail(email, verificationCode, fullName);
+  } catch (err) {
+    console.error("Failed to send verification email:", err);
+    return res.status(502).json({ error: "Failed to send verification email. Please try again." });
+  }
+
+  res.status(200).json({
+    message: "Verification code sent. Check your email to complete registration.",
+    email,
+  });
+});
+
+const confirmRegistrationSchema = z.object({
+  email: z.string().email(),
+  code: z.string().length(6),
+});
+
+router.post("/register/confirm", async (req, res) => {
+  const parsed = confirmRegistrationSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+  const { email, code } = parsed.data;
+
+  const pending = await db.query.pendingRegistrationsTable.findFirst({
+    where: eq(pendingRegistrationsTable.email, email),
+  });
+
+  if (!pending) {
+    return res.status(400).json({ error: "No pending registration found for this email. Please register again." });
+  }
+
+  if (pending.expiresAt.getTime() < Date.now()) {
+    await db
+      .delete(pendingRegistrationsTable)
+      .where(eq(pendingRegistrationsTable.id, pending.id));
+    return res.status(400).json({ error: "Verification code expired. Please register again." });
+  }
+
+  if (pending.verificationCode !== code) {
+    return res.status(400).json({ error: "Incorrect verification code" });
+  }
+
+  // Re-check uniqueness in case someone else grabbed the email/phone while
+  // this registration was pending.
+  const existing = await db.query.usersTable.findFirst({
+    where: eq(usersTable.email, pending.email),
+  });
+  if (existing) {
+    await db
+      .delete(pendingRegistrationsTable)
+      .where(eq(pendingRegistrationsTable.id, pending.id));
+    return res.status(409).json({ error: "Email already registered" });
+  }
+
+  if (pending.phoneNumber) {
+    const phoneTaken = await db.query.usersTable.findFirst({
+      where: eq(usersTable.phoneNumber, pending.phoneNumber),
+    });
+    if (phoneTaken) {
+      return res.status(409).json({ error: "This phone number is already linked to another account" });
+    }
+  }
+
   let referredByUserId: number | null = null;
-  if (referralCode) {
+  if (pending.referralCode) {
     const referrer = await db.query.usersTable.findFirst({
-      where: eq(usersTable.referralCode, referralCode.toUpperCase()),
+      where: eq(usersTable.referralCode, pending.referralCode.toUpperCase()),
     });
     if (referrer) {
       referredByUserId = referrer.id;
     }
   }
 
-  const passwordHash = await hashPassword(password);
   const ownReferralCode = await generateUniqueReferralCode();
 
   const [user] = await db
     .insert(usersTable)
     .values({
-      email,
-      passwordHash,
-      fullName,
+      email: pending.email,
+      passwordHash: pending.passwordHash,
+      fullName: pending.fullName,
       referralCode: ownReferralCode,
       referredByUserId,
-      phoneNumber,
-      country,
+      phoneNumber: pending.phoneNumber,
+      country: pending.country,
     })
     .returning();
 
@@ -86,6 +177,10 @@ router.post("/register", async (req, res) => {
     .insert(accountsTable)
     .values({ userId: user.id, type: "real", currency: "USD", balance: "0" })
     .returning();
+
+  await db
+    .delete(pendingRegistrationsTable)
+    .where(eq(pendingRegistrationsTable.id, pending.id));
 
   const token = signToken({ userId: user.id, email: user.email });
 
