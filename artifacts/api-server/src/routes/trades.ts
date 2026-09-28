@@ -1,6 +1,6 @@
 import { Router, type IRouter, type Response } from "express";
 import { z } from "zod";
-import { eq, and, lte, ne } from "drizzle-orm";
+import { eq, and, lte, ne, desc } from "drizzle-orm";
 import {
   db,
   accountsTable,
@@ -278,6 +278,7 @@ router.get("/history", async (req: AuthedRequest, res: Response) => {
       eq(tradesTable.accountId, accountId),
       ne(tradesTable.status, "open"),
     ),
+    orderBy: [desc(tradesTable.closedAt), desc(tradesTable.id)],
     with: { market: true },
   });
 
