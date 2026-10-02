@@ -6,21 +6,16 @@ import DerivSidebar from '@/components/DerivSidebar';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import TopUpModal from '@/components/TopUpModal';
 import WithdrawModal from '@/components/WithdrawModal';
-import { getStoredAccount, refreshAccounts, type AuthAccount } from '@/lib/auth-api';
+import { useLiveAccount } from '@/hooks/useLiveAccount';
 
 const Cashier = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [topUpOpen, setTopUpOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
-  const [account, setAccount] = useState<AuthAccount | null>(getStoredAccount());
+  const account = useLiveAccount();
   const isLoggedIn = account !== null;
 
-  useEffect(() => {
-    refreshAccounts()
-      .then(() => setAccount(getStoredAccount()))
-      .catch(() => {});
-  }, []);
   const balance = account
     ? `${account.currency} ${Number(account.balance).toLocaleString('en-US', {
         minimumFractionDigits: 2,

@@ -73,6 +73,7 @@ export function updateStoredAccountBalance(balance: string) {
   const activeType = getActiveAccountType();
   const updated = accounts.map((a) => (a.type === activeType ? { ...a, balance } : a));
   localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(updated));
+  window.dispatchEvent(new Event("auth-changed"));
 }
 
 export function updateStoredUserPhone(phoneNumber: string) {

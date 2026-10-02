@@ -28,17 +28,27 @@ const DerivHeader = ({ onMenuClick, balanceRefreshKey, onAccountSwitch }: DerivH
   }, [balanceRefreshKey]);
 
   useEffect(() => {
+    const syncLocal = () => {
+      setActiveType(getActiveAccountType());
+      setAccounts(getStoredAccounts());
+    };
     const refresh = () => {
+      if (document.visibilityState === 'hidden') return;
+      syncLocal();
       refreshAccounts()
         .then((fresh) => setAccounts(fresh))
         .catch(() => {});
     };
     window.addEventListener('focus', refresh);
     document.addEventListener('visibilitychange', refresh);
-    const interval = setInterval(refresh, 20000);
+    window.addEventListener('auth-changed', syncLocal);
+    window.addEventListener('storage', syncLocal);
+    const interval = setInterval(refresh, 10000);
     return () => {
       window.removeEventListener('focus', refresh);
       document.removeEventListener('visibilitychange', refresh);
+      window.removeEventListener('auth-changed', syncLocal);
+      window.removeEventListener('storage', syncLocal);
       clearInterval(interval);
     };
   }, []);

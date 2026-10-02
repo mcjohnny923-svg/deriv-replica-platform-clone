@@ -9,15 +9,13 @@ import DerivHeader from '@/components/DerivHeader';
 import DerivSidebar from '@/components/DerivSidebar';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import {
-  getRealAccount,
   updateStoredAccountBalance,
   getStoredUser,
   updateStoredUserPhone,
   setPhoneNumber,
-  refreshAccounts,
-  type AuthAccount,
 } from '@/lib/auth-api';
 import { initiateDeposit, checkDepositStatus, type DepositProvider } from '@/lib/payments-api';
+import { useLiveAccount } from '@/hooks/useLiveAccount';
 
 type FlowState = 'form' | 'waiting' | 'success' | 'failed';
 
@@ -81,13 +79,7 @@ const Deposit = () => {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [balanceRefreshKey, setBalanceRefreshKey] = useState(0);
-  const [account, setAccount] = useState<AuthAccount | null>(getRealAccount());
-
-  useEffect(() => {
-    refreshAccounts()
-      .then(() => setAccount(getRealAccount()))
-      .catch(() => {});
-  }, []);
+  const account = useLiveAccount();
   const [storedPhone, setStoredPhone] = useState(getStoredUser()?.phoneNumber ?? null);
 
   const [phoneInput, setPhoneInput] = useState('');

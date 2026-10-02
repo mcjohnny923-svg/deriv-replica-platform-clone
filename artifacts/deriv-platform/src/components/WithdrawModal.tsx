@@ -9,7 +9,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { initiateWithdraw, getExchangeRate } from '@/lib/payments-api';
-import { getActiveAccountType } from '@/lib/auth-api';
+import { getActiveAccountType, updateStoredAccountBalance } from '@/lib/auth-api';
 
 interface WithdrawModalProps {
   open: boolean;
@@ -52,7 +52,8 @@ const WithdrawModal = ({ open, onOpenChange, accountId }: WithdrawModalProps) =>
     }
     setSubmitting(true);
     try {
-      await initiateWithdraw({ accountId, amountUsd: amountNum });
+      const result = await initiateWithdraw({ accountId, amountUsd: amountNum });
+      updateStoredAccountBalance(result.newBalance);
       setSubmittedAmount(amountNum.toFixed(2));
       setSucceeded(true);
     } catch (err) {
