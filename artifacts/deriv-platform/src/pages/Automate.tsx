@@ -333,10 +333,10 @@ const Automate = () => {
           </div>
 
           {/* Sticky Run button, always visible above the bottom nav */}
-          <div className="md:hidden shrink-0 p-4 border-t border-gray-200 dark:border-[#323738] bg-gray-50 dark:bg-[#0e0e0e]">
+          <div className="md:hidden shrink-0 flex justify-center px-3 py-1.5 border-t border-gray-200 dark:border-[#323738] bg-gray-50 dark:bg-[#0e0e0e]">
             <Button
               onClick={handleRun}
-              className={`w-full py-6 text-base font-semibold ${
+              className={`h-7 min-h-0 px-5 py-0 text-xs font-semibold rounded-full ${
                 isRunning ? 'bg-red-600 hover:bg-red-700' : 'bg-green-500 hover:bg-green-600'
               }`}
             >
