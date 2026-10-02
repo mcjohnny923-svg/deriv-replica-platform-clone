@@ -52,6 +52,12 @@ router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) 
   }
 
   const usdAmount = kesToUsd(amountKes);
+
+  const MIN_DEPOSIT_USD = 5;
+  if (usdAmount < MIN_DEPOSIT_USD) {
+    return res.status(400).json({ error: `Minimum deposit is $${MIN_DEPOSIT_USD}.` });
+  }
+
   const accountReference = `TRD-${accountId}-${Date.now()}`;
 
   if (provider === "card") {

@@ -22,6 +22,7 @@ import { initiateDeposit, checkDepositStatus, type DepositProvider } from '@/lib
 type FlowState = 'form' | 'waiting' | 'success' | 'failed';
 
 const KES_PER_USD = 130;
+const MIN_DEPOSIT_USD = 5;
 const PAYSTACK_INLINE_SRC = 'https://js.paystack.co/v1/inline.js';
 
 const PROVIDER_LABELS: Record<DepositProvider, string> = {
@@ -163,6 +164,10 @@ const Deposit = () => {
       toast.error('Enter a valid amount.');
       return;
     }
+    if (parsedUsd < MIN_DEPOSIT_USD) {
+      toast.error(`Minimum deposit is $${MIN_DEPOSIT_USD}.`);
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -282,6 +287,9 @@ const Deposit = () => {
                   <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                     = {kesDisplay} KES will be charged (rate: {KES_PER_USD} KES/USD)
                   </div>
+                  {parsedUsd > 0 && parsedUsd < MIN_DEPOSIT_USD && (
+                    <div className="text-xs text-red-500 mt-1">Minimum deposit is ${MIN_DEPOSIT_USD}.</div>
+                  )}
                   <div className="grid grid-cols-4 gap-2 mt-3">
                     {['5', '10', '25', '50'].map((preset) => (
                       <Button
@@ -298,7 +306,7 @@ const Deposit = () => {
 
                 <Button
                   onClick={handleSubmit}
-                  disabled={submitting}
+                  disabled={submitting || !(parsedUsd >= MIN_DEPOSIT_USD)}
                   className="w-full bg-red-600 hover:bg-red-700 text-white py-3 text-base disabled:opacity-50"
                 >
                   {submitting ? 'Please wait...' : buttonLabel}
