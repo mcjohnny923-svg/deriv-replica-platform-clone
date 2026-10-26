@@ -7,4 +7,4 @@ export function generateReferralCode(): string {
   return code;
 }
 
-export const REFERRAL_COMMISSION_RATE = 0.05;
+export const REFERRAL_COMMISSION_RATE = 0.20;

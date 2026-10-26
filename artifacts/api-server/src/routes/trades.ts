@@ -158,7 +158,7 @@ async function settleDueTrades(accountId: number) {
     }
 
     // 5% referral commission on stake, win or lose
-    await creditReferralCommission(accountId, trade.id, stakeNum);
+    // trade commission disabled: commission is paid on deposits only
   }
 }
 

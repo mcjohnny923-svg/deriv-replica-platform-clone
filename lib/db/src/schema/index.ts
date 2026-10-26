@@ -174,9 +174,8 @@ export const referralEarningsTable = pgTable("referral_earnings", {
   referredUserId: integer("referred_user_id")
     .references(() => usersTable.id)
     .notNull(),
-  tradeId: integer("trade_id")
-    .references(() => tradesTable.id)
-    .notNull(),
+  tradeId: integer("trade_id").references(() => tradesTable.id),
+  transactionId: integer("transaction_id").references(() => transactionsTable.id),
   amount: numeric("amount", { precision: 15, scale: 2 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

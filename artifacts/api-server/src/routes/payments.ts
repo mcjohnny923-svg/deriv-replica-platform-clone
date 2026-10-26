@@ -1,7 +1,8 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { db, accountsTable, transactionsTable, usersTable } from "@workspace/db";
+import { db, accountsTable, transactionsTable, usersTable, referralEarningsTable } from "@workspace/db";
+import { REFERRAL_COMMISSION_RATE } from "../lib/referral";
 import { authenticate, type AuthedRequest } from "../middlewares/authenticate";
 import {
   initiateNovtrupDeposit,
@@ -12,6 +13,36 @@ import {
 } from "../lib/novtrup";
 import { kesToUsd, usdToKes, getKesPerUsdRate } from "../lib/forex";
 import { notifyWithdrawalRequest } from "../lib/sms-webhook";
+
+// Referral commission is paid only when a referred user's REAL-account deposit completes.
+async function creditDepositCommission(transactionId: number, accountId: number, depositUsd: number) {
+  try {
+    const account = await db.query.accountsTable.findFirst({
+      where: eq(accountsTable.id, accountId),
+    });
+    if (!account || account.type !== "real") return;
+
+    const depositor = await db.query.usersTable.findFirst({
+      where: eq(usersTable.id, account.userId),
+    });
+    if (!depositor?.referredByUserId) return;
+
+    const commission = depositUsd * REFERRAL_COMMISSION_RATE;
+    if (commission < 0.01) return;
+
+    await db
+      .insert(referralEarningsTable)
+      .values({
+        referrerUserId: depositor.referredByUserId,
+        referredUserId: depositor.id,
+        transactionId,
+        amount: commission.toFixed(2),
+      })
+      .onConflictDoNothing();
+  } catch (err) {
+    console.error(`Deposit commission failed for transaction ${transactionId}:`, err);
+  }
+}
 
 const router: IRouter = Router();
 
@@ -305,6 +336,9 @@ router.post("/webhook/novtrup", async (req: Request, res: Response) => {
       .update(transactionsTable)
       .set({ status: "completed" })
       .where(eq(transactionsTable.id, transaction.id));
+    if (transaction.type === "deposit") {
+      await creditDepositCommission(transaction.id, transaction.accountId, Number(transaction.amount));
+    }
   } else {
     await db
       .update(transactionsTable)

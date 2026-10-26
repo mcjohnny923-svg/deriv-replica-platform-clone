@@ -83,7 +83,7 @@ const Partners = () => {
                   </div>
 
                   <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
-                    Anyone who signs up through this link becomes your referral. You earn 5% of the stake on every trade they place — win or lose.
+                    Anyone who signs up through this link becomes your referral. You earn 20% of every deposit they make into their real account.
                   </p>
 
                   <div className="flex gap-2">
@@ -114,7 +114,7 @@ const Partners = () => {
                       <div className="text-xl font-bold text-gray-900 dark:text-white">{summary.signupsCount}</div>
                     </div>
                     <div className="bg-gray-100 dark:bg-[#323738] rounded-lg p-3">
-                      <div className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400">Trades commissioned</div>
+                      <div className="text-xs text-gray-400 dark:text-gray-500 dark:text-gray-400">Deposits commissioned</div>
                       <div className="text-xl font-bold text-gray-900 dark:text-white">{summary.tradesCommissioned}</div>
                     </div>
                   </div>
