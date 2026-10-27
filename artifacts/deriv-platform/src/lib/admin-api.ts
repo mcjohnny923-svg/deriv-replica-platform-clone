@@ -112,3 +112,41 @@ export async function setUserAutoWithdraw(
   }
   return data;
 }
+
+export interface AdminPartnerWithdrawal {
+  id: number;
+  amount: string;
+  status: "pending" | "paid" | "rejected";
+  createdAt: string;
+  resolvedAt: string | null;
+  email: string;
+  fullName: string | null;
+  phoneNumber: string | null;
+}
+
+export async function fetchPartnerWithdrawals(adminKey: string): Promise<AdminPartnerWithdrawal[]> {
+  const res = await fetch(`${API_BASE_URL}/api/admin/partner-withdrawals`, {
+    headers: authHeaders(adminKey),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error ?? "Failed to load withdrawal requests");
+  }
+  return data.withdrawals;
+}
+
+export async function resolvePartnerWithdrawal(
+  adminKey: string,
+  id: number,
+  action: "paid" | "return",
+): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/api/admin/partner-withdrawals/${id}/resolve`, {
+    method: "POST",
+    headers: authHeaders(adminKey),
+    body: JSON.stringify({ action }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error ?? "Failed to update request");
+  }
+}

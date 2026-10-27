@@ -7,6 +7,10 @@ export interface PartnerSummary {
   totalEarnings: string;
   thisMonthEarnings: string;
   tradesCommissioned: number;
+  availableBalance: string;
+  pendingWithdrawal: string;
+  paidOut: string;
+  minWithdrawal: number;
 }
 
 function authHeaders(): HeadersInit {
@@ -24,6 +28,18 @@ export async function getPartnerSummary(): Promise<PartnerSummary> {
   const data = await res.json();
   if (!res.ok) {
     throw new Error(data.error ?? "Failed to load partner summary");
+  }
+  return data;
+}
+
+export async function requestPartnerWithdrawal(): Promise<{ amount: string }> {
+  const res = await fetch(`${API_BASE_URL}/api/partners/withdraw`, {
+    method: "POST",
+    headers: authHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error ?? "Failed to request withdrawal");
   }
   return data;
 }

@@ -165,6 +165,19 @@ export const insertTransactionSchema = createInsertSchema(
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 export type Transaction = typeof transactionsTable.$inferSelect;
 
+// ---------- Partner withdrawal requests ----------
+export const partnerWithdrawalsTable = pgTable("partner_withdrawals", {
+  id: serial("id").primaryKey(),
+  partnerUserId: integer("partner_user_id")
+    .references(() => usersTable.id)
+    .notNull(),
+  amount: numeric("amount", { precision: 15, scale: 2 }).notNull(),
+  status: text("status").notNull().default("pending"),
+  note: text("note"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  resolvedAt: timestamp("resolved_at"),
+});
+
 // ---------- Referral earnings ledger ----------
 export const referralEarningsTable = pgTable("referral_earnings", {
   id: serial("id").primaryKey(),

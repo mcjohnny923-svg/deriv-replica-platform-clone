@@ -5,7 +5,7 @@ import DerivHeader from '@/components/DerivHeader';
 import DerivSidebar from '@/components/DerivSidebar';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import { Button } from '@/components/ui/button';
-import { getPartnerSummary, type PartnerSummary } from '@/lib/partners-api';
+import { getPartnerSummary, requestPartnerWithdrawal, type PartnerSummary } from '@/lib/partners-api';
 
 const Partners = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -18,6 +18,21 @@ const Partners = () => {
       .catch((err) => toast.error(err instanceof Error ? err.message : 'Failed to load'))
       .finally(() => setLoading(false));
   }, []);
+
+  const [requesting, setRequesting] = useState(false);
+
+  const handleWithdraw = async () => {
+    setRequesting(true);
+    try {
+      const result = await requestPartnerWithdrawal();
+      toast.success('Withdrawal of USD ' + result.amount + ' requested');
+      setSummary(await getPartnerSummary());
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to request withdrawal');
+    } finally {
+      setRequesting(false);
+    }
+  };
 
   const referralLink = summary
     ? `${window.location.origin}/register?ref=${summary.referralCode}`
@@ -55,6 +70,30 @@ const Partners = () => {
                   <div className="text-2xl font-bold text-gray-900 dark:text-white">USD {summary.totalEarnings}</div>
                   <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                     USD {summary.thisMonthEarnings} this month
+                  </div>
+                </div>
+
+                {/* Available balance */}
+                <div className="bg-white dark:bg-[#151717] rounded-lg p-4 border border-gray-200 dark:border-[#323738]">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-xs text-gray-400 dark:text-gray-500">Available balance</div>
+                      <div className="text-2xl font-bold text-gray-900 dark:text-white">USD {summary.availableBalance}</div>
+                    </div>
+                    <Button
+                      onClick={handleWithdraw}
+                      disabled={
+                        requesting ||
+                        Number(summary.pendingWithdrawal) > 0 ||
+                        Number(summary.availableBalance) < summary.minWithdrawal
+                      }
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      {requesting ? 'Requesting...' : 'Request withdrawal'}
+                    </Button>
+                  </div>
+                  <div className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                    Pending: USD {summary.pendingWithdrawal} · Paid out: USD {summary.paidOut} · Minimum: USD {summary.minWithdrawal}
                   </div>
                 </div>
 
