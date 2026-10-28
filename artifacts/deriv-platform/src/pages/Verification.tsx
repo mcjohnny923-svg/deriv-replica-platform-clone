@@ -83,7 +83,7 @@ const Verification = () => {
             <h1 className="text-2xl font-bold">Verification</h1>
             <p className="text-xs text-gray-400 dark:text-gray-500">
               Upload clear photos or PDFs (JPG, PNG or PDF, max 5 MB). Your documents are private and
-              are only seen by our verification team.
+              are only seen by our verification team. Rejected documents are deleted immediately, and approved documents are deleted 30 days after approval.
             </p>
 
             {SLOTS.map((slot) => {
@@ -111,7 +111,7 @@ const Verification = () => {
 
                   {doc && (
                     <div className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-                      {doc.fileName} · {new Date(doc.createdAt).toLocaleDateString()}
+                      {doc.fileName === 'deleted' ? 'File removed after review' : doc.fileName} · {new Date(doc.createdAt).toLocaleDateString()}
                     </div>
                   )}
                   {doc?.status === 'rejected' && doc.rejectReason && (

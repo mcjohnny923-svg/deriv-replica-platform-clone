@@ -3,11 +3,15 @@ import { z } from "zod";
 import { eq, and, desc } from "drizzle-orm";
 import { db, usersTable, verificationDocumentsTable } from "@workspace/db";
 import { adminAuth } from "../middlewares/adminAuth";
+import { wipeExpiredVerificationDocs, startVerificationCleanup } from "../lib/verification-cleanup";
 
 const router: IRouter = Router();
 
+startVerificationCleanup();
+
 router.get("/", adminAuth, async (_req: Request, res: Response) => {
   try {
+    await wipeExpiredVerificationDocs();
     const rows = await db
       .select({
         id: verificationDocumentsTable.id,
@@ -45,6 +49,10 @@ router.get("/:id/file", adminAuth, async (req: Request, res: Response) => {
     res.status(404).json({ error: "Document not found" });
     return;
   }
+  if (!row.data) {
+    res.status(410).json({ error: "This file has been deleted." });
+    return;
+  }
   res.json(row);
 });
 
@@ -72,6 +80,7 @@ router.post("/:id/review", adminAuth, async (req: Request, res: Response) => {
       status: action === "approve" ? "approved" : "rejected",
       rejectReason: action === "reject" ? reason!.trim() : null,
       reviewedAt: new Date(),
+      ...(action === "reject" ? { fileData: "", fileName: "deleted" } : {}),
     })
     .where(and(eq(verificationDocumentsTable.id, id), eq(verificationDocumentsTable.status, "pending")))
     .returning({ id: verificationDocumentsTable.id });
