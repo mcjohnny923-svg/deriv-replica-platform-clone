@@ -47,6 +47,7 @@ const DerivSidebar = ({ isOpen, onToggle }: DerivSidebarProps) => {
     { icon: Briefcase, label: 'Portfolio', path: '/portfolio' },
     { icon: CreditCard, label: 'Cashier', path: '/cashier' },
     { icon: Users, label: 'Partners', path: '/partners' },
+    { icon: Users, label: 'Verification', path: '/verification' },
   ];
 
   const accountItems = [

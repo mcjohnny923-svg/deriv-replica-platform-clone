@@ -150,3 +150,51 @@ export async function resolvePartnerWithdrawal(
     throw new Error(data.error ?? "Failed to update request");
   }
 }
+
+export interface AdminVerificationDoc {
+  id: number;
+  docType: "identity" | "address";
+  fileName: string;
+  mimeType: string;
+  status: "pending" | "approved" | "rejected";
+  rejectReason: string | null;
+  createdAt: string;
+  reviewedAt: string | null;
+  email: string;
+  fullName: string | null;
+  phoneNumber: string | null;
+}
+
+export async function fetchVerificationDocs(adminKey: string): Promise<AdminVerificationDoc[]> {
+  const res = await fetch(`${API_BASE_URL}/api/admin/verification`, { headers: authHeaders(adminKey) });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error ?? "Failed to load documents");
+  return data.documents;
+}
+
+export async function fetchVerificationFile(
+  adminKey: string,
+  id: number,
+): Promise<{ data: string; mimeType: string }> {
+  const res = await fetch(`${API_BASE_URL}/api/admin/verification/${id}/file`, {
+    headers: authHeaders(adminKey),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error ?? "Failed to load file");
+  return data;
+}
+
+export async function reviewVerificationDoc(
+  adminKey: string,
+  id: number,
+  action: "approve" | "reject",
+  reason?: string,
+): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/api/admin/verification/${id}/review`, {
+    method: "POST",
+    headers: authHeaders(adminKey),
+    body: JSON.stringify({ action, reason }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error ?? "Failed to review document");
+}

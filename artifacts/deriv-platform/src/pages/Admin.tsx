@@ -1,3 +1,4 @@
+import AdminVerification from '@/components/AdminVerification';
 import AdminWithdrawals from '@/components/AdminWithdrawals';
 import { useState, useEffect, Fragment } from 'react';
 import { Lock, Loader2, RefreshCw, ChevronDown, ChevronRight } from 'lucide-react';
@@ -264,6 +265,7 @@ const Admin = () => {
           </div>
         )}
 
+        {tab === 'users' && adminKey && <AdminVerification adminKey={adminKey} />}
         {tab === 'partners' && adminKey && <AdminWithdrawals adminKey={adminKey} />}
         {tab === 'partners' && (
           <div className="bg-white dark:bg-[#151717] border border-gray-200 dark:border-[#323738] rounded-lg overflow-x-auto">

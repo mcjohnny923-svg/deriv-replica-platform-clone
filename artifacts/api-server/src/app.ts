@@ -31,6 +31,7 @@ app.use(
   }),
 );
 app.use(cors());
+app.use("/api/verification/upload", express.json({ limit: "8mb" }));
 app.use(
   express.json({
     verify: (req, _res, buf) => {

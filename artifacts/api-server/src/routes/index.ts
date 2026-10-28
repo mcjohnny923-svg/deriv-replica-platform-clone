@@ -5,6 +5,8 @@ import tradesRouter from "./trades";
 import partnersRouter from "./partners";
 import paymentsRouter from "./payments";
 import adminRouter from "./admin";
+import verificationRouter from "./verification";
+import verificationAdminRouter from "./verification-admin";
 import partnerWithdrawalsRouter from "./partner-withdrawals";
 import marketsRouter from "./markets";
 
@@ -15,6 +17,8 @@ router.use("/trades", tradesRouter);
 router.use("/partners", partnersRouter);
 router.use("/payments", paymentsRouter);
 router.use("/admin/partner-withdrawals", partnerWithdrawalsRouter);
+router.use("/admin/verification", verificationAdminRouter);
+router.use("/verification", verificationRouter);
 router.use("/admin", adminRouter);
 router.use("/markets", marketsRouter);
 

@@ -14,6 +14,7 @@ import Admin from "./pages/Admin";
 import Positions from "./pages/Positions";
 import Automate from "./pages/Automate";
 import Partners from "./pages/Partners";
+import Verification from "./pages/Verification";
 import NotFound from "./pages/NotFound";
 import { TradeSettingsProvider } from "./contexts/TradeSettingsContext";
 import { BotEngineProvider } from "./contexts/BotEngineContext";
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/positions" element={<Positions />} />
           <Route path="/automate" element={<Automate />} />
           <Route path="/partners" element={<Partners />} />
+          <Route path="/verification" element={<Verification />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

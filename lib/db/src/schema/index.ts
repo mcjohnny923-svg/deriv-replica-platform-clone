@@ -178,6 +178,22 @@ export const partnerWithdrawalsTable = pgTable("partner_withdrawals", {
   resolvedAt: timestamp("resolved_at"),
 });
 
+// ---------- Verification documents (KYC) ----------
+export const verificationDocumentsTable = pgTable("verification_documents", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .references(() => usersTable.id)
+    .notNull(),
+  docType: text("doc_type").notNull(),
+  fileName: text("file_name").notNull(),
+  mimeType: text("mime_type").notNull(),
+  fileData: text("file_data").notNull(),
+  status: text("status").notNull().default("pending"),
+  rejectReason: text("reject_reason"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  reviewedAt: timestamp("reviewed_at"),
+});
+
 // ---------- Referral earnings ledger ----------
 export const referralEarningsTable = pgTable("referral_earnings", {
   id: serial("id").primaryKey(),
