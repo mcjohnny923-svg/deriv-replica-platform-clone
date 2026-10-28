@@ -205,3 +205,15 @@ export function getRealAccount(): AuthAccount | null {
   const accounts = getStoredAccounts();
   return accounts.find((a) => a.type === 'real') ?? null;
 }
+
+export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/api/account/change-password`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.error ?? "Failed to change password");
+  }
+}

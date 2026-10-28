@@ -14,6 +14,7 @@ import {
   getStoredAccount,
   refreshAccounts,
   updateProfile,
+  changePassword,
   updateStoredUserFields,
   type AuthAccount,
 } from '@/lib/auth-api';
@@ -84,6 +85,36 @@ const Profile = () => {
         maximumFractionDigits: 2,
       })}`
     : '—';
+
+  const [pwOpen, setPwOpen] = useState(false);
+  const [pwCurrent, setPwCurrent] = useState('');
+  const [pwNew, setPwNew] = useState('');
+  const [pwConfirm, setPwConfirm] = useState('');
+  const [pwSaving, setPwSaving] = useState(false);
+
+  const handleChangePassword = async () => {
+    if (pwNew.length < 8) {
+      toast.error('New password must be at least 8 characters');
+      return;
+    }
+    if (pwNew !== pwConfirm) {
+      toast.error('New passwords do not match');
+      return;
+    }
+    setPwSaving(true);
+    try {
+      await changePassword(pwCurrent, pwNew);
+      toast.success('Password changed');
+      setPwCurrent('');
+      setPwNew('');
+      setPwConfirm('');
+      setPwOpen(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to change password');
+    } finally {
+      setPwSaving(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0e0e0e] text-gray-900 dark:text-white flex flex-col">
@@ -221,9 +252,45 @@ const Profile = () => {
                   </div>
                   <Switch defaultChecked />
                 </div>
-                <Button variant="outline" className="w-full border-gray-300 dark:border-[#414647] text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#323738]">
+                <Button
+                  variant="outline"
+                  onClick={() => setPwOpen(!pwOpen)}
+                  className="w-full border-gray-300 dark:border-[#414647] text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#323738]"
+                >
                   Change Password
                 </Button>
+                {pwOpen && (
+                  <div className="space-y-3 p-3 bg-gray-100 dark:bg-[#323738] rounded-lg">
+                    <Input
+                      type="password"
+                      placeholder="Current password"
+                      autoComplete="current-password"
+                      value={pwCurrent}
+                      onChange={(e) => setPwCurrent(e.target.value)}
+                    />
+                    <Input
+                      type="password"
+                      placeholder="New password (min 8 characters)"
+                      autoComplete="new-password"
+                      value={pwNew}
+                      onChange={(e) => setPwNew(e.target.value)}
+                    />
+                    <Input
+                      type="password"
+                      placeholder="Confirm new password"
+                      autoComplete="new-password"
+                      value={pwConfirm}
+                      onChange={(e) => setPwConfirm(e.target.value)}
+                    />
+                    <Button
+                      onClick={handleChangePassword}
+                      disabled={pwSaving || !pwCurrent || !pwNew || !pwConfirm}
+                      className="w-full bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      {pwSaving ? 'Saving...' : 'Save new password'}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
 
