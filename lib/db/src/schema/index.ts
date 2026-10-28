@@ -194,6 +194,16 @@ export const verificationDocumentsTable = pgTable("verification_documents", {
   reviewedAt: timestamp("reviewed_at"),
 });
 
+// ---------- Password reset codes ----------
+export const passwordResetCodesTable = pgTable("password_reset_codes", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull(),
+  codeHash: text("code_hash").notNull(),
+  attempts: integer("attempts").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+});
+
 // ---------- Referral earnings ledger ----------
 export const referralEarningsTable = pgTable("referral_earnings", {
   id: serial("id").primaryKey(),

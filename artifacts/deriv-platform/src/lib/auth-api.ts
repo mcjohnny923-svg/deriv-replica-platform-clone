@@ -217,3 +217,27 @@ export async function changePassword(currentPassword: string, newPassword: strin
     throw new Error(data.error ?? "Failed to change password");
   }
 }
+
+export async function requestPasswordReset(email: string): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/api/password-reset/request`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error ?? "Failed to send code");
+}
+
+export async function confirmPasswordReset(input: {
+  email: string;
+  code: string;
+  newPassword: string;
+}): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/api/password-reset/confirm`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error ?? "Failed to reset password");
+}

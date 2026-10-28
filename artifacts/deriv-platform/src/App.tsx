@@ -15,6 +15,7 @@ import Positions from "./pages/Positions";
 import Automate from "./pages/Automate";
 import Partners from "./pages/Partners";
 import Verification from "./pages/Verification";
+import ForgotPassword from "./pages/ForgotPassword";
 import NotFound from "./pages/NotFound";
 import { TradeSettingsProvider } from "./contexts/TradeSettingsContext";
 import { BotEngineProvider } from "./contexts/BotEngineContext";
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/deposit" element={<Deposit />} />
           <Route path="/withdrawal" element={<Deposit />} />

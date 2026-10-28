@@ -72,3 +72,17 @@ export async function sendVerificationEmail(to: string, code: string, name: stri
     `,
   });
 }
+
+export async function sendPasswordResetEmail(to: string, code: string): Promise<void> {
+  if (!SMTP_USER || !SMTP_PASS) {
+    console.warn("SMTP_USER/SMTP_PASS not set - skipping password reset email");
+    return;
+  }
+  await transporter.sendMail({
+    from: `"NovBinary" <${SMTP_USER}>`,
+    to,
+    subject: "Your NovBinary password reset code",
+    text: `Your password reset code is ${code}. It expires in 15 minutes. If you did not ask for this, ignore this email and your password will stay the same.`,
+    html: `<p>Your password reset code is:</p><p style="font-size:28px;font-weight:bold;letter-spacing:4px">${code}</p><p>It expires in 15 minutes. If you did not ask for this, ignore this email and your password will stay the same.</p>`,
+  });
+}
