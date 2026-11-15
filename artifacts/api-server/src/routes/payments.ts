@@ -1,6 +1,6 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db, accountsTable, transactionsTable, usersTable, referralEarningsTable } from "@workspace/db";
 import { REFERRAL_COMMISSION_RATE } from "../lib/referral";
 import { authenticate, type AuthedRequest } from "../middlewares/authenticate";
@@ -59,7 +59,7 @@ router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) 
   if (!parsed.success) {
     return res.status(400).json({ error: parsed.error.flatten() });
   }
-  const { accountId, amountKes, provider } = parsed.data;
+  const { amountKes, provider } = parsed.data;
 
   const user = await db.query.usersTable.findFirst({
     where: eq(usersTable.id, req.userId!),
@@ -75,12 +75,17 @@ router.post("/deposit", authenticate, async (req: AuthedRequest, res: Response) 
     });
   }
 
+  // Deposits are real money, so they must always land in the user's REAL
+  // account - never whichever account happens to be active in the browser
+  // (a deposit started while on Demo used to credit the Demo account).
+  // The accountId sent by the client is ignored on purpose.
   const account = await db.query.accountsTable.findFirst({
-    where: eq(accountsTable.id, accountId),
+    where: and(eq(accountsTable.userId, req.userId!), eq(accountsTable.type, "real")),
   });
-  if (!account || account.userId !== req.userId) {
-    return res.status(403).json({ error: "Account not found or not owned by you" });
+  if (!account) {
+    return res.status(404).json({ error: "Real account not found" });
   }
+  const accountId = account.id;
 
   const usdAmount = kesToUsd(amountKes);
 
