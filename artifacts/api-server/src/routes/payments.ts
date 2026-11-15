@@ -327,9 +327,24 @@ router.post("/webhook/novtrup", async (req: Request, res: Response) => {
   }
 
   if (payload.status === "SUCCESS") {
-    const account = await db.query.accountsTable.findFirst({
+    let account = await db.query.accountsTable.findFirst({
       where: eq(accountsTable.id, transaction.accountId),
     });
+    // Safety net: deposits are real money and must never credit a demo account,
+    // even if an older pending row was saved against one.
+    if (account && transaction.type === "deposit" && account.type !== "real") {
+      const realAccount = await db.query.accountsTable.findFirst({
+        where: and(eq(accountsTable.userId, account.userId), eq(accountsTable.type, "real")),
+      });
+      if (realAccount) {
+        account = realAccount;
+        await db
+          .update(transactionsTable)
+          .set({ accountId: realAccount.id })
+          .where(eq(transactionsTable.id, transaction.id));
+        transaction.accountId = realAccount.id;
+      }
+    }
     if (account) {
       const newBalance = Number(account.balance) + Number(transaction.amount);
       await db
