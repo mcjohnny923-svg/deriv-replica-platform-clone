@@ -31,6 +31,8 @@ export interface AdminPartner {
   email: string;
   fullName: string | null;
   referralCode: string | null;
+  masterPartnerId: number | null;
+  referredByUserId: number | null;
   signupsCount: number;
   totalCommission: string;
   referredUsers: AdminPartnerReferredUser[];
@@ -109,6 +111,23 @@ export async function setUserAutoWithdraw(
   const data = await res.json();
   if (!res.ok) {
     throw new Error(data.error ?? "Failed to update auto-withdraw setting");
+  }
+  return data;
+}
+
+export async function setMasterPartner(
+  adminKey: string,
+  userId: number,
+  masterPartnerId: number | null,
+): Promise<{ ok: boolean; masterPartnerId: number | null }> {
+  const res = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/master-partner`, {
+    method: "POST",
+    headers: authHeaders(adminKey),
+    body: JSON.stringify({ masterPartnerId }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error ?? "Failed to set master partner");
   }
   return data;
 }

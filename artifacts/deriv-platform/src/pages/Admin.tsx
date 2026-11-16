@@ -9,6 +9,7 @@ import {
   fetchAdminPartners,
   setUserSuspended,
   setUserAutoWithdraw,
+  setMasterPartner,
   type AdminUser,
   type AdminPartner,
 } from '@/lib/admin-api';
@@ -62,6 +63,16 @@ const Admin = () => {
       setError(err instanceof Error ? err.message : 'Failed to load partners');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSetMaster = async (partnerId: number, masterId: number | null) => {
+    try {
+      await setMasterPartner(adminKey, partnerId, masterId);
+      setError('');
+      await loadPartners(adminKey);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to set master partner');
     }
   };
 
@@ -305,6 +316,26 @@ const Admin = () => {
                       <tr className="border-b border-gray-200 dark:border-[#232728] bg-gray-50 dark:bg-[#0e0e0e]">
                         <td></td>
                         <td colSpan={4} className="p-3">
+                          <div className="flex items-center gap-2 mb-3 text-xs text-gray-600 dark:text-gray-300">
+                            <span>Master partner:</span>
+                            <select
+                              value={p.masterPartnerId ?? ''}
+                              onChange={(e) =>
+                                handleSetMaster(p.id, e.target.value === '' ? null : Number(e.target.value))
+                              }
+                              className="bg-white dark:bg-[#323738] border border-gray-300 dark:border-[#414647] rounded px-2 py-1 text-gray-900 dark:text-white"
+                            >
+                              <option value="">None</option>
+                              {(partners ?? [])
+                                .filter((m) => m.id !== p.id && !m.referredByUserId && !m.masterPartnerId)
+                                .map((m) => (
+                                  <option key={m.id} value={m.id}>
+                                    {m.email}
+                                  </option>
+                                ))}
+                            </select>
+                            <span className="text-gray-400">(+5% extra on this partner's referred deposits)</span>
+                          </div>
                           <table className="w-full text-xs">
                             <thead>
                               <tr className="text-gray-400 dark:text-gray-500 text-left">

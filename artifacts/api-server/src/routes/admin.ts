@@ -159,6 +159,7 @@ router.get("/partners", adminAuth, async (_req: Request, res: Response) => {
           fullName: partner.fullName,
           referralCode: partner.referralCode,
           masterPartnerId: partner.masterPartnerId,
+          referredByUserId: partner.referredByUserId,
           signupsCount: referred.length,
           totalCommission: totalCommission.toFixed(2),
           referredUsers: referredWithDeposits,
@@ -194,14 +195,14 @@ router.post("/users/:id/master-partner", adminAuth, async (req: Request, res: Re
     if (!(await hasReferrals(userId))) {
       return res.status(400).json({ error: "This user is not a partner yet (no referred users)" });
     }
-    if (!(await hasReferrals(masterPartnerId))) {
-      return res.status(400).json({ error: "The master must be a partner too (at least one referred user)" });
-    }
     if (masterPartnerId === userId) {
       return res.status(400).json({ error: "A partner cannot be their own master" });
     }
     const master = await db.query.usersTable.findFirst({ where: eq(usersTable.id, masterPartnerId) });
     if (!master) return res.status(404).json({ error: "Master partner not found" });
+    if (master.referredByUserId) {
+      return res.status(400).json({ error: "A master cannot have been referred by another partner" });
+    }
     if (master.masterPartnerId) {
       return res.status(400).json({ error: "That master is itself under another master (one level only)" });
     }
