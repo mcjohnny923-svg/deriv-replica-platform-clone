@@ -2,7 +2,7 @@ import { Router, type IRouter, type Request, type Response } from "express";
 import { z } from "zod";
 import { and, eq } from "drizzle-orm";
 import { db, accountsTable, transactionsTable, usersTable, referralEarningsTable } from "@workspace/db";
-import { REFERRAL_COMMISSION_RATE } from "../lib/referral";
+import { REFERRAL_COMMISSION_RATE, MASTER_COMMISSION_RATE } from "../lib/referral";
 import { authenticate, type AuthedRequest } from "../middlewares/authenticate";
 import {
   initiateNovtrupDeposit,
@@ -39,6 +39,30 @@ async function creditDepositCommission(transactionId: number, accountId: number,
         amount: commission.toFixed(2),
       })
       .onConflictDoNothing();
+
+    // Master partner bonus: 5% extra (deposits only), paid once per deposit.
+    const partner = await db.query.usersTable.findFirst({
+      where: eq(usersTable.id, depositor.referredByUserId),
+    });
+    if (partner?.masterPartnerId) {
+      const masterCommission = depositUsd * MASTER_COMMISSION_RATE;
+      if (masterCommission >= 0.01) {
+        const existing = await db.query.referralEarningsTable.findFirst({
+          where: and(
+            eq(referralEarningsTable.transactionId, transactionId),
+            eq(referralEarningsTable.referrerUserId, partner.masterPartnerId),
+          ),
+        });
+        if (!existing) {
+          await db.insert(referralEarningsTable).values({
+            referrerUserId: partner.masterPartnerId,
+            referredUserId: depositor.id,
+            transactionId,
+            amount: masterCommission.toFixed(2),
+          });
+        }
+      }
+    }
   } catch (err) {
     console.error(`Deposit commission failed for transaction ${transactionId}:`, err);
   }

@@ -8,3 +8,5 @@ export function generateReferralCode(): string {
 }
 
 export const REFERRAL_COMMISSION_RATE = 0.20;
+// Extra commission paid to a partner's master on that partner's referred users' deposits (on top of the 20%).
+export const MASTER_COMMISSION_RATE = 0.05;

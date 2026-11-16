@@ -33,6 +33,7 @@ export const usersTable = pgTable("users", {
   fullName: text("full_name"),
   referralCode: text("referral_code").unique(),
   referredByUserId: integer("referred_by_user_id"),
+  masterPartnerId: integer("master_partner_id"),
   phoneNumber: text("phone_number").unique(),
   country: text("country"),
   isSuspended: boolean("is_suspended").notNull().default(false),

@@ -120,7 +120,9 @@ router.get("/partners", adminAuth, async (_req: Request, res: Response) => {
           with: { accounts: true },
         });
 
-        if (referred.length === 0) return null;
+        const hasSubPartners =
+          (await db.query.usersTable.findFirst({ where: eq(usersTable.masterPartnerId, partner.id) })) !== undefined;
+        if (referred.length === 0 && !hasSubPartners) return null;
 
         const referredWithDeposits = await Promise.all(
           referred.map(async (u) => {
@@ -156,6 +158,7 @@ router.get("/partners", adminAuth, async (_req: Request, res: Response) => {
           email: partner.email,
           fullName: partner.fullName,
           referralCode: partner.referralCode,
+          masterPartnerId: partner.masterPartnerId,
           signupsCount: referred.length,
           totalCommission: totalCommission.toFixed(2),
           referredUsers: referredWithDeposits,
@@ -167,6 +170,49 @@ router.get("/partners", adminAuth, async (_req: Request, res: Response) => {
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : "Failed to load partners" });
   }
+});
+
+const masterPartnerSchema = z.object({
+  masterPartnerId: z.number().int().positive().nullable(),
+});
+
+// Tag a partner under a master partner (or pass null to untag). One level only.
+router.post("/users/:id/master-partner", adminAuth, async (req: Request, res: Response) => {
+  const userId = Number(req.params.id);
+  const parsed = masterPartnerSchema.safeParse(req.body);
+  if (!Number.isInteger(userId) || !parsed.success) {
+    return res.status(400).json({ error: "Invalid request" });
+  }
+  const { masterPartnerId } = parsed.data;
+
+  const user = await db.query.usersTable.findFirst({ where: eq(usersTable.id, userId) });
+  if (!user) return res.status(404).json({ error: "User not found" });
+
+  if (masterPartnerId !== null) {
+    const hasReferrals = async (id: number) =>
+      (await db.query.usersTable.findFirst({ where: eq(usersTable.referredByUserId, id) })) !== undefined;
+    if (!(await hasReferrals(userId))) {
+      return res.status(400).json({ error: "This user is not a partner yet (no referred users)" });
+    }
+    if (!(await hasReferrals(masterPartnerId))) {
+      return res.status(400).json({ error: "The master must be a partner too (at least one referred user)" });
+    }
+    if (masterPartnerId === userId) {
+      return res.status(400).json({ error: "A partner cannot be their own master" });
+    }
+    const master = await db.query.usersTable.findFirst({ where: eq(usersTable.id, masterPartnerId) });
+    if (!master) return res.status(404).json({ error: "Master partner not found" });
+    if (master.masterPartnerId) {
+      return res.status(400).json({ error: "That master is itself under another master (one level only)" });
+    }
+    const hasSubs = await db.query.usersTable.findFirst({ where: eq(usersTable.masterPartnerId, userId) });
+    if (hasSubs) {
+      return res.status(400).json({ error: "This user is already a master of other partners (one level only)" });
+    }
+  }
+
+  await db.update(usersTable).set({ masterPartnerId }).where(eq(usersTable.id, userId));
+  return res.json({ ok: true, userId, masterPartnerId });
 });
 
 const autoWithdrawSchema = z.object({
