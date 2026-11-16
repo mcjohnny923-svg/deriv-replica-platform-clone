@@ -15,6 +15,7 @@ export interface AdminUser {
   createdAt: string;
   isSuspended: boolean;
   autoWithdraw: boolean;
+  referredByUserId: number | null;
   accounts: AdminAccount[];
 }
 
@@ -128,6 +129,23 @@ export async function setMasterPartner(
   const data = await res.json();
   if (!res.ok) {
     throw new Error(data.error ?? "Failed to set master partner");
+  }
+  return data;
+}
+
+export async function setUserReferrer(
+  adminKey: string,
+  userId: number,
+  referrerUserId: number | null,
+): Promise<{ ok: boolean; referrerUserId: number | null }> {
+  const res = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/referrer`, {
+    method: "POST",
+    headers: authHeaders(adminKey),
+    body: JSON.stringify({ referrerUserId }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error ?? "Failed to update referrer");
   }
   return data;
 }

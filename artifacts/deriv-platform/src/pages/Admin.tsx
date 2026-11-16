@@ -10,6 +10,7 @@ import {
   setUserSuspended,
   setUserAutoWithdraw,
   setMasterPartner,
+  setUserReferrer,
   type AdminUser,
   type AdminPartner,
 } from '@/lib/admin-api';
@@ -126,6 +127,23 @@ const Admin = () => {
     }
   };
 
+  const handleSetReferrer = async (user: AdminUser, referrerId: number | null) => {
+    try {
+      await setUserReferrer(adminKey, user.id, referrerId);
+      setError('');
+      setUsers((prev) =>
+        prev ? prev.map((x) => (x.id === user.id ? { ...x, referredByUserId: referrerId } : x)) : prev,
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update referrer');
+    }
+  };
+
+  // Partners = users who already have at least one referred user.
+  const partnerIdSet = new Set(
+    (users ?? []).map((x) => x.referredByUserId).filter((id): id is number => id !== null),
+  );
+
   if (!users) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-[#0e0e0e] text-gray-900 dark:text-white flex items-center justify-center p-4">
@@ -207,6 +225,7 @@ const Admin = () => {
                   <th className="p-3 font-medium">Real balance</th>
                   <th className="p-3 font-medium">Status</th>
                   <th className="p-3 font-medium">Auto-Withdraw</th>
+                  <th className="p-3 font-medium">Referred by</th>
                   <th className="p-3 font-medium">Joined</th>
                   <th className="p-3 font-medium">Actions</th>
                 </tr>
@@ -239,6 +258,37 @@ const Admin = () => {
                         {u.autoWithdraw ? 'On' : 'Off'}
                       </button>
                     </td>
+                    <td className="p-3">
+                      {u.referredByUserId !== null ? (
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="text-gray-600 dark:text-gray-300">
+                            {users.find((x) => x.id === u.referredByUserId)?.email ?? `User ${u.referredByUserId}`}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleSetReferrer(u, null)}
+                            className="px-2 py-1 rounded-md bg-red-600/20 text-red-400 hover:bg-red-600/30 font-medium"
+                          >
+                            Untag
+                          </button>
+                        </div>
+                      ) : (
+                        <select
+                          value=""
+                          onChange={(e) => e.target.value && handleSetReferrer(u, Number(e.target.value))}
+                          className="bg-white dark:bg-[#323738] border border-gray-300 dark:border-[#414647] rounded px-2 py-1 text-xs text-gray-900 dark:text-white"
+                        >
+                          <option value="">Tag to partner…</option>
+                          {users
+                            .filter((m) => partnerIdSet.has(m.id) && m.id !== u.id && !m.isSuspended)
+                            .map((m) => (
+                              <option key={m.id} value={m.id}>
+                                {m.email}
+                              </option>
+                            ))}
+                        </select>
+                      )}
+                    </td>
                     <td className="p-3 text-gray-400 dark:text-gray-500">{new Date(u.createdAt).toLocaleDateString()}</td>
                     <td className="p-3">
                       <div className="flex items-center gap-2">
@@ -266,7 +316,7 @@ const Admin = () => {
                 ))}
                 {users.length === 0 && (
                   <tr>
-                    <td colSpan={9} className="p-6 text-center text-gray-400 dark:text-gray-500">
+                    <td colSpan={10} className="p-6 text-center text-gray-400 dark:text-gray-500">
                       No users yet.
                     </td>
                   </tr>

@@ -229,6 +229,18 @@ export const insertReferralEarningSchema = createInsertSchema(
 export type InsertReferralEarning = z.infer<typeof insertReferralEarningSchema>;
 export type ReferralEarning = typeof referralEarningsTable.$inferSelect;
 
+// ---------- Referral tag/untag audit log ----------
+export const referralAuditLogTable = pgTable("referral_audit_log", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .references(() => usersTable.id)
+    .notNull(),
+  oldReferrerId: integer("old_referrer_id"),
+  newReferrerId: integer("new_referrer_id"),
+  changedBy: text("changed_by").notNull().default("admin"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // ---------- Relations ----------
 export const usersRelations = relations(usersTable, ({ many }) => ({
   accounts: many(accountsTable),

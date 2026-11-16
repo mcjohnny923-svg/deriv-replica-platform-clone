@@ -7,6 +7,7 @@ import {
   accountsTable,
   transactionsTable,
   referralEarningsTable,
+  referralAuditLogTable,
 } from "@workspace/db";
 import { adminAuth } from "../middlewares/adminAuth";
 
@@ -26,6 +27,7 @@ router.get("/users", adminAuth, async (_req: Request, res: Response) => {
       createdAt: u.createdAt,
       isSuspended: u.isSuspended,
       autoWithdraw: u.autoWithdraw,
+      referredByUserId: u.referredByUserId,
       accounts: u.accounts.map((a) => ({
         id: a.id,
         type: a.type,
@@ -171,6 +173,63 @@ router.get("/partners", adminAuth, async (_req: Request, res: Response) => {
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : "Failed to load partners" });
   }
+});
+
+const referrerSchema = z.object({
+  referrerUserId: z.number().int().positive().nullable(),
+});
+
+// Tag a user under a partner (referrerUserId = partner id) or untag (null).
+// Forward only: nothing is recalculated. A user must be untagged before being tagged to another partner.
+router.post("/users/:id/referrer", adminAuth, async (req: Request, res: Response) => {
+  const userId = Number(req.params.id);
+  const parsed = referrerSchema.safeParse(req.body);
+  if (!Number.isInteger(userId) || !parsed.success) {
+    return res.status(400).json({ error: "Invalid request" });
+  }
+  const newId = parsed.data.referrerUserId;
+
+  const user = await db.query.usersTable.findFirst({ where: eq(usersTable.id, userId) });
+  if (!user) return res.status(404).json({ error: "User not found" });
+  const oldId = user.referredByUserId ?? null;
+
+  if (newId === null) {
+    if (oldId === null) {
+      return res.status(400).json({ error: "This user has no referrer to remove" });
+    }
+  } else {
+    if (oldId !== null) {
+      return res.status(400).json({ error: "This user is already tagged to a partner. Untag first, then tag to the new partner." });
+    }
+    if (newId === userId) {
+      return res.status(400).json({ error: "A user cannot be their own referrer" });
+    }
+    const referrer = await db.query.usersTable.findFirst({ where: eq(usersTable.id, newId) });
+    if (!referrer) return res.status(404).json({ error: "Partner not found" });
+    if (referrer.isSuspended) {
+      return res.status(400).json({ error: "That partner is suspended" });
+    }
+    // No loops: walk up the referrer chain and make sure we never meet this user.
+    let cursor: number | null = referrer.referredByUserId ?? null;
+    for (let i = 0; cursor !== null && i < 20; i++) {
+      if (cursor === userId) {
+        return res.status(400).json({ error: "That would create a referral loop" });
+      }
+      const next = await db.query.usersTable.findFirst({ where: eq(usersTable.id, cursor) });
+      cursor = next?.referredByUserId ?? null;
+    }
+  }
+
+  await db.transaction(async (tx) => {
+    await tx.update(usersTable).set({ referredByUserId: newId }).where(eq(usersTable.id, userId));
+    await tx.insert(referralAuditLogTable).values({
+      userId,
+      oldReferrerId: oldId,
+      newReferrerId: newId,
+      changedBy: "admin",
+    });
+  });
+  return res.json({ ok: true, userId, referrerUserId: newId });
 });
 
 const masterPartnerSchema = z.object({
